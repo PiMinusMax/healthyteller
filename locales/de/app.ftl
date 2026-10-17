@@ -73,7 +73,7 @@ barcode-label = Barcode-Nummer
 barcode-check = Barcode prüfen
 barcode-loading = Wird geladen …
 barcode-privacy = Nur die Nummer verlässt das Gerät. Sie geht an Open Food Facts.
-barcode-camera-later = Das Scannen mit der Kamera folgt in einer späteren Version.
+barcode-camera-later = Das Scannen mit der Kamera gibt es in der Web-App. Hier geben Sie die Nummer ein.
 fetch-invalid-code = Diese Nummer ist kein gültiger Barcode. Ein Barcode hat 8, 12, 13 oder 14 Ziffern.
 fetch-not-found = Open Food Facts kennt dieses Produkt nicht.
 fetch-network = Open Food Facts ist gerade nicht erreichbar. Bitte prüfen Sie die Internetverbindung.
@@ -499,3 +499,45 @@ my-foods-search = Suchen
 my-foods-added = { $name } steht jetzt in Meine Lebensmittel, mit 100 g als Portion. Die Portion können Sie unten ändern.
 my-foods-already = schon in der Liste
 my-foods-add-named = { $name } hinzufügen
+
+## Kamera-Scan
+
+scan-start = Mit der Kamera scannen
+scan-starting = Kamera wird gestartet …
+scan-hint = Halten Sie den Barcode ruhig in das Bild. Er wird automatisch erkannt.
+scan-no-camera = Die Kamera ließ sich nicht öffnen. Bitte erlauben Sie den Zugriff oder geben Sie die Nummer ein.
+scan-video-label = Kamerabild zum Scannen des Barcodes
+
+settings-language = Sprache
+
+## 23 Vergleich, 24 Fragen an den Arzt
+
+card-compare = Mit anderem Lebensmittel vergleichen
+compare-topbar = Vergleich
+compare-instead-of = Statt { $name }
+compare-pick = Womit vergleichen?
+compare-pick-lead = Wählen Sie ein Lebensmittel aus Meine Lebensmittel oder aus dem Speicher dieses Geräts.
+compare-none = Auf diesem Gerät ist noch kein zweites Lebensmittel gespeichert. Suchen Sie zuerst ein weiteres.
+compare-per-portion = Je { $grams } g.
+compare-note = Die Werte stammen unverändert aus der Quelle. Unbekannt heißt nicht null. Die App wählt nicht für Sie aus.
+compare-add = { $name } auf den Teller legen
+compare-open = Karte von { $name } öffnen
+questions-link = Fragen an den Arzt
+questions-topbar = Arzttermin
+questions-title = Fragen für den nächsten Termin
+questions-lead = Die App sammelt offene Fragen aus dem Profil von { $name }. Sie entscheidet sie nicht.
+questions-none = Zurzeit gibt es keine offenen Fragen aus dem Profil. Eigene Fragen können Sie unten notieren.
+questions-kind-conflict = Widerspruch
+questions-kind-missing = Vorgabe fehlt
+questions-kind-traces = Spurenhinweis
+questions-question = Frage
+questions-conflict-context = Für { $upper } und für { $lower } gelten hier gegensätzliche Regeln.
+questions-conflict = Wie viel { $nutrient } pro Tag ist für mich richtig?
+questions-missing-context = Wegen { $condition } ist das eine wichtige Kennzahl. Im Profil ist noch keine Vorgabe eingetragen.
+questions-missing = Gibt es für mich eine Grenze für { $nutrient } pro Tag?
+questions-traces-context = Die Daten nennen einen Spurenhinweis: { $allergens }.
+questions-traces = Sind Lebensmittel mit Spurenhinweis auf { $allergens } für mich in Ordnung?
+questions-include = In den Bericht aufnehmen
+questions-own = Eigene Frage
+questions-print = Bericht drucken oder als PDF speichern
+questions-count = { $chosen } von { $total } Fragen ausgewählt

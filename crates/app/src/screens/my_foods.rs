@@ -188,6 +188,25 @@ fn AddMyFood() -> Element {
         last.set(Some(name));
     };
 
+    // Search hits may carry only name and brand; foods already on the device are complete.
+    let mut add_complete = move |food: Food| {
+        if !food.nutrients.is_empty() || state.read().food(&food.id.0).is_some() {
+            add(food);
+            return;
+        }
+        let code = food.id.0.trim_start_matches("off:").to_owned();
+        lookup.set(Lookup::Loading);
+        spawn(async move {
+            match fetch::product_by_barcode(&code).await {
+                Ok(full) => {
+                    add(full);
+                    lookup.set(Lookup::Idle);
+                }
+                Err(e) => lookup.set(Lookup::Failed(tr(e.message_key()))),
+            }
+        });
+    };
+
     let search = move |_| {
         let terms = query();
         lookup.set(Lookup::Loading);
@@ -306,7 +325,7 @@ fn AddMyFood() -> Element {
                                     "aria-label": tr_args("my-foods-add-named", &[("name", food.name.clone())]),
                                     onclick: {
                                         let food = food.clone();
-                                        move |_| add(food.clone())
+                                        move |_| add_complete(food.clone())
                                     },
                                     Icon { name: IconName::Plus, size: 20 }
                                     {tr("action-add")}
