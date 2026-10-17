@@ -56,6 +56,12 @@ Die CI führt dieselben Prüfungen aus, dazu den Start der Desktop-App und bei P
 - Fehlende Werte sind keine Null. Unbekannt bleibt unbekannt.
 - Testprofile sind erfunden. Echte Personen- oder Gesundheitsdaten erscheinen nie in Code, Tests, Issues oder Logs.
 
+**Quellen**
+
+- Die App spricht nur mit den Diensten der Originalquelle, nie mit einem eigenen Server.
+- Ist bei einer Quelle etwas kaputt, wird es dort behoben: als Issue oder Pull Request beim Original. Braucht das einen Fork, ist er ein eigenes Repo außerhalb dieses Projekts, enthält nur diese Korrekturen und betreibt keinen eigenen Dienst.
+- Ein vorübergehender Ausweichweg, etwa ein Testsystem der Quelle, steht mit Grund und Endbedingung im Steckbrief unter `sources/` und in einer ADR.
+
 **Aussagen der App**
 
 - Kein Urteil ohne Begründung: Wert pro Portion, ein Satz Grund, Quelle.

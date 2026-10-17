@@ -91,12 +91,30 @@ pub fn Search() -> Element {
         .collect();
     drop(s);
 
-    let search_online = move |_| {
+    let mut search_online = move || {
         let terms = query();
+        if terms.trim().chars().count() < 2 || online() == Online::Loading {
+            return;
+        }
         online.set(Online::Loading);
         spawn(async move {
             match fetch::search_products(&terms).await {
                 Ok(foods) => online.set(Online::Results(foods)),
+                Err(e) => online.set(Online::Failed(tr(e.message_key()))),
+            }
+        });
+    };
+
+    // Search hits carry only name and brand; the full product is loaded by barcode.
+    let pick_result = move |id: String| {
+        let code = id.trim_start_matches("off:").to_owned();
+        spawn(async move {
+            match fetch::product_by_barcode(&code).await {
+                Ok(food) => {
+                    let id = food.id.0.clone();
+                    update(state, |s| s.cache_food(food));
+                    navigator().push(Route::PortionScreen { id });
+                }
                 Err(e) => online.set(Online::Failed(tr(e.message_key()))),
             }
         });
@@ -151,6 +169,11 @@ pub fn Search() -> Element {
                         placeholder: tr("search-placeholder"),
                         value: "{query}",
                         oninput: move |e| query.set(e.value()),
+                        onkeydown: move |e| {
+                            if e.key() == Key::Enter {
+                                search_online();
+                            }
+                        },
                     }
                 }
             }
@@ -177,7 +200,7 @@ pub fn Search() -> Element {
                         button {
                             class: "btn btn-secondary",
                             disabled: q.chars().count() < 2 || online() == Online::Loading,
-                            onclick: search_online,
+                            onclick: move |_| search_online(),
                             Icon { name: IconName::Search }
                             if online() == Online::Loading { {tr("barcode-loading")} } else { {tr("search-online-action")} }
                         }
@@ -196,13 +219,8 @@ pub fn Search() -> Element {
                                     button {
                                         class: "row-btn food-row",
                                         onclick: {
-                                            let food = food.clone();
-                                            move |_| {
-                                                let id = food.id.0.clone();
-                                                let food = food.clone();
-                                                update(state, |s| s.cache_food(food));
-                                                navigator().push(Route::PortionScreen { id });
-                                            }
+                                            let id = food.id.0.clone();
+                                            move |_| pick_result(id.clone())
                                         },
                                         span { class: "grow food-name", {labels::food_title(&food)} }
                                         Icon { name: IconName::ChevronRight }

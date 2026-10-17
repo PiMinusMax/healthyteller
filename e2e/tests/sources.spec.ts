@@ -12,7 +12,9 @@ test.beforeEach(async ({ page }) => {
 test("search by name at Open Food Facts", async ({ page }) => {
   let searched = "";
   page.on("request", (r) => {
-    if (r.url().includes("/cgi/search.pl")) searched = new URL(r.url()).searchParams.get("search_terms") ?? "";
+    if (/^https:\/\/search\.openfoodfacts\.(net|org)\//.test(r.url())) {
+      searched ||= new URL(r.url()).searchParams.get("q") ?? "";
+    }
   });
   await page.getByLabel("Lebensmittel suchen").fill("Quark");
   await page.getByRole("button", { name: "Online nach Name oder Marke suchen" }).click();
@@ -26,6 +28,32 @@ test("search by name at Open Food Facts", async ({ page }) => {
   const more = page.locator("#card-more").locator("..");
   await expect(more).toContainText("Gruppe 4 von 4");
   await expect(more).toContainText("E1442, E330");
+});
+
+test("Enter starts the online search", async ({ page }) => {
+  await page.getByLabel("Lebensmittel suchen").fill("Quark");
+  await page.getByLabel("Lebensmittel suchen").press("Enter");
+  await expect(page.getByRole("button", { name: /Testquark mager/ })).toBeVisible();
+});
+
+test("falls back to the older search when Search-a-licious is down", async ({ page }) => {
+  await page.unrouteAll();
+  await mockOpenFoodFacts(page, "product-found.json", { searchDown: true });
+  await page.getByLabel("Lebensmittel suchen").fill("Quark");
+  await page.getByRole("button", { name: "Online nach Name oder Marke suchen" }).click();
+  await expect(page.getByRole("button", { name: /Testquark Vanille/ })).toBeVisible();
+});
+
+test("an overloaded source shows a clear message", async ({ page }) => {
+  await page.unrouteAll();
+  await page.route(/openfoodfacts\.(org|net)/, (route) =>
+    route.fulfill({ status: 503, headers: { "access-control-allow-origin": "*" }, body: "<html></html>" }),
+  );
+  await page.getByLabel("Lebensmittel suchen").fill("Quark");
+  await page.getByRole("button", { name: "Online nach Name oder Marke suchen" }).click();
+  await expect(page.getByRole("alert")).toHaveText(
+    "Open Food Facts antwortet gerade nicht. Bitte versuchen Sie es später noch einmal.",
+  );
 });
 
 test("import a product file as fallback", async ({ page }) => {
