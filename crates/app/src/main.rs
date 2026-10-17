@@ -47,6 +47,12 @@ pub enum Route {
         ProfileEdit { id: String, step: u8 },
         #[route("/einstellungen")]
         Settings {},
+        #[route("/einstellungen/quellen")]
+        DataSources {},
+        #[route("/einstellungen/geraetewechsel")]
+        DeviceTransfer {},
+        #[route("/einstellungen/erweitert")]
+        SettingsAdvanced {},
         #[route("/ueber")]
         About {},
         #[route("/begriff/:term")]

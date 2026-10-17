@@ -11,7 +11,7 @@ test("compare two foods side by side", async ({ page }) => {
   // A second food on the device: the search fixture.
   await page.getByRole("link", { name: /Lebensmittel prüfen/ }).click();
   await page.getByLabel("Lebensmittel suchen").fill("Quark");
-  await page.getByRole("button", { name: "Online nach Name oder Marke suchen" }).click();
+  await page.getByRole("button", { name: "Suchen", exact: true }).click();
   await page.getByRole("button", { name: /Testquark mager/ }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Testquark mager" })).toBeVisible();
   await page.goto("/");

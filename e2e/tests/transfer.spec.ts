@@ -7,7 +7,7 @@ test("encrypted export can be imported after deleting all data", async ({ page }
   test.setTimeout(90_000);
   await acceptNotice(page);
   await createProfile(page, { conditions: ["Bluthochdruck"], allergies: ["Milch"] });
-  await page.goto("/einstellungen");
+  await page.goto("/einstellungen/geraetewechsel");
 
   await page.getByLabel("Passwort", { exact: true }).first().fill(PASSWORD);
   await page.getByLabel("Passwort wiederholen").fill(PASSWORD);
@@ -17,12 +17,13 @@ test("encrypted export can be imported after deleting all data", async ({ page }
   const file = testInfo.outputPath("export.htx");
   await (await downloadPromise).saveAs(file);
 
+  await page.goto("/einstellungen/erweitert");
   await page.getByRole("button", { name: "Alle Daten löschen" }).click();
   await page.getByRole("button", { name: "Endgültig löschen" }).click();
   await acceptNotice(page);
   await expect(page.getByText("Noch kein Profil.")).toBeVisible();
 
-  await page.goto("/einstellungen");
+  await page.goto("/einstellungen/geraetewechsel");
   await page.getByLabel("Exportdatei (.htx)").setInputFiles(file);
   await page.locator("#import-pass").fill("wrong password!");
   await page.getByRole("button", { name: "Importieren", exact: true }).click();
@@ -38,7 +39,7 @@ test("encrypted export can be imported after deleting all data", async ({ page }
 
 test("export needs matching passwords of sufficient length", async ({ page }) => {
   await acceptNotice(page);
-  await page.goto("/einstellungen");
+  await page.goto("/einstellungen/geraetewechsel");
   await page.getByLabel("Passwort", { exact: true }).first().fill("short");
   await page.getByLabel("Passwort wiederholen").fill("short");
   await page.getByRole("button", { name: "Verschlüsselte Datei erstellen" }).click();

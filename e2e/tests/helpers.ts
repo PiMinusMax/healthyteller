@@ -75,11 +75,18 @@ export async function createProfile(
   await expect(page.getByText("Test Person")).toBeVisible();
 }
 
+/** Types a barcode on the search screen; on the web the number entry sits behind the scan button. */
+export async function typeBarcode(page: Page, code: string) {
+  const entry = page.getByText("Nummer eintippen");
+  if (await entry.isVisible()) await entry.click();
+  await page.getByLabel("Barcode-Nummer").fill(code);
+  await page.getByRole("button", { name: "Prüfen", exact: true }).click();
+}
+
 /** Loads the fixture product by barcode and opens the food card. */
 export async function checkFixtureFood(page: Page, grams = "150 g") {
   await page.getByRole("link", { name: /Lebensmittel prüfen/ }).click();
-  await page.getByLabel("Barcode-Nummer").fill(FIXTURE_BARCODE);
-  await page.getByRole("button", { name: "Barcode prüfen" }).click();
+  await typeBarcode(page, FIXTURE_BARCODE);
   await expect(page.getByRole("heading", { level: 1, name: FIXTURE_NAME })).toBeVisible();
   await page.getByRole("button", { name: grams }).click();
   await page.getByRole("link", { name: "Bewerten" }).click();

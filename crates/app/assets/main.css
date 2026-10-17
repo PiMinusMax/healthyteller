@@ -243,6 +243,9 @@ dl.facts dd { margin: 0; }
 .input:focus { border-color: var(--kt-primary); outline: none; box-shadow: 0 0 0 3px var(--kt-primary-soft); }
 .input-unit { display: flex; align-items: center; gap: 8px; }
 .input-unit .input { flex: 1; }
+.input-row { display: flex; gap: 10px; align-items: stretch; }
+.input-row .grow, .input-row .input { flex: 1; min-width: 0; }
+.input-row .btn { flex: none; }
 .search { position: relative; }
 .search .input { padding-left: 52px; border-color: var(--kt-ink); }
 .search svg { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); }
@@ -304,6 +307,11 @@ table.nutrients { width: 100%; border-collapse: collapse; font-size: 16px; }
 table.nutrients th { text-align: left; font-size: 14px; color: var(--kt-ink-2); font-weight: 400; padding: 6px 16px; }
 table.nutrients td { padding: 10px 16px; border-top: 1px solid var(--kt-line-soft); }
 table.nutrients td.r, table.nutrients th.r { text-align: right; }
+.origin-legend { list-style: none; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px 16px; }
+.origin-legend li { display: flex; align-items: center; gap: 10px; border: none; padding: 0; }
+.origin-legend .mark { flex: none; }
+.origin-legend.compact { padding: 0; display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 15px; color: var(--kt-ink-2); }
+.origin-legend.compact .mark { width: 24px; height: 24px; font-size: 13px; }
 .mark { display: inline-flex; width: 28px; height: 28px; border-radius: 14px; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; }
 .mark-measured { background: var(--kt-ink); color: var(--kt-ground); }
 .mark-calculated { border: 2px solid var(--kt-ink); }
@@ -332,3 +340,8 @@ table.compare thead th { border-bottom: 2px solid var(--kt-ink); }
 
 .print-only { display: none; }
 @media print { .print-only { display: block; } }
+
+/* Collapsible card: one summary line, content on demand */
+details.card > summary span:first-child { font-weight: 800; font-size: 19px; }
+details.card[open] > summary svg { transform: rotate(180deg); }
+table.nutrients tbody th { padding-top: 16px; font-weight: 800; color: var(--kt-ink); }
