@@ -78,14 +78,41 @@ fn font_faces() -> String {
     .concat()
 }
 
+/// Path the web app is served under, e.g. `/healthyteller` on GitHub Pages, or empty.
+fn web_base() -> String {
+    dioxus::cli_config::base_path()
+        .map(|b| b.trim_matches('/').to_owned())
+        .filter(|b| !b.is_empty())
+        .map(|b| format!("/{b}"))
+        .unwrap_or_default()
+}
+
 #[component]
 fn App() -> Element {
     use_context_provider(|| Signal::new(AppState::load()));
     use_context_provider(|| screens::ProfileDraft(Signal::new(None)));
+    let base = web_base();
+    // Installable web app that also works offline (files in public/).
+    if cfg!(target_arch = "wasm32") {
+        let sw = format!("{base}/sw.js");
+        use_hook(move || {
+            document::eval(&format!(
+                "if ('serviceWorker' in navigator) {{ navigator.serviceWorker.register('{sw}').catch(() => {{}}); }}"
+            ));
+        });
+    }
     rsx! {
         document::Title { {tr("app-title")} }
         document::Stylesheet { href: MAIN_CSS }
         document::Style { {font_faces()} }
+        if cfg!(target_arch = "wasm32") {
+            document::Link { rel: "manifest", href: "{base}/manifest.webmanifest" }
+            document::Link { rel: "apple-touch-icon", href: "{base}/icons/apple-touch-icon.png" }
+            document::Link { rel: "icon", r#type: "image/png", href: "{base}/icons/icon-192.png" }
+            document::Meta { name: "theme-color", content: "#1D3B8F" }
+            document::Meta { name: "apple-mobile-web-app-capable", content: "yes" }
+            document::Meta { name: "apple-mobile-web-app-title", content: "Healthy Teller" }
+        }
         Router::<Route> {}
     }
 }

@@ -28,7 +28,7 @@ Zahlen ohne Quelle nehmen wir nicht an, auch keine „allgemein bekannten“.
 
 ## Entwicklungsumgebung
 
-Am einfachsten ist der Dev Container in `.devcontainer/`. Er bringt Rust, dx, cargo-deny, Node, Playwright und das Android SDK mit. Ohne Container siehe [README](README.md#ausprobieren).
+Am einfachsten ist der Dev Container in `.devcontainer/`. Er bringt Rust, dx, cargo-deny, Node, Playwright und das Android SDK mit. Ohne Container siehe [README](README.md#selbst-bauen).
 
 ## Vor jedem Commit
 
@@ -82,6 +82,14 @@ Die CI führt dieselben Prüfungen aus, dazu den Start der Desktop-App und bei P
 - Commit-Nachrichten nach [Conventional Commits](https://www.conventionalcommits.org/de/), zum Beispiel `feat(app): add file import`.
 - Architekturentscheidungen als kurze ADR in `docs/adr/`.
 - README und `docs/` aktuell halten.
+
+## Neue Version veröffentlichen
+
+1. Versionsnummer in `Cargo.toml` (`[workspace.package] version`) erhöhen und per Pull Request mergen.
+2. Auf `main` einen Tag setzen, zum Beispiel `git tag v0.2.0 && git push origin v0.2.0`.
+3. Der Workflow `Release` baut APK, AppImage, deb, Windows-Installer und DMG und hängt sie an ein neues Release.
+
+Damit Android-Updates sich über ältere Versionen installieren lassen, braucht das Repository einen festen Schlüssel als Secrets `ANDROID_KEYSTORE_BASE64` und `ANDROID_KEYSTORE_PASSWORD` (Keystore mit Alias `healthyteller`). Ohne sie wird jede Version mit einem Wegwerf-Schlüssel signiert und muss vor einem Update deinstalliert werden.
 
 ## Lizenz Ihrer Beiträge
 

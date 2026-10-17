@@ -1,0 +1,16 @@
+{
+  "name": "Healthy Teller",
+  "short_name": "Healthy Teller",
+  "description": "Prüft Lebensmittel gleichzeitig gegen mehrere Erkrankungen, Allergien und Ziele.",
+  "lang": "de",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F5F3ED",
+  "theme_color": "#1D3B8F",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

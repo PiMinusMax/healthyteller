@@ -7,3 +7,6 @@ title = "Healthy Teller"
 [bundle]
 identifier = "io.github.piminusmax.healthyteller"
 publisher = "Healthy Teller"
+icon = ["icons/icon-32.png", "icons/icon-128.png", "icons/icon-256.png", "icons/icon-512.png", "icons/icon.ico"]
+short_description = "Prüft Lebensmittel gegen mehrere Erkrankungen und Allergien zugleich."
+copyright = "GPL-3.0-or-later"

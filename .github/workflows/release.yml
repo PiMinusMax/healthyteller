@@ -1,0 +1,139 @@
+# Builds installable packages. On a version tag (v1.2.3) they are published as a
+# GitHub release; for pull requests that change this workflow they are only built.
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  pull_request:
+    paths: [".github/workflows/release.yml", "crates/app/Dioxus.toml", "crates/app/icons/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  DX_VERSION: 0.7.10
+
+jobs:
+  android:
+    name: Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+      - run: rustup toolchain install && rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
+      - uses: Swatinem/rust-cache@v2
+      - name: Install dx
+        run: curl -sSfL "https://github.com/DioxusLabs/dioxus/releases/download/v${DX_VERSION}/dx-x86_64-unknown-linux-gnu.tar.gz" | tar xz -C ~/.cargo/bin dx
+      - name: Build APK for phones (arm64)
+        working-directory: crates/app
+        run: |
+          export ANDROID_NDK_HOME="$ANDROID_NDK_LATEST_HOME" NDK_HOME="$ANDROID_NDK_LATEST_HOME"
+          dx build --platform android --target aarch64-linux-android --release
+      - name: Sign
+        # With the repository secrets ANDROID_KEYSTORE_BASE64 and ANDROID_KEYSTORE_PASSWORD the
+        # APK is signed with the project key, so updates install over older versions. Without
+        # them a throwaway key is used: fine for testing, but each update needs a reinstall.
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          mkdir -p dist
+          apk=$(find target/dx -path '*android*' -name '*.apk' | head -n 1)
+          test -n "$apk"
+          echo "Built $apk"
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > release.jks
+            pass="$KEYSTORE_PASSWORD"
+          else
+            pass=throwaway-key
+            keytool -genkeypair -keystore release.jks -storepass "$pass" -keypass "$pass" -alias healthyteller \
+              -keyalg RSA -keysize 4096 -validity 3650 -dname "CN=Healthy Teller test build"
+          fi
+          apksigner=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -n 1)
+          "$apksigner" sign --ks release.jks --ks-pass "pass:$pass" --out dist/healthyteller-android-arm64.apk "$apk"
+          "$apksigner" verify dist/healthyteller-android-arm64.apk
+          rm release.jks
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: dist/
+
+  linux:
+    name: Linux
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev libxdo-dev libfuse2
+      - run: rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+      - name: Install dx
+        run: curl -sSfL "https://github.com/DioxusLabs/dioxus/releases/download/v${DX_VERSION}/dx-x86_64-unknown-linux-gnu.tar.gz" | tar xz -C ~/.cargo/bin dx
+      - name: Bundle
+        working-directory: crates/app
+        run: dx bundle --platform linux --release --package-types appimage --package-types deb --out-dir ../../dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: dist/
+
+  windows:
+    name: Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+      - name: Install dx
+        shell: pwsh
+        run: |
+          Invoke-WebRequest "https://github.com/DioxusLabs/dioxus/releases/download/v$env:DX_VERSION/dx-x86_64-pc-windows-msvc.zip" -OutFile dx.zip
+          Expand-Archive dx.zip -DestinationPath "$env:USERPROFILE\.cargo\bin" -Force
+      - name: Bundle
+        working-directory: crates/app
+        run: dx bundle --platform windows --release --package-types nsis --out-dir ../../dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: dist/
+
+  macos:
+    name: macOS
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+      - name: Install dx
+        run: curl -sSfL "https://github.com/DioxusLabs/dioxus/releases/download/v${DX_VERSION}/dx-aarch64-apple-darwin.tar.gz" | tar xz -C ~/.cargo/bin dx
+      - name: Bundle
+        working-directory: crates/app
+        run: dx bundle --platform macos --release --package-types dmg --out-dir ../../dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: dist/
+
+  publish:
+    name: Publish release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [android, linux, windows, macos]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: List files
+        run: ls -la dist
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true
