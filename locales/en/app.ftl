@@ -447,3 +447,18 @@ print-group-avoid = Avoid
 print-group-unknown = Cannot be evaluated yet
 print-empty = The list is made from my foods. Add foods there first.
 print-action = Print
+
+## Open Food Facts search, file import, more information
+
+search-online-title = Search Open Food Facts
+search-online-action = Search online by name or brand
+search-online-privacy = Only the search term leaves the device. It goes to Open Food Facts.
+search-online-none = Open Food Facts found nothing for this.
+import-label = Or import a product file
+import-hint = A JSON file you downloaded from Open Food Facts yourself. It stays on this device.
+import-read-error = The file could not be read.
+card-more = More information from the source
+card-nova = Group { $group } of 4
+card-additives = Additives
+card-ingredients = Ingredients
+card-more-note = This information comes unchanged from the source. The app does not evaluate it yet.

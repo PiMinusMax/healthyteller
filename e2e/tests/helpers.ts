@@ -6,15 +6,18 @@ import * as path from "path";
 export const FIXTURE_BARCODE = "4000000000017";
 export const FIXTURE_NAME = "Testjoghurt natur";
 
+export const FIXTURES = path.join(__dirname, "../../fixtures/open-food-facts");
+
 /** Answers every Open Food Facts request with a fixture, so tests never hit the network. */
 export async function mockOpenFoodFacts(page: Page, file = "product-found.json") {
-  const body = fs.readFileSync(path.join(__dirname, "../../fixtures/open-food-facts", file), "utf8");
+  const product = fs.readFileSync(path.join(FIXTURES, file), "utf8");
+  const search = fs.readFileSync(path.join(FIXTURES, "search-results.json"), "utf8");
   await page.route("https://world.openfoodfacts.org/**", (route) =>
     route.fulfill({
       status: 200,
       contentType: "application/json",
       headers: { "access-control-allow-origin": "*" },
-      body,
+      body: route.request().url().includes("/cgi/search.pl") ? search : product,
     }),
   );
 }

@@ -447,3 +447,18 @@ print-group-avoid = Meiden
 print-group-unknown = Noch nicht bewertbar
 print-empty = Die Liste entsteht aus Meine Lebensmittel. Fügen Sie dort zuerst Lebensmittel hinzu.
 print-action = Drucken
+
+## Suche bei Open Food Facts, Datei-Import, weitere Angaben
+
+search-online-title = Bei Open Food Facts suchen
+search-online-action = Online nach Name oder Marke suchen
+search-online-privacy = Nur der Suchbegriff verlässt das Gerät. Er geht an Open Food Facts.
+search-online-none = Open Food Facts hat dazu nichts gefunden.
+import-label = Oder Produktdatei importieren
+import-hint = Eine JSON-Datei, die Sie selbst bei Open Food Facts heruntergeladen haben. Sie bleibt auf diesem Gerät.
+import-read-error = Die Datei ließ sich nicht lesen.
+card-more = Weitere Angaben der Quelle
+card-nova = Gruppe { $group } von 4
+card-additives = Zusatzstoffe
+card-ingredients = Zutaten
+card-more-note = Diese Angaben stammen unverändert aus der Quelle. Die App bewertet sie noch nicht.
