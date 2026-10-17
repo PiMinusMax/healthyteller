@@ -6,7 +6,7 @@ use healthyteller_core::{
 };
 
 use crate::Route;
-use crate::components::{Badge, Card, Icon, IconName, TopBar};
+use crate::components::{Badge, Card, Icon, IconName, QualityMark, TopBar};
 use crate::date;
 use crate::format;
 use crate::i18n::{tr, tr_args};
@@ -33,6 +33,7 @@ struct Metric {
 #[derive(Clone, PartialEq)]
 struct Entry {
     index: usize,
+    id: String,
     name: String,
     portion: String,
     allergens: Vec<Allergen>,
@@ -81,6 +82,7 @@ pub fn Plate() -> Element {
             };
             Entry {
                 index,
+                id: e.item.food_id.0.clone(),
                 name: food.map_or_else(|| e.item.food_id.0.clone(), |f| f.name.clone()),
                 portion: labels::portion(&e.item.portion),
                 allergens,
@@ -250,6 +252,7 @@ pub fn Plate() -> Element {
                                     p { class: "food-name", "{e.name}" }
                                     p { class: "small muted", "{e.portion}" }
                                 }
+                                QualityMark { id: e.id.clone(), compact: true }
                                 if !e.allergens.is_empty() { Badge { level: healthyteller_core::Level::Avoid, small: true } }
                                 button {
                                     class: "icon-btn",

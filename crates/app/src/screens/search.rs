@@ -1,12 +1,12 @@
 //! 03/04 Suche: one search field, the camera scan and the number as fallback.
 
 use dioxus::prelude::*;
-use healthyteller_core::Food;
+use healthyteller_ingest::search::SearchHit;
 
 use crate::Route;
-use crate::components::{Icon, IconName, TopBar};
+use crate::components::{Icon, IconName, QualityMark, TopBar};
 use crate::fetch;
-use crate::i18n::tr;
+use crate::i18n::{tr, tr_args};
 use crate::labels;
 use crate::state::{update, use_app_state};
 
@@ -14,7 +14,7 @@ use crate::state::{update, use_app_state};
 enum Online {
     Idle,
     Loading,
-    Results(Vec<Food>),
+    Results(Vec<SearchHit>),
     Failed(String),
 }
 
@@ -109,10 +109,10 @@ pub fn Search() -> Element {
     };
 
     let local_ids: Vec<String> = hits.iter().map(|(id, _, _)| id.clone()).collect();
-    let online_hits: Vec<Food> = match online() {
-        Online::Results(foods) => foods
+    let online_hits: Vec<SearchHit> = match online() {
+        Online::Results(hits) => hits
             .into_iter()
-            .filter(|f| !local_ids.contains(&f.id.0))
+            .filter(|h| !local_ids.contains(&h.food.id.0))
             .collect(),
         _ => Vec::new(),
     };
@@ -192,19 +192,23 @@ pub fn Search() -> Element {
                                 Link { class: "food-row", to: Route::PortionScreen { id: id.clone() },
                                     span { class: "grow food-name", "{name}" }
                                     if mine { span { class: "small muted", {tr("search-mine")} } }
+                                    QualityMark { id: id.clone(), compact: true }
                                     Icon { name: IconName::ChevronRight }
                                 }
                             }
                         }
-                        for food in online_hits {
-                            li { key: "{food.id.0}",
+                        for hit in online_hits {
+                            li { key: "{hit.food.id.0}",
                                 button {
                                     class: "row-btn food-row",
                                     onclick: {
-                                        let id = food.id.0.clone();
+                                        let id = hit.food.id.0.clone();
                                         move |_| pick_result(id.clone())
                                     },
-                                    span { class: "grow food-name", {labels::food_title(&food)} }
+                                    span { class: "grow food-name", {labels::food_title(&hit.food)} }
+                                    if hit.merged > 1 {
+                                        span { class: "small muted", {tr_args("search-merged", &[("count", hit.merged.to_string())])} }
+                                    }
                                     Icon { name: IconName::ChevronRight }
                                 }
                             }

@@ -10,12 +10,13 @@ use healthyteller_core::{
 use serde_json::Value;
 
 use crate::adapter::{FetchRequest, IngestError, RawArtifact, SourceAdapter, SourceMeta};
+use crate::search::SearchHit;
 
 pub const SOURCE_ID: &str = "off";
 
 const FIELDS: &str = "code,product_name,product_name_de,generic_name_de,brands,nutriments,\
 allergens_tags,traces_tags,ingredients_text,ingredients_text_de,nova_group,additives_tags,\
-completeness,rev";
+completeness,rev,nutriments_estimated";
 
 /// Open Food Facts asks every app to identify itself.
 pub const USER_AGENT: &str = "HealthyTeller/0.1 (https://github.com/PiMinusMax/healthyteller)";
@@ -104,7 +105,8 @@ fn encode_query(text: &str) -> String {
 }
 
 /// Fields the name search needs. The full product is loaded by barcode once picked.
-const SEARCH_FIELDS: &str = "code,product_name,product_name_de,generic_name_de,brands";
+const SEARCH_FIELDS: &str =
+    "code,product_name,product_name_de,generic_name_de,brands,completeness,last_modified_t";
 
 /// Search services of Open Food Facts, in the order the app tries them.
 /// See sources/open-food-facts.md and docs/adr/0003-namenssuche.md.
@@ -138,10 +140,10 @@ impl OpenFoodFacts {
             .map(|service| FetchRequest {
                 url: match service {
                     SearchService::SearchALicious(base) => format!(
-                        "{base}?q={q}&langs=de&page_size=20&fields={SEARCH_FIELDS}"
+                        "{base}?q={q}&langs=de&page_size=50&fields={SEARCH_FIELDS}"
                     ),
                     SearchService::Legacy(base) => format!(
-                        "{base}?search_terms={q}&search_simple=1&action=process&json=1&page_size=20&fields={SEARCH_FIELDS}"
+                        "{base}?search_terms={q}&search_simple=1&action=process&json=1&page_size=50&fields={SEARCH_FIELDS}"
                     ),
                 },
                 headers: vec![("User-Agent", USER_AGENT.to_owned())],
@@ -149,8 +151,10 @@ impl OpenFoodFacts {
             .collect())
     }
 
-    /// Products of a search answer, from either search. Entries without a barcode are skipped.
-    pub fn parse_search(&self, raw: &RawArtifact) -> Result<Vec<Food>, IngestError> {
+    /// Hits of a search answer, from either search, in the order of the service.
+    /// Entries without a barcode are skipped. Rank them with
+    /// [`crate::search::rank_and_merge`].
+    pub fn parse_search(&self, raw: &RawArtifact) -> Result<Vec<SearchHit>, IngestError> {
         let json: Value =
             serde_json::from_slice(&raw.bytes).map_err(|e| IngestError::Format(e.to_string()))?;
         let products = json
@@ -160,7 +164,14 @@ impl OpenFoodFacts {
             .ok_or_else(|| IngestError::Format("missing products".into()))?;
         Ok(products
             .iter()
-            .filter_map(|p| parse_product(p, &raw.retrieved_at).ok())
+            .filter_map(|p| {
+                Some(SearchHit {
+                    food: parse_product(p, &raw.retrieved_at).ok()?,
+                    completeness: p.get("completeness").and_then(number),
+                    last_modified: p.get("last_modified_t").and_then(Value::as_i64),
+                    merged: 1,
+                })
+            })
             .collect())
     }
 }
@@ -230,22 +241,51 @@ fn tags(product: &Value, key: &str) -> Vec<String> {
         .unwrap_or_default()
 }
 
-/// First brand. API v2 sends a comma-separated string, Search-a-licious a list,
-/// whose staging index prefixes entries with a language code such as `xx:`.
+/// First brand. API v2 sends a comma-separated string, Search-a-licious a list.
+/// The staging index sends tag slugs with a language prefix (`xx:rewe-bio`);
+/// those become readable words ("Rewe Bio").
 fn brand(product: &Value) -> Option<String> {
     let first = match product.get("brands")? {
-        Value::String(s) => s.split(',').next()?.to_owned(),
-        Value::Array(a) => a.first()?.as_str()?.to_owned(),
+        Value::String(s) => s.split(',').next()?.trim().to_owned(),
+        Value::Array(a) => {
+            let first = a.first()?.as_str()?.trim();
+            let first = match first.split_once(':') {
+                Some((lang, rest))
+                    if lang.len() == 2 && lang.chars().all(|c| c.is_ascii_lowercase()) =>
+                {
+                    rest.trim()
+                }
+                _ => first,
+            };
+            if is_slug(first) {
+                unslug(first)
+            } else {
+                first.to_owned()
+            }
+        }
         _ => return None,
     };
-    let first = first.trim();
-    let first = match first.split_once(':') {
-        Some((lang, rest)) if lang.len() == 2 && lang.chars().all(|c| c.is_ascii_lowercase()) => {
-            rest.trim()
-        }
-        _ => first,
-    };
-    Some(first.to_owned()).filter(|b| !b.is_empty())
+    Some(first).filter(|b| !b.is_empty())
+}
+
+fn is_slug(text: &str) -> bool {
+    !text.is_empty()
+        && text
+            .chars()
+            .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-')
+}
+
+fn unslug(slug: &str) -> String {
+    slug.split('-')
+        .filter(|w| !w.is_empty())
+        .map(|w| {
+            let mut c = w.chars();
+            c.next()
+                .map(|f| f.to_uppercase().chain(c).collect::<String>())
+                .unwrap_or_default()
+        })
+        .collect::<Vec<_>>()
+        .join(" ")
 }
 
 fn allergens(tags: &[String]) -> BTreeSet<Allergen> {
@@ -259,6 +299,26 @@ fn allergens(tags: &[String]) -> BTreeSet<Allergen> {
         .collect()
 }
 
+/// Values per 100 g of one nutriments object, in the unit of each nutrient.
+fn nutriments(n: &Value) -> Vec<(Nutrient, Quantity)> {
+    let per_100g = |key: &str| n.get(format!("{key}_100g")).and_then(number);
+    let mut out = Vec::new();
+    if let Some(kcal) = per_100g("energy-kcal") {
+        out.push((Nutrient::Energy, Quantity::new(kcal, Unit::Kilocalorie)));
+    } else if let Some(kcal) =
+        per_100g("energy").and_then(|kj| Quantity::new(kj, Unit::Kilojoule).to(Unit::Kilocalorie))
+    {
+        out.push((Nutrient::Energy, kcal));
+    }
+    for &(key, nutrient) in NUTRIMENTS {
+        if let Some(grams) = per_100g(key) {
+            let q = Quantity::new(grams, Unit::Gram);
+            out.push((nutrient, q.to(nutrient.unit()).unwrap_or(q)));
+        }
+    }
+    out
+}
+
 fn parse_product(product: &Value, retrieved_at: &str) -> Result<Food, IngestError> {
     let code = text(product, "code").ok_or_else(|| IngestError::Format("missing code".into()))?;
     let source = SourceRef {
@@ -269,36 +329,28 @@ fn parse_product(product: &Value, retrieved_at: &str) -> Result<Food, IngestErro
             .map_or_else(|| "api-v2".to_owned(), |rev| format!("api-v2, rev {rev}")),
         retrieved_at: retrieved_at.to_owned(),
     };
-    let value = |quantity: Quantity| SourcedValue {
+    let value = |quantity: Quantity, derivation: Derivation| SourcedValue {
         quantity,
         basis: ValueBasis::Per100gAsSold,
         source: source.clone(),
-        derivation: Derivation::Declared,
+        derivation,
         samples: None,
         min: None,
         max: None,
     };
 
+    // Label values first. Open Food Facts calculates further values from the
+    // ingredients (`nutriments_estimated`); they only fill gaps.
     let mut nutrients = BTreeMap::new();
-    if let Some(n) = product.get("nutriments") {
-        let per_100g = |key: &str| n.get(format!("{key}_100g")).and_then(number);
-        if let Some(kcal) = per_100g("energy-kcal") {
-            nutrients.insert(
-                Nutrient::Energy,
-                value(Quantity::new(kcal, Unit::Kilocalorie)),
-            );
-        } else if let Some(kj) = per_100g("energy") {
-            let kcal = Quantity::new(kj, Unit::Kilojoule).to(Unit::Kilocalorie);
-            if let Some(kcal) = kcal {
-                nutrients.insert(Nutrient::Energy, value(kcal));
-            }
-        }
-        for &(key, nutrient) in NUTRIMENTS {
-            if let Some(grams) = per_100g(key) {
-                let q = Quantity::new(grams, Unit::Gram);
-                let q = q.to(nutrient.unit()).unwrap_or(q);
-                nutrients.insert(nutrient, value(q));
-            }
+    for (key, derivation) in [
+        ("nutriments", Derivation::Declared),
+        ("nutriments_estimated", Derivation::Interpolated),
+    ] {
+        let Some(n) = product.get(key) else { continue };
+        for (nutrient, quantity) in nutriments(n) {
+            nutrients
+                .entry(nutrient)
+                .or_insert_with(|| value(quantity, derivation.clone()));
         }
     }
 
@@ -397,6 +449,31 @@ mod tests {
     }
 
     #[test]
+    fn estimated_values_fill_gaps_but_never_replace_the_label() {
+        let food = &OpenFoodFacts
+            .parse(&fixture("product-estimated.json"))
+            .unwrap()[0];
+        let energy = &food.nutrients[&Nutrient::Energy];
+        assert_eq!(energy.quantity, Quantity::new(50.0, Unit::Kilocalorie));
+        assert_eq!(energy.derivation, Derivation::Declared);
+        // A label zero stays a zero from the label.
+        assert_eq!(
+            food.nutrients[&Nutrient::Fat].derivation,
+            Derivation::Declared
+        );
+        let calcium = &food.nutrients[&Nutrient::Calcium];
+        assert_eq!(calcium.derivation, Derivation::Interpolated);
+        assert!((calcium.quantity.amount - 5.0).abs() < 1e-9);
+        assert_eq!(calcium.quantity.unit, Unit::Milligram);
+        assert_eq!(
+            food.nutrients[&Nutrient::Protein].derivation,
+            Derivation::Interpolated
+        );
+        // Neither source has a value: it stays missing.
+        assert!(!food.nutrients.contains_key(&Nutrient::Iron));
+    }
+
+    #[test]
     fn product_not_found() {
         assert_eq!(
             OpenFoodFacts.parse(&fixture("product-not-found.json")),
@@ -409,9 +486,10 @@ mod tests {
         let foods = OpenFoodFacts
             .parse_search(&fixture("search-results.json"))
             .unwrap();
-        let names: Vec<&str> = foods.iter().map(|f| f.name.as_str()).collect();
+        let names: Vec<&str> = foods.iter().map(|h| h.food.name.as_str()).collect();
         assert_eq!(names, vec!["Testquark mager", "Testquark Vanille"]);
-        assert!(foods[1].allergens.contains.contains(&Allergen::Milk));
+        assert!(foods[1].food.allergens.contains.contains(&Allergen::Milk));
+        assert_eq!(foods[0].completeness, Some(0.7));
     }
 
     #[test]
@@ -419,13 +497,14 @@ mod tests {
         let foods = OpenFoodFacts
             .parse_search(&fixture("search-a-licious-results.json"))
             .unwrap();
-        let names: Vec<&str> = foods.iter().map(|f| f.name.as_str()).collect();
+        let names: Vec<&str> = foods.iter().map(|h| h.food.name.as_str()).collect();
         assert_eq!(names, vec!["Testquark mager", "Testquark Vanille"]);
-        assert_eq!(foods[1].id, FoodId("off:4000000000055".into()));
+        assert_eq!(foods[1].food.id, FoodId("off:4000000000055".into()));
         // Brands come as a list here.
-        assert_eq!(foods[0].brand.as_deref(), Some("Fixture Molkerei"));
+        assert_eq!(foods[0].food.brand.as_deref(), Some("Fixture Molkerei"));
+        assert_eq!(foods[1].last_modified, Some(1_780_000_000));
         // Hits carry no nutrients; the app loads the product by barcode.
-        assert!(foods[0].nutrients.is_empty());
+        assert!(foods[0].food.nutrients.is_empty());
     }
 
     #[test]
@@ -454,6 +533,8 @@ mod tests {
     fn brand_drops_language_prefix() {
         let product = serde_json::json!({ "brands": ["xx:Fixture Molkerei"] });
         assert_eq!(brand(&product).as_deref(), Some("Fixture Molkerei"));
+        let product = serde_json::json!({ "brands": ["xx:fixture-molkerei-2"] });
+        assert_eq!(brand(&product).as_deref(), Some("Fixture Molkerei 2"));
         let product = serde_json::json!({ "brands": "Marke: Spezial, Zweite" });
         assert_eq!(brand(&product).as_deref(), Some("Marke: Spezial"));
     }

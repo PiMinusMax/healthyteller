@@ -77,7 +77,8 @@ pub fn NutrientList(id: String, grams: u32, prep: String) -> Element {
             ul { class: "origin-legend compact", "aria-label": tr("nutrients-origin"),
                 li { Mark { derivation: Some(Derivation::Measured) } span { "aria-hidden": "true", {tr("origin-measured")} } }
                 li { Mark { derivation: Some(Derivation::Calculated) } span { "aria-hidden": "true", {tr("origin-calculated")} } }
-                li { Mark { derivation: Some(Derivation::Estimated { basis: String::new() }) } span { "aria-hidden": "true", {tr("origin-estimate")} } }
+                li { Mark { derivation: Some(Derivation::Interpolated) } span { "aria-hidden": "true", {tr("origin-interpolated")} } }
+                li { Mark { derivation: Some(Derivation::Estimated { basis: String::new(), method: Default::default() }) } span { "aria-hidden": "true", {tr("origin-estimate")} } }
             }
             if !groups.is_empty() {
                 section { class: "card", "aria-label": tr("nutrients-title"),
@@ -123,13 +124,14 @@ pub fn NutrientList(id: String, grams: u32, prep: String) -> Element {
     }
 }
 
-/// Origin mark: ● measured, ∑ calculated or declared, ≈ estimate, ? unknown.
+/// Origin mark: ● measured, ∑ calculated or declared, ◐ calculated from ingredients, ≈ estimate, ? unknown.
 #[component]
 fn Mark(derivation: Option<Derivation>) -> Element {
     let (class, symbol, label) = match &derivation {
         Some(Derivation::Measured) => ("mark-measured", "●", tr("origin-measured")),
         Some(Derivation::Calculated) => ("mark-calculated", "∑", tr("origin-calculated")),
         Some(Derivation::Declared) => ("mark-calculated", "∑", tr("origin-declared")),
+        Some(Derivation::Interpolated) => ("mark-interpolated", "◐", tr("origin-interpolated")),
         Some(Derivation::Estimated { .. }) => ("mark-estimate", "≈", tr("origin-estimate")),
         None => ("mark-unknown", "?", tr("origin-unknown")),
     };

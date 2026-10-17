@@ -23,16 +23,38 @@ pub enum Derivation {
     Calculated,
     /// Declared by the manufacturer on the label.
     Declared,
+    /// Calculated by the source from the ingredients and their shares, e.g.
+    /// `nutriments_estimated` in Open Food Facts. Less exact than the label.
+    Interpolated,
     /// Estimated by the app following a documented method (AGENTS.md rule 3).
-    Estimated { basis: String },
+    Estimated {
+        basis: String,
+        #[serde(default)]
+        method: EstimateMethod,
+    },
+}
+
+/// The documented estimation methods of the app (docs/adr/0004-datenlage-und-schaetzung.md).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum EstimateMethod {
+    /// Method 1: taken from the matching generic food.
+    #[default]
+    Generic,
+    /// Method 2: calculated from the ingredients and their shares.
+    Ingredients,
+    /// Method 3: an estimation recipe of the project.
+    Recipe,
 }
 
 impl Derivation {
-    /// Symbol shown next to the value: ● measured, ∑ calculated or declared, ≈ estimate.
+    /// Symbol shown next to the value: ● measured, ∑ calculated or declared,
+    /// ◐ calculated by the source from ingredients, ≈ estimate.
     pub fn mark(&self) -> &'static str {
         match self {
             Derivation::Measured => "●",
             Derivation::Calculated | Derivation::Declared => "∑",
+            Derivation::Interpolated => "◐",
             Derivation::Estimated { .. } => "≈",
         }
     }

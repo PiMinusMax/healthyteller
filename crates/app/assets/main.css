@@ -317,6 +317,14 @@ table.nutrients td.r, table.nutrients th.r { text-align: right; }
 .mark-calculated { border: 2px solid var(--kt-ink); }
 .mark-estimate { background: var(--kt-mass-soft); border: 2px solid var(--kt-mass-strong); border-radius: 6px; }
 .mark-unknown { border: 2px dashed var(--kt-unknown-border); border-radius: 6px; }
+.mark-interpolated { border: 2px solid var(--kt-ink); font-size: 17px; }
+
+/* Data quality of a food: fill symbol and word */
+.quality { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: var(--kt-text-small); color: var(--kt-ink); white-space: nowrap; }
+.quality-symbol { font-size: 20px; line-height: 1; }
+.quality-incomplete .quality-symbol { color: var(--kt-ink-2); }
+.quality-explanation { display: flex; flex-direction: column; gap: 2px; margin-top: 4px; }
+.quality-explanation p { margin: 0; }
 
 details.group > summary { list-style: none; cursor: pointer; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 details.group > summary::-webkit-details-marker { display: none; }
