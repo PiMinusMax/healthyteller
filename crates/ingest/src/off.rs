@@ -1,4 +1,4 @@
-//! Open Food Facts, API v2, one product per barcode.
+//! Open Food Facts, API v2, one product per barcode, plus the name search.
 //! <https://openfoodfacts.github.io/openfoodfacts-server/api/>
 
 use std::collections::{BTreeMap, BTreeSet};
@@ -103,34 +103,58 @@ fn encode_query(text: &str) -> String {
     out
 }
 
+/// Fields the name search needs. The full product is loaded by barcode once picked.
+const SEARCH_FIELDS: &str = "code,product_name,product_name_de,generic_name_de,brands";
+
 impl OpenFoodFacts {
-    /// Full-text search by name or brand. Only the search terms leave the device.
+    /// Full-text search by name or brand via Search-a-licious, the search service
+    /// Open Food Facts recommends. Only the search terms leave the device.
+    /// <https://search.openfoodfacts.org/docs>
     pub fn search_request(&self, terms: &str) -> Result<FetchRequest, IngestError> {
-        let terms = terms.trim();
-        if terms.chars().count() < 2 {
-            return Err(IngestError::InvalidQuery(terms.to_owned()));
-        }
+        let terms = search_terms(terms)?;
         Ok(FetchRequest {
             url: format!(
-                "https://world.openfoodfacts.org/cgi/search.pl?search_terms={}&search_simple=1&action=process&json=1&page_size=20&fields={FIELDS}",
+                "https://search.openfoodfacts.org/search?q={}&langs=de&page_size=20&fields={SEARCH_FIELDS}",
                 encode_query(terms)
             ),
             headers: vec![("User-Agent", USER_AGENT.to_owned())],
         })
     }
 
-    /// Products of a search answer. Entries without a barcode are skipped.
+    /// The older full-text search (`cgi/search.pl`), kept as a fallback.
+    pub fn legacy_search_request(&self, terms: &str) -> Result<FetchRequest, IngestError> {
+        let terms = search_terms(terms)?;
+        Ok(FetchRequest {
+            url: format!(
+                "https://world.openfoodfacts.org/cgi/search.pl?search_terms={}&search_simple=1&action=process&json=1&page_size=20&fields={SEARCH_FIELDS}",
+                encode_query(terms)
+            ),
+            headers: vec![("User-Agent", USER_AGENT.to_owned())],
+        })
+    }
+
+    /// Products of a search answer, from either search. Entries without a barcode are skipped.
     pub fn parse_search(&self, raw: &RawArtifact) -> Result<Vec<Food>, IngestError> {
         let json: Value =
             serde_json::from_slice(&raw.bytes).map_err(|e| IngestError::Format(e.to_string()))?;
         let products = json
-            .get("products")
+            .get("hits")
+            .or_else(|| json.get("products"))
             .and_then(Value::as_array)
             .ok_or_else(|| IngestError::Format("missing products".into()))?;
         Ok(products
             .iter()
             .filter_map(|p| parse_product(p, &raw.retrieved_at).ok())
             .collect())
+    }
+}
+
+fn search_terms(terms: &str) -> Result<&str, IngestError> {
+    let terms = terms.trim();
+    if terms.chars().count() < 2 {
+        Err(IngestError::InvalidQuery(terms.to_owned()))
+    } else {
+        Ok(terms)
     }
 }
 
@@ -197,6 +221,16 @@ fn tags(product: &Value, key: &str) -> Vec<String> {
                 .collect()
         })
         .unwrap_or_default()
+}
+
+/// First brand. API v2 sends a comma-separated string, Search-a-licious a list.
+fn brand(product: &Value) -> Option<String> {
+    let first = match product.get("brands")? {
+        Value::String(s) => s.split(',').next()?.to_owned(),
+        Value::Array(a) => a.first()?.as_str()?.to_owned(),
+        _ => return None,
+    };
+    Some(first.trim().to_owned()).filter(|b| !b.is_empty())
 }
 
 fn allergens(tags: &[String]) -> BTreeSet<Allergen> {
@@ -267,7 +301,7 @@ fn parse_product(product: &Value, retrieved_at: &str) -> Result<Food, IngestErro
     Ok(Food {
         id: FoodId(format!("{SOURCE_ID}:{code}")),
         name,
-        brand: text(product, "brands").map(|b| b.split(',').next().unwrap_or(&b).trim().to_owned()),
+        brand: brand(product),
         kind: FoodKind::Brand,
         nutrients,
         allergens: AllergenData {
@@ -366,14 +400,38 @@ mod tests {
     }
 
     #[test]
+    fn parses_search_a_licious_hits() {
+        let foods = OpenFoodFacts
+            .parse_search(&fixture("search-a-licious-results.json"))
+            .unwrap();
+        let names: Vec<&str> = foods.iter().map(|f| f.name.as_str()).collect();
+        assert_eq!(names, vec!["Testquark mager", "Testquark Vanille"]);
+        assert_eq!(foods[1].id, FoodId("off:4000000000055".into()));
+        // Brands come as a list here.
+        assert_eq!(foods[0].brand.as_deref(), Some("Fixture Molkerei"));
+        // Hits carry no nutrients; the app loads the product by barcode.
+        assert!(foods[0].nutrients.is_empty());
+    }
+
+    #[test]
     fn search_request_encodes_terms() {
         let req = OpenFoodFacts.search_request(" Quark & Müsli ").unwrap();
         assert!(
-            req.url.contains("search_terms=Quark+%26+M%C3%BCsli&"),
+            req.url
+                .starts_with("https://search.openfoodfacts.org/search?q=Quark+%26+M%C3%BCsli&"),
             "{}",
             req.url
         );
+        let legacy = OpenFoodFacts
+            .legacy_search_request(" Quark & Müsli ")
+            .unwrap();
+        assert!(
+            legacy.url.contains("search_terms=Quark+%26+M%C3%BCsli&"),
+            "{}",
+            legacy.url
+        );
         assert!(OpenFoodFacts.search_request("q").is_err());
+        assert!(OpenFoodFacts.legacy_search_request("q").is_err());
     }
 
     #[test]

@@ -8,17 +8,38 @@ export const FIXTURE_NAME = "Testjoghurt natur";
 
 export const FIXTURES = path.join(__dirname, "../../fixtures/open-food-facts");
 
-/** Answers every Open Food Facts request with a fixture, so tests never hit the network. */
-export async function mockOpenFoodFacts(page: Page, file = "product-found.json") {
+/**
+ * Answers every Open Food Facts request with a fixture, so tests never hit the network.
+ * Products from the search fixture are also served by barcode. With `searchDown`,
+ * Search-a-licious answers 503 and the app has to fall back to the older search.
+ */
+export async function mockOpenFoodFacts(
+  page: Page,
+  file = "product-found.json",
+  options: { searchDown?: boolean } = {},
+) {
   const product = fs.readFileSync(path.join(FIXTURES, file), "utf8");
   const search = fs.readFileSync(path.join(FIXTURES, "search-results.json"), "utf8");
-  await page.route("https://world.openfoodfacts.org/**", (route) =>
-    route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      headers: { "access-control-allow-origin": "*" },
-      body: route.request().url().includes("/cgi/search.pl") ? search : product,
-    }),
+  const searchALicious = fs.readFileSync(path.join(FIXTURES, "search-a-licious-results.json"), "utf8");
+  const byCode = new Map<string, unknown>(
+    JSON.parse(search).products.filter((p: { code?: string }) => p.code).map((p: { code: string }) => [p.code, p]),
+  );
+  const json = { contentType: "application/json", headers: { "access-control-allow-origin": "*" } };
+  await page.route("https://world.openfoodfacts.org/**", (route) => {
+    const url = route.request().url();
+    const code = url.match(/\/api\/v2\/product\/(\d+)\.json/)?.[1];
+    const found = code ? byCode.get(code) : undefined;
+    const body = url.includes("/cgi/search.pl")
+      ? search
+      : found
+        ? JSON.stringify({ status: 1, product: found })
+        : product;
+    return route.fulfill({ status: 200, ...json, body });
+  });
+  await page.route("https://search.openfoodfacts.org/**", (route) =>
+    options.searchDown
+      ? route.fulfill({ status: 503, ...json, body: "{}" })
+      : route.fulfill({ status: 200, ...json, body: searchALicious }),
   );
 }
 
