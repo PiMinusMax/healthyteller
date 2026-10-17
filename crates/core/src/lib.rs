@@ -21,7 +21,7 @@ pub use evaluate::{
 pub use food::{AllergenData, Food, FoodId, FoodKind, Portion, Preparation};
 pub use nutrient::{Nutrient, NutrientGroup};
 pub use plate::{DayTotals, PlateItem, Total};
-pub use profile::{Condition, DoctorLimit, Focus, Profile, Sex};
+pub use profile::{Condition, DoctorLimit, Focus, MedicationGroup, Profile, Sex};
 pub use quality::{DataQuality, QualityReport, assess};
 pub use quantity::{Quantity, Unit};
 pub use rule::{Dimension, Evidence, LimitKind, Rule, RuleBasis, RuleStatus, Thresholds};

@@ -91,7 +91,7 @@ pub fn PrintList() -> Element {
                     p { class: "muted", {labels::profile_summary(&p)} " · " {tr_args("print-date", &[("date", today)])} }
                 }
                 Notice { kind: NoticeKind::Basic }
-                if !p.conditions.is_empty() {
+                if !p.conditions.is_empty() || !p.medications.is_empty() {
                     Notice { kind: NoticeKind::Doctor }
                 }
                 if !p.allergies.is_empty() {

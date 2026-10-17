@@ -32,7 +32,7 @@ Die App stellt keine Diagnose, berechnet keine Medikamenten- oder Insulindosis u
 
 Erste nutzbare Version:
 
-- Profil mit Erkrankungen, Allergien und Arztvorgaben
+- Profil mit Erkrankungen, Allergien, Medikamentengruppen und Arztvorgaben
 - Produkte per Kamera-Scan, Barcode-Nummer oder Name aus [Open Food Facts](https://world.openfoodfacts.org)
 - Bewertung von Allergenen und eigenen Arztvorgaben, Teller mit Tagessummen, Meine Lebensmittel, Druckliste
 - Vergleich zweier Lebensmittel und eine Liste mit Fragen für den nächsten Arzttermin

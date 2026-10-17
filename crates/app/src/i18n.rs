@@ -191,6 +191,11 @@ mod tests {
                 .map(|c| format!("condition-{}", c.key())),
         );
         ids.extend(
+            MedicationGroup::ALL
+                .iter()
+                .map(|m| format!("medication-{}", m.key())),
+        );
+        ids.extend(
             Preparation::ALL
                 .iter()
                 .map(|p| format!("preparation-{}", p.key())),
