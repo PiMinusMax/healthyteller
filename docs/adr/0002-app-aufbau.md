@@ -21,9 +21,11 @@ Mit den Mockups in `docs/mockups/` steht das Ziel der Oberfläche fest. Die App 
 - **Tests ohne Netz.** Die Ende-zu-Ende-Tests beantworten Anfragen an Open Food Facts mit den Fixtures aus `fixtures/open-food-facts/`.
 - **Farben im Dunkelmodus.** Die Mockup-Tokens definieren für Dunkel keine hellen Hintergrundflächen (soft). Diese Werte sind ergänzt und in `crates/app/assets/main.css` als „added“ markiert; axe prüft den Kontrast in Hell und Dunkel.
 
+- **Kamera-Scan in Rust.** Die Web-App liest Kamerabilder über `getUserMedia`, verkleinert sie auf 640 px Breite und erkennt EAN-13, EAN-8, UPC-A und UPC-E mit `rxing` im Crate `barcode`. Safari auf dem iPhone hat keine Barcode-Schnittstelle, deshalb läuft die Erkennung in WebAssembly. Nur die erkannte Nummer wird weiterverwendet.
+
 ## Noch nicht umgesetzt
 
-- Kamera-Scan (Crate `barcode`)
+- Kamera-Scan in Desktop- und Android-App (in der Web-App vorhanden)
 - Referenzwerte (Soll) und damit Lücken und Vorschläge
 - Konfliktbericht als PDF, Alternativen, Schätzmethoden
 - Verschlüsselung des lokalen Speichers selbst; bisher ist nur die Exportdatei verschlüsselt

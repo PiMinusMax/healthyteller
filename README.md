@@ -33,9 +33,10 @@ Die App stellt keine Diagnose, berechnet keine Medikamenten- oder Insulindosis u
 Erste nutzbare Version:
 
 - Profil mit Erkrankungen, Allergien und Arztvorgaben
-- Produkte per Barcode-Nummer oder Name aus [Open Food Facts](https://world.openfoodfacts.org)
+- Produkte per Kamera-Scan, Barcode-Nummer oder Name aus [Open Food Facts](https://world.openfoodfacts.org)
 - Bewertung von Allergenen und eigenen Arztvorgaben, Teller mit Tagessummen, Meine Lebensmittel, Druckliste
 - Gerätewechsel über eine verschlüsselte Exportdatei
+- Deutsch und Englisch
 - Web, Desktop (Linux, Windows, macOS) und Android aus einer Codebasis
 
 Fachlich geprüfte Regeln und Referenzwerte fehlen noch. Für Erkrankungen zeigt die App deshalb meist „unbekannt“. Jede Grenze braucht eine zitierte Quelle und eine fachliche Freigabe. Hier hilft das Projekt am meisten Unterstützung, siehe [Mitmachen](#mitmachen).
@@ -87,7 +88,7 @@ Wie das geht und welche Regeln dabei gelten, steht in [CONTRIBUTING.md](CONTRIBU
 | `crates/core` | Datenmodell, Regel-Engine, Bewertung; ohne Oberfläche, Netz und Dateisystem |
 | `crates/ingest` | Import-Adapter je Datenquelle, Regelwerk laden |
 | `crates/storage` | lokaler Speicher |
-| `crates/barcode` | Barcode-Erkennung (in Arbeit) |
+| `crates/barcode` | Barcode-Erkennung aus Kamerabildern, auch im Browser |
 | `crates/app` | Dioxus-Oberfläche für Web, Desktop, Android, iOS |
 | `locales/` | Oberflächentexte, Deutsch zuerst |
 | `rules/`, `mappings/`, `estimates/`, `references/`, `sources/` | Regelwerk und Begleitdaten, nur IDs und Quellenangaben |

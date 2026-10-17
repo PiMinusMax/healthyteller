@@ -73,7 +73,7 @@ barcode-label = Barcode-Nummer
 barcode-check = Barcode prüfen
 barcode-loading = Wird geladen …
 barcode-privacy = Nur die Nummer verlässt das Gerät. Sie geht an Open Food Facts.
-barcode-camera-later = Das Scannen mit der Kamera folgt in einer späteren Version.
+barcode-camera-later = Das Scannen mit der Kamera gibt es in der Web-App. Hier geben Sie die Nummer ein.
 fetch-invalid-code = Diese Nummer ist kein gültiger Barcode. Ein Barcode hat 8, 12, 13 oder 14 Ziffern.
 fetch-not-found = Open Food Facts kennt dieses Produkt nicht.
 fetch-network = Open Food Facts ist gerade nicht erreichbar. Bitte prüfen Sie die Internetverbindung.
@@ -498,3 +498,13 @@ my-foods-search = Suchen
 my-foods-added = { $name } steht jetzt in Meine Lebensmittel, mit 100 g als Portion. Die Portion können Sie unten ändern.
 my-foods-already = schon in der Liste
 my-foods-add-named = { $name } hinzufügen
+
+## Kamera-Scan
+
+scan-start = Mit der Kamera scannen
+scan-starting = Kamera wird gestartet …
+scan-hint = Halten Sie den Barcode ruhig in das Bild. Er wird automatisch erkannt.
+scan-no-camera = Die Kamera ließ sich nicht öffnen. Bitte erlauben Sie den Zugriff oder geben Sie die Nummer ein.
+scan-video-label = Kamerabild zum Scannen des Barcodes
+
+settings-language = Sprache

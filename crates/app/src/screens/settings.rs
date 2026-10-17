@@ -5,7 +5,7 @@ use healthyteller_ingest::sources::{Access, SOURCES};
 
 use crate::Route;
 use crate::components::{Card, Icon, IconName, TopBar};
-use crate::i18n::{tr, tr_args};
+use crate::i18n::{Language, tr, tr_args};
 use crate::state::{Reference, Theme, update, use_app_state};
 
 #[component]
@@ -39,6 +39,20 @@ pub fn Settings() -> Element {
                         }
                     }
                     p { class: "small muted", {tr("settings-reference-pending")} }
+                }
+            }
+
+            Card { title: tr("settings-language"), id: "settings-language",
+                fieldset { class: "card-body", style: "border: none; margin: 0;",
+                    legend { class: "visually-hidden", {tr("settings-language")} }
+                    div { class: "choice-grid",
+                        for (l, label) in [(Language::De, "Deutsch"), (Language::En, "English")] {
+                            label { key: "{label}", class: "choice", lang: l.code(),
+                                input { r#type: "radio", name: "language", checked: settings.language == l, onchange: move |_| update(state, |s| s.settings.language = l) }
+                                span { "{label}" }
+                            }
+                        }
+                    }
                 }
             }
 

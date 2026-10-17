@@ -73,7 +73,7 @@ barcode-label = Barcode number
 barcode-check = Check barcode
 barcode-loading = Loading …
 barcode-privacy = Only the number leaves the device. It goes to Open Food Facts.
-barcode-camera-later = Scanning with the camera follows in a later version.
+barcode-camera-later = Scanning with the camera is available in the web app. Here you enter the number.
 fetch-invalid-code = This number is not a valid barcode. A barcode has 8, 12, 13 or 14 digits.
 fetch-not-found = Open Food Facts does not know this product.
 fetch-network = Open Food Facts cannot be reached right now. Please check the internet connection.
@@ -498,3 +498,13 @@ my-foods-search = Search
 my-foods-added = { $name } is now in my foods, with 100 g as portion. You can change the portion below.
 my-foods-already = already in the list
 my-foods-add-named = Add { $name }
+
+## Camera scan
+
+scan-start = Scan with the camera
+scan-starting = Starting camera …
+scan-hint = Hold the barcode steady in the picture. It is recognised automatically.
+scan-no-camera = The camera could not be opened. Please allow access or enter the number.
+scan-video-label = Camera picture for scanning the barcode
+
+settings-language = Language
