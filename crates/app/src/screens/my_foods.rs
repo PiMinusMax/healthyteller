@@ -1,13 +1,15 @@
 //! 15 Meine Lebensmittel bearbeiten: portion, order, remove, saved plates.
 
 use dioxus::prelude::*;
-use healthyteller_core::{Level, Options, evaluate};
+use healthyteller_core::{Food, Level, Options, evaluate};
 
 use crate::Route;
 use crate::components::{Badge, Card, Icon, IconName, TopBar};
+use crate::fetch;
 use crate::format;
 use crate::i18n::{tr, tr_args};
-use crate::state::{update, use_app_state};
+use crate::labels;
+use crate::state::{MyFood, default_portion, update, use_app_state};
 
 #[derive(Clone, PartialEq)]
 struct Row {
@@ -73,7 +75,7 @@ pub fn MyFoods() -> Element {
                 h1 { class: "title", {tr("my-foods-title")} }
                 p { class: "lead", {tr("my-foods-edit-lead")} }
             }
-            Link { class: "btn btn-primary btn-large", to: Route::Search {}, Icon { name: IconName::Plus } {tr("action-add")} }
+            AddMyFood {}
             Card { title: tr_args("my-foods-count", &[("count", count.to_string())]), id: "my-foods-list",
                 if rows.is_empty() {
                     p { class: "card-body muted", {tr("my-foods-empty")} }
@@ -151,6 +153,169 @@ pub fn MyFoods() -> Element {
                 }
             }
             Link { class: "btn btn-secondary btn-large", to: Route::PrintList {}, Icon { name: IconName::Print } {tr("print-create")} }
+        }
+    }
+}
+
+#[derive(Clone, PartialEq)]
+enum Lookup {
+    Idle,
+    Loading,
+    Failed(String),
+}
+
+/// Adds foods to the list directly, with a usual portion of 100 g that can be changed below.
+#[component]
+fn AddMyFood() -> Element {
+    let state = use_app_state();
+    let mut query = use_signal(String::new);
+    let mut barcode = use_signal(String::new);
+    let mut results = use_signal(Vec::<Food>::new);
+    let mut lookup = use_signal(|| Lookup::Idle);
+    let mut last = use_signal(|| None::<String>);
+
+    let mut add = move |food: Food| {
+        let name = food.name.clone();
+        update(state, |s| {
+            if s.my_food(&food.id.0).is_none() {
+                s.my_foods.push(MyFood {
+                    food_id: food.id.clone(),
+                    portion: default_portion(),
+                });
+            }
+            s.cache_food(food);
+        });
+        last.set(Some(name));
+    };
+
+    let search = move |_| {
+        let terms = query();
+        lookup.set(Lookup::Loading);
+        spawn(async move {
+            match fetch::search_products(&terms).await {
+                Ok(foods) => {
+                    lookup.set(if foods.is_empty() {
+                        Lookup::Failed(tr("search-online-none"))
+                    } else {
+                        Lookup::Idle
+                    });
+                    results.set(foods);
+                }
+                Err(e) => lookup.set(Lookup::Failed(tr(e.message_key()))),
+            }
+        });
+    };
+
+    let by_barcode = move |_| {
+        let code = barcode();
+        lookup.set(Lookup::Loading);
+        spawn(async move {
+            match fetch::product_by_barcode(&code).await {
+                Ok(food) => {
+                    add(food);
+                    barcode.set(String::new());
+                    lookup.set(Lookup::Idle);
+                }
+                Err(e) => lookup.set(Lookup::Failed(tr(e.message_key()))),
+            }
+        });
+    };
+
+    // Foods already on this device come first, without a network request.
+    let q = query().trim().to_lowercase();
+    let s = state.read();
+    let mut shown: Vec<(Food, bool)> = if q.chars().count() < 2 {
+        Vec::new()
+    } else {
+        s.foods
+            .values()
+            .map(|c| c.food.clone())
+            .filter(|f| {
+                f.name.to_lowercase().contains(&q)
+                    || f.brand
+                        .as_ref()
+                        .is_some_and(|b| b.to_lowercase().contains(&q))
+            })
+            .map(|f| {
+                let mine = s.my_food(&f.id.0).is_some();
+                (f, mine)
+            })
+            .collect()
+    };
+    for f in results() {
+        if !shown.iter().any(|(x, _)| x.id == f.id) {
+            let mine = s.my_food(&f.id.0).is_some();
+            shown.push((f, mine));
+        }
+    }
+    drop(s);
+    let loading = lookup() == Lookup::Loading;
+
+    rsx! {
+        Card { title: tr("my-foods-add-title"), id: "my-foods-add",
+            div { class: "card-body",
+                div { class: "field",
+                    label { r#for: "my-foods-query", {tr("search-label")} }
+                    div { style: "display: flex; gap: 10px;",
+                        input {
+                            id: "my-foods-query",
+                            class: "input",
+                            r#type: "search",
+                            placeholder: tr("search-placeholder"),
+                            value: "{query}",
+                            oninput: move |e| query.set(e.value()),
+                        }
+                        button { class: "btn btn-primary", disabled: query().trim().chars().count() < 2 || loading, onclick: search, {tr("my-foods-search")} }
+                    }
+                    p { class: "small muted", {tr("search-online-privacy")} }
+                }
+                div { class: "field",
+                    label { r#for: "my-foods-barcode", {tr("barcode-label")} }
+                    div { style: "display: flex; gap: 10px;",
+                        input {
+                            id: "my-foods-barcode",
+                            class: "input num",
+                            inputmode: "numeric",
+                            autocomplete: "off",
+                            value: "{barcode}",
+                            oninput: move |e| barcode.set(e.value()),
+                        }
+                        button { class: "btn btn-primary", disabled: barcode().trim().is_empty() || loading, onclick: by_barcode, {tr("action-add")} }
+                    }
+                }
+                if loading {
+                    p { role: "status", {tr("barcode-loading")} }
+                }
+                if let Lookup::Failed(msg) = lookup() {
+                    p { class: "error", role: "alert", "{msg}" }
+                }
+                if let Some(name) = last() {
+                    p { role: "status", {tr_args("my-foods-added", &[("name", name)])} }
+                }
+            }
+            if !shown.is_empty() {
+                ul { class: "list",
+                    for (food, mine) in shown {
+                        li { key: "{food.id.0}", class: "food-row",
+                            span { class: "grow food-name", {labels::food_title(&food)} }
+                            if mine {
+                                span { class: "small muted", {tr("my-foods-already")} }
+                            } else {
+                                button {
+                                    class: "btn btn-secondary",
+                                    "aria-label": tr_args("my-foods-add-named", &[("name", food.name.clone())]),
+                                    onclick: {
+                                        let food = food.clone();
+                                        move |_| add(food.clone())
+                                    },
+                                    Icon { name: IconName::Plus, size: 20 }
+                                    {tr("action-add")}
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

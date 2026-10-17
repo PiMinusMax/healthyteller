@@ -88,7 +88,9 @@ pub struct DoctorLimit {
 pub struct Profile {
     pub id: String,
     pub name: String,
-    pub age: Option<u8>,
+    /// ISO 8601 date (`YYYY-MM-DD`). The age follows from it, so it never goes stale.
+    #[serde(default)]
+    pub birth_date: Option<String>,
     pub sex: Option<Sex>,
     pub conditions: BTreeSet<Condition>,
     pub allergies: BTreeSet<Allergen>,
@@ -102,7 +104,7 @@ impl Profile {
         Self {
             id: id.into(),
             name: name.into(),
-            age: None,
+            birth_date: None,
             sex: None,
             conditions: BTreeSet::new(),
             allergies: BTreeSet::new(),
@@ -127,6 +129,18 @@ impl Profile {
             .find(|l| l.nutrient == nutrient && l.basis == basis)
     }
 
+    /// Age in full years on `today` (ISO 8601). `None` without a valid birth date
+    /// or when the birth date lies after `today`.
+    pub fn age_on(&self, today: &str) -> Option<u8> {
+        let (by, bm, bd) = parse_date(self.birth_date.as_deref()?)?;
+        let (ty, tm, td) = parse_date(today)?;
+        let mut age = ty - by;
+        if (tm, td) < (bm, bd) {
+            age -= 1;
+        }
+        u8::try_from(age).ok()
+    }
+
     /// Up to two initials for the avatar.
     pub fn initials(&self) -> String {
         self.name
@@ -138,9 +152,48 @@ impl Profile {
     }
 }
 
+fn parse_date(iso: &str) -> Option<(i32, u32, u32)> {
+    let mut parts = iso.trim().splitn(3, '-');
+    let y = parts.next()?.parse().ok()?;
+    let m = parts
+        .next()?
+        .parse()
+        .ok()
+        .filter(|m| (1..=12).contains(m))?;
+    let d = parts
+        .next()?
+        .parse()
+        .ok()
+        .filter(|d| (1..=31).contains(d))?;
+    Some((y, m, d))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn age_follows_from_birth_date() {
+        let mut p = Profile::new("1", "Test");
+        assert_eq!(p.age_on("2026-10-17"), None);
+        p.birth_date = Some("1950-10-17".into());
+        assert_eq!(p.age_on("2026-10-17"), Some(76));
+        assert_eq!(p.age_on("2026-10-16"), Some(75));
+        p.birth_date = Some("1952-02-29".into());
+        assert_eq!(p.age_on("2027-02-28"), Some(74));
+        assert_eq!(p.age_on("2027-03-01"), Some(75));
+        p.birth_date = Some("2030-01-01".into());
+        assert_eq!(p.age_on("2026-10-17"), None);
+        p.birth_date = Some("not a date".into());
+        assert_eq!(p.age_on("2026-10-17"), None);
+    }
+
+    #[test]
+    fn profiles_saved_with_age_still_load() {
+        let json = r#"{"id":"p1","name":"Test","age":70,"sex":null,"conditions":[],"allergies":[],"focus_override":null,"doctor_limits":[]}"#;
+        let p: Profile = serde_json::from_str(json).unwrap();
+        assert_eq!(p.birth_date, None);
+    }
 
     #[test]
     fn focus_follows_conditions_unless_overridden() {

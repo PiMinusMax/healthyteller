@@ -305,7 +305,7 @@ bar-label = { $nutrient }: { $total } today of at most { $limit }
 
 ## 15 Edit my foods
 
-my-foods-edit-lead = Change the portion, move with the arrows or remove. The saved portion goes on the plate when you tap.
+my-foods-edit-lead = The foods you eat often and like. Search for them above and add them. Change the portion in the list; the arrows change the order.
 my-foods-count = { $count } foods
 my-foods-portion = Portion
 my-foods-portion-of = Portion of { $name } in grams
@@ -325,12 +325,11 @@ profile-step-1 = Person
 profile-step-2 = Conditions and allergies
 profile-step-3 = Doctor's limits
 profile-person-title = Who is the profile for?
-profile-person-lead = Age and sex later determine the matching reference values.
+profile-person-lead = Date of birth and sex later determine the matching reference values. The app works out the age itself.
 profile-person = Person
 profile-name = Name
 profile-name-hint = For example your first name or "Mum".
 profile-name-missing = Please enter a name.
-profile-age = Age in years
 profile-sex = Sex
 profile-reference-hint = Only for the reference values. It stays on this device.
 sex-female = female
@@ -485,3 +484,17 @@ transfer-pass-mismatch = The two passwords do not match.
 transfer-not-export = This is not an export file from Healthy Teller.
 transfer-wrong-pass = The password is wrong or the file is damaged.
 transfer-crypto-error = Encryption failed.
+
+## Birth date, my foods on the start page
+
+profile-birth-date = Date of birth
+profile-age-today = { $age } years old today
+home-my-foods-empty = Add the foods you eat often and like once. Then they go on the plate with one tap.
+home-my-foods-setup = Set up my foods
+home-my-foods-edit = Edit my foods
+home-my-foods-more = View and edit all ({ $count } more)
+my-foods-add-title = Add food
+my-foods-search = Search
+my-foods-added = { $name } is now in my foods, with 100 g as portion. You can change the portion below.
+my-foods-already = already in the list
+my-foods-add-named = Add { $name }

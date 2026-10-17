@@ -305,7 +305,7 @@ bar-label = { $nutrient }: heute { $total } von höchstens { $limit }
 
 ## 15 Meine Lebensmittel bearbeiten
 
-my-foods-edit-lead = Portion ändern, mit den Pfeilen verschieben oder entfernen. Die gespeicherte Portion kommt beim Antippen auf den Teller.
+my-foods-edit-lead = Die Lebensmittel, die Sie oft und gern essen. Suchen Sie sie oben und fügen Sie sie hinzu. Die Portion ändern Sie in der Liste, die Pfeile ändern die Reihenfolge.
 my-foods-count = { $count } Lebensmittel
 my-foods-portion = Portion
 my-foods-portion-of = Portion von { $name } in Gramm
@@ -325,12 +325,11 @@ profile-step-1 = Person
 profile-step-2 = Erkrankungen und Allergien
 profile-step-3 = Arztvorgaben
 profile-person-title = Für wen ist das Profil?
-profile-person-lead = Alter und Geschlecht bestimmen später die passenden Referenzwerte.
+profile-person-lead = Geburtsdatum und Geschlecht bestimmen später die passenden Referenzwerte. Das Alter rechnet die App selbst aus.
 profile-person = Person
 profile-name = Name
 profile-name-hint = Zum Beispiel Ihr Vorname oder „Mama“.
 profile-name-missing = Bitte geben Sie einen Namen ein.
-profile-age = Alter in Jahren
 profile-sex = Geschlecht
 profile-reference-hint = Nur für die Referenzwerte. Die Angabe bleibt auf diesem Gerät.
 sex-female = weiblich
@@ -485,3 +484,17 @@ transfer-pass-mismatch = Die beiden Passwörter stimmen nicht überein.
 transfer-not-export = Das ist keine Exportdatei von Healthy Teller.
 transfer-wrong-pass = Das Passwort ist falsch oder die Datei ist beschädigt.
 transfer-crypto-error = Die Verschlüsselung ist fehlgeschlagen.
+
+## Geburtsdatum, Meine Lebensmittel auf der Startseite
+
+profile-birth-date = Geburtsdatum
+profile-age-today = Heute { $age } Jahre alt
+home-my-foods-empty = Legen Sie einmal die Lebensmittel an, die Sie oft und gern essen. Dann liegen sie mit einem Tippen auf dem Teller.
+home-my-foods-setup = Meine Lebensmittel einrichten
+home-my-foods-edit = Meine Lebensmittel bearbeiten
+home-my-foods-more = Alle ansehen und bearbeiten ({ $count } weitere)
+my-foods-add-title = Lebensmittel hinzufügen
+my-foods-search = Suchen
+my-foods-added = { $name } steht jetzt in Meine Lebensmittel, mit 100 g als Portion. Die Portion können Sie unten ändern.
+my-foods-already = schon in der Liste
+my-foods-add-named = { $name } hinzufügen

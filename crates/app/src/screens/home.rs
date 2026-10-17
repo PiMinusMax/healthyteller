@@ -6,7 +6,10 @@ use crate::Route;
 use crate::components::{Card, Icon, IconName, Logo};
 use crate::i18n::{tr, tr_args};
 use crate::labels;
-use crate::state::use_app_state;
+use crate::state::{update, use_app_state};
+
+/// Own foods shown on the start page; the rest is one tap away.
+const HOME_MY_FOODS: usize = 5;
 
 #[component]
 pub fn Home() -> Element {
@@ -18,7 +21,19 @@ pub fn Home() -> Element {
     } else {
         0
     };
+    let my_foods: Vec<(usize, String, String)> = s
+        .my_foods
+        .iter()
+        .enumerate()
+        .take(HOME_MY_FOODS)
+        .filter_map(|(i, m)| {
+            s.food(&m.food_id.0)
+                .map(|f| (i, f.name.clone(), labels::portion(&m.portion)))
+        })
+        .collect();
+    let more = s.my_foods.len().saturating_sub(HOME_MY_FOODS);
     drop(s);
+    let mut added = use_signal(|| None::<String>);
     let plate_line = if today_count == 0 {
         tr("home-plate-empty")
     } else {
@@ -59,6 +74,43 @@ pub fn Home() -> Element {
                 span { class: "tile-icon", Icon { name: IconName::Plate, size: 36 } }
                 span { class: "tile-title", {tr("home-plate-title")} }
                 span { class: "muted", style: "font-size: 19px;", "{plate_line}" }
+            }
+            Card { title: tr("my-foods-title"), id: "home-my-foods",
+                if my_foods.is_empty() {
+                    div { class: "card-body",
+                        p { {tr("home-my-foods-empty")} }
+                        Link { class: "btn btn-secondary btn-large", to: Route::MyFoods {}, Icon { name: IconName::Plus } {tr("home-my-foods-setup")} }
+                    }
+                } else {
+                    p { class: "card-body small muted", {tr("my-foods-hint")} }
+                    ul { class: "list",
+                        for (i, name, portion) in my_foods {
+                            li { key: "{i}", class: "food-row",
+                                button {
+                                    class: "row-btn grow",
+                                    onclick: move |_| {
+                                        update(state, |s| {
+                                            if let Some(m) = s.my_foods.get(i).cloned() {
+                                                s.add_to_plate(m.food_id, m.portion);
+                                            }
+                                        });
+                                        added.set(Some(name.clone()));
+                                    },
+                                    span { class: "plus", "aria-hidden": "true", "+" }
+                                    span { span { class: "food-name", "{name}" } ", {portion}" }
+                                }
+                            }
+                        }
+                    }
+                    if let Some(name) = added() {
+                        p { class: "card-row", role: "status", {tr_args("plate-added", &[("name", name)])} }
+                    }
+                    div { class: "card-row",
+                        Link { class: "link-btn", to: Route::MyFoods {},
+                            if more > 0 { {tr_args("home-my-foods-more", &[("count", more.to_string())])} } else { {tr("home-my-foods-edit")} }
+                        }
+                    }
+                }
             }
             div { class: "footer-note",
                 span { class: "status-line", Icon { name: IconName::Lock, size: 20 } {tr("home-local")} }
