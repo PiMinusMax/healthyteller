@@ -1,0 +1,47 @@
+# Dependency checks (AGENTS.md rule 15): only GPL-compatible licenses,
+# only crates.io, no known vulnerabilities.
+
+[graph]
+all-features = true
+
+[advisories]
+yanked = "deny"
+git-fetch-with-cli = true
+# Unmaintained crates are only an error when we depend on them directly;
+# transitive ones come from Dioxus and are tracked upstream.
+unmaintained = "workspace"
+ignore = [
+    # glib 0.18 comes in via wry/webkit2gtk (desktop on Linux). We never use
+    # VariantStrIter; goes away once wry moves to a newer gtk-rs.
+    { id = "RUSTSEC-2024-0429", reason = "transitive via dioxus-desktop, affected API unused" },
+    # rand 0.7 is only a build dependency of wry (phf_codegen via selectors)
+    # and is not used with a custom logger.
+    { id = "RUSTSEC-2026-0097", reason = "transitive build-time dependency of dioxus-desktop" },
+]
+
+[licenses]
+confidence-threshold = 0.93
+allow = [
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "CC0-1.0",
+    "GPL-3.0-or-later",
+    "ISC",
+    "MIT",
+    "MPL-2.0",
+    "NCSA",
+    "Unicode-3.0",
+    "Unlicense",
+    "Zlib",
+]
+
+[bans]
+multiple-versions = "allow"
+wildcards = "deny"
+allow-wildcard-paths = true
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"

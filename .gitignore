@@ -4,3 +4,7 @@
 # Build output
 /target/
 node_modules/
+
+# Playwright output
+/e2e/playwright-report/
+/e2e/test-results/

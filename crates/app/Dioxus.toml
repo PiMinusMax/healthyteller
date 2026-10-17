@@ -1,0 +1,9 @@
+[application]
+name = "healthyteller"
+
+[web.app]
+title = "Healthy Teller"
+
+[bundle]
+identifier = "io.github.piminusmax.healthyteller"
+publisher = "Healthy Teller"
