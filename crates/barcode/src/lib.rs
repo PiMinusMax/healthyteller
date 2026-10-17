@@ -29,7 +29,9 @@ pub fn decode_luma(luma: Vec<u8>, width: u32, height: u32) -> Option<String> {
 
 /// Converts RGBA pixels, as a canvas delivers them, to grey values.
 pub fn rgba_to_luma(rgba: &[u8]) -> Vec<u8> {
-    rgba.chunks_exact(4)
+    rgba.as_chunks::<4>()
+        .0
+        .iter()
         .map(|p| {
             // ITU-R BT.601 weights, integer arithmetic.
             ((u32::from(p[0]) * 299 + u32::from(p[1]) * 587 + u32::from(p[2]) * 114) / 1000) as u8
