@@ -1,0 +1,6 @@
+# Locally generated data from external sources, never committed (AGENTS.md rule 1)
+/data/
+
+# Build output
+/target/
+node_modules/
