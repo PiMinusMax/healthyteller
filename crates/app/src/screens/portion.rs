@@ -97,7 +97,6 @@ pub fn PortionScreen(id: String) -> Element {
                             }
                         }
                     }
-                    p { class: "small muted", {tr("portion-preparation-note")} }
                 }
             }
             Link {
@@ -105,7 +104,6 @@ pub fn PortionScreen(id: String) -> Element {
                 to: Route::FoodCard { id: id.clone(), grams: grams(), prep: prep().key().to_owned() },
                 {tr("action-evaluate")}
             }
-            p { class: "small muted", {tr("portion-per-100")} }
         }
     }
 }

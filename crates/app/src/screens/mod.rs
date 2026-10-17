@@ -33,7 +33,7 @@ pub use print::PrintList;
 pub use profile::{ProfileDraft, ProfileEdit, Profiles};
 pub use questions::DoctorQuestions;
 pub use search::Search;
-pub use settings::Settings;
+pub use settings::{DataSources, DeviceTransfer, Settings, SettingsAdvanced};
 #[cfg(test)]
 pub use term::TERMS;
 pub use term::Term;
