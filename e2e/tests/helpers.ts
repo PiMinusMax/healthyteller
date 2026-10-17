@@ -11,7 +11,7 @@ export const FIXTURES = path.join(__dirname, "../../fixtures/open-food-facts");
 /**
  * Answers every Open Food Facts request with a fixture, so tests never hit the network.
  * Products from the search fixture are also served by barcode. With `searchDown`,
- * Search-a-licious answers 503 and the app has to fall back to the older search.
+ * both Search-a-licious indexes answer 503 and the app has to fall back to the older search.
  */
 export async function mockOpenFoodFacts(
   page: Page,
@@ -36,7 +36,8 @@ export async function mockOpenFoodFacts(
         : product;
     return route.fulfill({ status: 200, ...json, body });
   });
-  await page.route("https://search.openfoodfacts.org/**", (route) =>
+  // Search-a-licious: staging index (.net) and production index (.org).
+  await page.route(/^https:\/\/search\.openfoodfacts\.(net|org)\//, (route) =>
     options.searchDown
       ? route.fulfill({ status: 503, ...json, body: "{}" })
       : route.fulfill({ status: 200, ...json, body: searchALicious }),

@@ -69,15 +69,20 @@ pub async fn product_by_barcode(code: &str) -> Result<Food, FetchError> {
 }
 
 /// Searches Open Food Facts by name or brand. Only the search terms leave the device.
-/// Tries Search-a-licious first and falls back to the older search. Hits carry no
-/// nutrients; load the picked product with [`product_by_barcode`].
+/// Tries the search services in the order the adapter gives and keeps the first
+/// error if all fail. Hits carry no nutrients; load the picked product with
+/// [`product_by_barcode`].
 pub async fn search_products(terms: &str) -> Result<Vec<Food>, FetchError> {
-    match search_with(OpenFoodFacts.search_request(terms)?).await {
-        Ok(foods) => Ok(foods),
-        Err(first) => search_with(OpenFoodFacts.legacy_search_request(terms)?)
-            .await
-            .map_err(|_| first),
+    let mut first_error = None;
+    for request in OpenFoodFacts.search_requests(terms)? {
+        match search_with(request).await {
+            Ok(foods) => return Ok(foods),
+            Err(e) => {
+                first_error.get_or_insert(e);
+            }
+        }
     }
+    Err(first_error.unwrap_or(FetchError::NotFound))
 }
 
 async fn search_with(request: healthyteller_ingest::FetchRequest) -> Result<Vec<Food>, FetchError> {

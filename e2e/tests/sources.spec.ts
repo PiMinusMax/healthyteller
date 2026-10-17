@@ -12,7 +12,9 @@ test.beforeEach(async ({ page }) => {
 test("search by name at Open Food Facts", async ({ page }) => {
   let searched = "";
   page.on("request", (r) => {
-    if (r.url().startsWith("https://search.openfoodfacts.org/")) searched = new URL(r.url()).searchParams.get("q") ?? "";
+    if (/^https:\/\/search\.openfoodfacts\.(net|org)\//.test(r.url())) {
+      searched ||= new URL(r.url()).searchParams.get("q") ?? "";
+    }
   });
   await page.getByLabel("Lebensmittel suchen").fill("Quark");
   await page.getByRole("button", { name: "Online nach Name oder Marke suchen" }).click();
@@ -44,7 +46,7 @@ test("falls back to the older search when Search-a-licious is down", async ({ pa
 
 test("an overloaded source shows a clear message", async ({ page }) => {
   await page.unrouteAll();
-  await page.route(/openfoodfacts\.org/, (route) =>
+  await page.route(/openfoodfacts\.(org|net)/, (route) =>
     route.fulfill({ status: 503, headers: { "access-control-allow-origin": "*" }, body: "<html></html>" }),
   );
   await page.getByLabel("Lebensmittel suchen").fill("Quark");

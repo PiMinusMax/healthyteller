@@ -1,10 +1,10 @@
 {
-  "_comment": "Fixture with invented values in the format of Search-a-licious (search.openfoodfacts.org/search). Not real products.",
+  "_comment": "Fixture with invented values in the format of Search-a-licious (search.openfoodfacts.org/search; the staging index prefixes brands with xx:). Not real products.",
   "hits": [
     {
       "code": "4000000000048",
       "product_name": "Testquark mager",
-      "brands": ["Fixture Molkerei"]
+      "brands": ["xx:Fixture Molkerei"]
     },
     {
       "code": "4000000000055",

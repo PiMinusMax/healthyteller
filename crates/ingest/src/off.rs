@@ -106,31 +106,47 @@ fn encode_query(text: &str) -> String {
 /// Fields the name search needs. The full product is loaded by barcode once picked.
 const SEARCH_FIELDS: &str = "code,product_name,product_name_de,generic_name_de,brands";
 
-impl OpenFoodFacts {
-    /// Full-text search by name or brand via Search-a-licious, the search service
-    /// Open Food Facts recommends. Only the search terms leave the device.
-    /// <https://search.openfoodfacts.org/docs>
-    pub fn search_request(&self, terms: &str) -> Result<FetchRequest, IngestError> {
-        let terms = search_terms(terms)?;
-        Ok(FetchRequest {
-            url: format!(
-                "https://search.openfoodfacts.org/search?q={}&langs=de&page_size=20&fields={SEARCH_FIELDS}",
-                encode_query(terms)
-            ),
-            headers: vec![("User-Agent", USER_AGENT.to_owned())],
-        })
-    }
+/// Search services of Open Food Facts, in the order the app tries them.
+/// See sources/open-food-facts.md and docs/adr/0003-namenssuche.md.
+const SEARCH_SERVICES: &[SearchService] = &[
+    // Staging index of Open Food Facts. Used first while the production index
+    // is stale (openfoodfacts/search-a-licious#469). Remove once that is fixed.
+    SearchService::SearchALicious("https://search.openfoodfacts.net/search"),
+    SearchService::SearchALicious("https://search.openfoodfacts.org/search"),
+    SearchService::Legacy("https://world.openfoodfacts.org/cgi/search.pl"),
+];
 
-    /// The older full-text search (`cgi/search.pl`), kept as a fallback.
-    pub fn legacy_search_request(&self, terms: &str) -> Result<FetchRequest, IngestError> {
-        let terms = search_terms(terms)?;
-        Ok(FetchRequest {
-            url: format!(
-                "https://world.openfoodfacts.org/cgi/search.pl?search_terms={}&search_simple=1&action=process&json=1&page_size=20&fields={SEARCH_FIELDS}",
-                encode_query(terms)
-            ),
-            headers: vec![("User-Agent", USER_AGENT.to_owned())],
-        })
+enum SearchService {
+    /// Search-a-licious, the search Open Food Facts recommends.
+    /// <https://search.openfoodfacts.org/docs>
+    SearchALicious(&'static str),
+    /// The older full-text search of the main site.
+    Legacy(&'static str),
+}
+
+impl OpenFoodFacts {
+    /// Full-text search by name or brand, one request per search service in the
+    /// order to try them. Only the search terms leave the device.
+    pub fn search_requests(&self, terms: &str) -> Result<Vec<FetchRequest>, IngestError> {
+        let terms = terms.trim();
+        if terms.chars().count() < 2 {
+            return Err(IngestError::InvalidQuery(terms.to_owned()));
+        }
+        let q = encode_query(terms);
+        Ok(SEARCH_SERVICES
+            .iter()
+            .map(|service| FetchRequest {
+                url: match service {
+                    SearchService::SearchALicious(base) => format!(
+                        "{base}?q={q}&langs=de&page_size=20&fields={SEARCH_FIELDS}"
+                    ),
+                    SearchService::Legacy(base) => format!(
+                        "{base}?search_terms={q}&search_simple=1&action=process&json=1&page_size=20&fields={SEARCH_FIELDS}"
+                    ),
+                },
+                headers: vec![("User-Agent", USER_AGENT.to_owned())],
+            })
+            .collect())
     }
 
     /// Products of a search answer, from either search. Entries without a barcode are skipped.
@@ -146,15 +162,6 @@ impl OpenFoodFacts {
             .iter()
             .filter_map(|p| parse_product(p, &raw.retrieved_at).ok())
             .collect())
-    }
-}
-
-fn search_terms(terms: &str) -> Result<&str, IngestError> {
-    let terms = terms.trim();
-    if terms.chars().count() < 2 {
-        Err(IngestError::InvalidQuery(terms.to_owned()))
-    } else {
-        Ok(terms)
     }
 }
 
@@ -223,14 +230,22 @@ fn tags(product: &Value, key: &str) -> Vec<String> {
         .unwrap_or_default()
 }
 
-/// First brand. API v2 sends a comma-separated string, Search-a-licious a list.
+/// First brand. API v2 sends a comma-separated string, Search-a-licious a list,
+/// whose staging index prefixes entries with a language code such as `xx:`.
 fn brand(product: &Value) -> Option<String> {
     let first = match product.get("brands")? {
         Value::String(s) => s.split(',').next()?.to_owned(),
         Value::Array(a) => a.first()?.as_str()?.to_owned(),
         _ => return None,
     };
-    Some(first.trim().to_owned()).filter(|b| !b.is_empty())
+    let first = first.trim();
+    let first = match first.split_once(':') {
+        Some((lang, rest)) if lang.len() == 2 && lang.chars().all(|c| c.is_ascii_lowercase()) => {
+            rest.trim()
+        }
+        _ => first,
+    };
+    Some(first.to_owned()).filter(|b| !b.is_empty())
 }
 
 fn allergens(tags: &[String]) -> BTreeSet<Allergen> {
@@ -414,24 +429,33 @@ mod tests {
     }
 
     #[test]
-    fn search_request_encodes_terms() {
-        let req = OpenFoodFacts.search_request(" Quark & Müsli ").unwrap();
+    fn search_requests_in_order_with_encoded_terms() {
+        let urls: Vec<String> = OpenFoodFacts
+            .search_requests(" Quark & Müsli ")
+            .unwrap()
+            .into_iter()
+            .map(|r| r.url)
+            .collect();
+        assert_eq!(urls.len(), 3);
         assert!(
-            req.url
-                .starts_with("https://search.openfoodfacts.org/search?q=Quark+%26+M%C3%BCsli&"),
+            urls[0].starts_with("https://search.openfoodfacts.net/search?q=Quark+%26+M%C3%BCsli&"),
             "{}",
-            req.url
+            urls[0]
         );
-        let legacy = OpenFoodFacts
-            .legacy_search_request(" Quark & Müsli ")
-            .unwrap();
         assert!(
-            legacy.url.contains("search_terms=Quark+%26+M%C3%BCsli&"),
-            "{}",
-            legacy.url
+            urls[1].starts_with("https://search.openfoodfacts.org/search?q=Quark+%26+M%C3%BCsli&")
         );
-        assert!(OpenFoodFacts.search_request("q").is_err());
-        assert!(OpenFoodFacts.legacy_search_request("q").is_err());
+        assert!(urls[2].starts_with("https://world.openfoodfacts.org/cgi/search.pl?"));
+        assert!(urls[2].contains("search_terms=Quark+%26+M%C3%BCsli&"));
+        assert!(OpenFoodFacts.search_requests("q").is_err());
+    }
+
+    #[test]
+    fn brand_drops_language_prefix() {
+        let product = serde_json::json!({ "brands": ["xx:Fixture Molkerei"] });
+        assert_eq!(brand(&product).as_deref(), Some("Fixture Molkerei"));
+        let product = serde_json::json!({ "brands": "Marke: Spezial, Zweite" });
+        assert_eq!(brand(&product).as_deref(), Some("Marke: Spezial"));
     }
 
     #[test]
