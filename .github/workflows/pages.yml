@@ -1,0 +1,57 @@
+# Publishes the web app on GitHub Pages after every push to main.
+# One-time setup: Settings → Pages → Source: "GitHub Actions".
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+  DX_VERSION: 0.7.10
+
+jobs:
+  build:
+    name: Build web app
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: rustup toolchain install
+      - uses: Swatinem/rust-cache@v2
+      - name: Install dx
+        run: curl -sSfL "https://github.com/DioxusLabs/dioxus/releases/download/v${DX_VERSION}/dx-x86_64-unknown-linux-gnu.tar.gz" | tar xz -C ~/.cargo/bin dx
+      - name: Build
+        working-directory: crates/app
+        # The site lives under https://<owner>.github.io/<repository>/.
+        run: dx build --platform web --release --base-path "${GITHUB_REPOSITORY#*/}"
+      - name: Prepare site
+        run: |
+          site=target/dx/healthyteller-app/release/web/public
+          # GitHub Pages answers unknown paths with 404.html; the app routes them itself.
+          cp "$site/index.html" "$site/404.html"
+          touch "$site/.nojekyll"
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: target/dx/healthyteller-app/release/web/public
+
+  deploy:
+    name: Deploy
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

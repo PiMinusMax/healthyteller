@@ -41,7 +41,9 @@ Fachlich geprüfte Regeln und Referenzwerte fehlen noch. Für Erkrankungen zeigt
 
 ## Ausprobieren
 
-Am einfachsten im Dev Container (`.devcontainer/`, zum Beispiel mit VS Code), der alle Werkzeuge mitbringt. Ohne Container braucht es:
+Die Web-Version läuft ohne Installation im Browser, auch auf dem iPhone: **https://piminusmax.github.io/healthyteller/** (nach jedem Merge auf `main` aktualisiert). Über „Zum Home-Bildschirm“ lässt sie sich wie eine App ablegen.
+
+Selbst bauen geht am einfachsten im Dev Container (`.devcontainer/`, zum Beispiel mit VS Code), der alle Werkzeuge mitbringt. Ohne Container braucht es:
 
 - Rust (stable) und das Ziel `wasm32-unknown-unknown`
 - [dx 0.7.10](https://github.com/DioxusLabs/dioxus/releases/tag/v0.7.10), das Werkzeug von Dioxus
