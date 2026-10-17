@@ -40,11 +40,23 @@ Erste nutzbare Version:
 
 Fachlich geprüfte Regeln und Referenzwerte fehlen noch. Für Erkrankungen zeigt die App deshalb meist „unbekannt“. Jede Grenze braucht eine zitierte Quelle und eine fachliche Freigabe. Hier hilft das Projekt am meisten Unterstützung, siehe [Mitmachen](#mitmachen).
 
-## Ausprobieren
+## Installieren
 
-Die Web-Version läuft ohne Installation im Browser, auch auf dem iPhone: **https://piminusmax.github.io/healthyteller/** (nach jedem Merge auf `main` aktualisiert). Über „Zum Home-Bildschirm“ lässt sie sich wie eine App ablegen.
+**Im Browser, auch auf dem iPhone:** https://piminusmax.github.io/healthyteller/
+Über „Zum Home-Bildschirm“ (iPhone, Safari) oder „App installieren“ (Android, Chrome; Desktop, Chrome oder Edge) liegt sie wie eine App auf dem Gerät. Nach dem ersten Öffnen startet sie auch ohne Internet; nur das Laden neuer Produkte braucht eine Verbindung.
 
-Selbst bauen geht am einfachsten im Dev Container (`.devcontainer/`, zum Beispiel mit VS Code), der alle Werkzeuge mitbringt. Ohne Container braucht es:
+**Als App-Paket:** Unter [Releases](https://github.com/PiMinusMax/healthyteller/releases) liegen zu jeder Version:
+
+| Plattform | Datei | Hinweis |
+| --- | --- | --- |
+| Android | `healthyteller-android-arm64.apk` | Installation aus unbekannten Quellen erlauben |
+| Linux | `.AppImage` oder `.deb` | AppImage ausführbar machen und starten |
+| Windows | `…setup.exe` | nicht signiert, Windows warnt beim ersten Start |
+| macOS | `.dmg` | nicht signiert, beim ersten Start mit Rechtsklick „Öffnen“ |
+
+## Selbst bauen
+
+Am einfachsten im Dev Container (`.devcontainer/`, zum Beispiel mit VS Code), der alle Werkzeuge mitbringt. Ohne Container braucht es:
 
 - Rust (stable) und das Ziel `wasm32-unknown-unknown`
 - [dx 0.7.10](https://github.com/DioxusLabs/dioxus/releases/tag/v0.7.10), das Werkzeug von Dioxus
