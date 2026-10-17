@@ -15,6 +15,12 @@
     "allergens_tags": ["en:milk"],
     "traces_tags": ["en:nuts", "en:unknown-tag"],
     "ingredients_text_de": "Joghurt (Milch), Pektin",
+    "serving_size": "1 Becher (150 g)",
+    "serving_quantity": 150,
+    "serving_quantity_unit": "g",
+    "quantity": "500 g",
+    "product_quantity": "500",
+    "product_quantity_unit": "g",
     "nutriments": {
       "energy-kcal_100g": 60,
       "energy_100g": 251,

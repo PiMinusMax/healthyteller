@@ -44,7 +44,40 @@ pub struct Food {
     /// NOVA group 1 to 4.
     pub nova_group: Option<u8>,
     pub additives: Vec<String>,
+    /// Portion sizes the source states, e.g. the manufacturer's serving or the package.
+    #[serde(default)]
+    pub portions: Vec<SourcePortion>,
     pub source: SourceRef,
+}
+
+/// A portion size as the source states it. The app never makes one up (AGENTS.md rule 2).
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct SourcePortion {
+    pub kind: PortionKind,
+    pub grams: f64,
+    /// The source's own wording, e.g. "1 Becher (150 g)".
+    pub label: Option<String>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum PortionKind {
+    /// One serving as the manufacturer declares it.
+    Serving,
+    /// The whole package.
+    Package,
+    /// One piece, e.g. a banana, from a food composition database.
+    Piece,
+}
+
+impl PortionKind {
+    pub fn key(self) -> &'static str {
+        match self {
+            PortionKind::Serving => "serving",
+            PortionKind::Package => "package",
+            PortionKind::Piece => "piece",
+        }
+    }
 }
 
 impl Food {
@@ -151,6 +184,7 @@ pub(crate) mod tests {
             ingredients: None,
             nova_group: None,
             additives: Vec::new(),
+            portions: Vec::new(),
             source,
         }
     }

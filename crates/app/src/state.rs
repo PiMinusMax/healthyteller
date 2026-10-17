@@ -269,6 +269,13 @@ impl AppState {
         });
     }
 
+    /// The person's own portion of the food, else the source's serving, else 100 g.
+    pub fn usual_portion(&self, food: &Food) -> Portion {
+        self.my_food(&food.id.0)
+            .map(|m| m.portion)
+            .unwrap_or_else(|| source_portion(food))
+    }
+
     /// Results needing attention for a food in its usual portion, one per dimension, for lists:
     /// caution, avoid and values the source lacks. Never an overall score (AGENTS.md rule 7).
     pub fn attention(&self, food_id: &str) -> Vec<(String, Level)> {
@@ -282,9 +289,7 @@ impl AppState {
         let Some(profile) = self.active_profile() else {
             return Vec::new();
         };
-        let portion = self
-            .my_food(&food.id.0)
-            .map_or_else(default_portion, |m| m.portion);
+        let portion = self.usual_portion(food);
         let e = healthyteller_core::evaluate(
             food,
             &portion,
@@ -369,6 +374,17 @@ pub fn update(mut state: Signal<AppState>, f: impl FnOnce(&mut AppState)) {
     let mut s = state.write();
     f(&mut s);
     s.save();
+}
+
+/// The serving the source states, else 100 g. Never a size the app makes up.
+pub fn source_portion(food: &Food) -> Portion {
+    food.portions
+        .iter()
+        .find(|p| p.kind == healthyteller_core::PortionKind::Serving)
+        .map_or_else(default_portion, |p| Portion {
+            grams: p.grams,
+            preparation: Preparation::Raw,
+        })
 }
 
 pub fn default_portion() -> Portion {

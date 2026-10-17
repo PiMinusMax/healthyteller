@@ -4,8 +4,8 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use healthyteller_core::{
-    Allergen, AllergenData, Derivation, Food, FoodId, FoodKind, Nutrient, Quantity, SourceRef,
-    SourcedValue, Unit, ValueBasis,
+    Allergen, AllergenData, Derivation, Food, FoodId, FoodKind, Nutrient, PortionKind, Quantity,
+    SourcePortion, SourceRef, SourcedValue, Unit, ValueBasis,
 };
 use serde_json::Value;
 
@@ -16,7 +16,8 @@ pub const SOURCE_ID: &str = "off";
 
 const FIELDS: &str = "code,product_name,product_name_de,generic_name_de,brands,nutriments,\
 allergens_tags,traces_tags,ingredients_text,ingredients_text_de,nova_group,additives_tags,\
-completeness,rev,nutriments_estimated";
+completeness,rev,nutriments_estimated,serving_size,serving_quantity,serving_quantity_unit,\
+quantity,product_quantity,product_quantity_unit";
 
 /// Open Food Facts asks every app to identify itself.
 pub const USER_AGENT: &str = "HealthyTeller/0.1 (https://github.com/PiMinusMax/healthyteller)";
@@ -390,8 +391,39 @@ fn parse_product(product: &Value, retrieved_at: &str) -> Result<Food, IngestErro
             .iter()
             .map(|t| t.trim_start_matches("en:").to_uppercase())
             .collect(),
+        portions: portions(product),
         source,
     })
+}
+
+/// Serving and package size in grams as the product page states them. Sizes in millilitres
+/// are left out: turning them into grams would need a density the source does not give.
+fn portions(product: &Value) -> Vec<SourcePortion> {
+    let grams = |amount: &str, unit: &str| {
+        let unit = text(product, unit).unwrap_or_else(|| "g".to_owned());
+        product
+            .get(amount)
+            .and_then(number)
+            .filter(|g| *g > 0.0 && unit.eq_ignore_ascii_case("g"))
+    };
+    let mut out = Vec::new();
+    if let Some(g) = grams("serving_quantity", "serving_quantity_unit") {
+        out.push(SourcePortion {
+            kind: PortionKind::Serving,
+            grams: g,
+            label: text(product, "serving_size"),
+        });
+    }
+    if let Some(g) = grams("product_quantity", "product_quantity_unit")
+        && !out.iter().any(|p| (p.grams - g).abs() < 0.5)
+    {
+        out.push(SourcePortion {
+            kind: PortionKind::Package,
+            grams: g,
+            label: text(product, "quantity"),
+        });
+    }
+    out
 }
 
 #[cfg(test)]
@@ -418,6 +450,21 @@ mod tests {
         assert_eq!(food.brand.as_deref(), Some("Fixture Molkerei"));
         assert_eq!(food.nova_group, Some(1));
         assert_eq!(food.additives, vec!["E440".to_owned()]);
+        assert_eq!(
+            food.portions,
+            vec![
+                SourcePortion {
+                    kind: PortionKind::Serving,
+                    grams: 150.0,
+                    label: Some("1 Becher (150 g)".into()),
+                },
+                SourcePortion {
+                    kind: PortionKind::Package,
+                    grams: 500.0,
+                    label: Some("500 g".into()),
+                },
+            ]
+        );
 
         let energy = &food.nutrients[&Nutrient::Energy];
         assert_eq!(energy.quantity, Quantity::new(60.0, Unit::Kilocalorie));
@@ -471,6 +518,19 @@ mod tests {
         );
         // Neither source has a value: it stays missing.
         assert!(!food.nutrients.contains_key(&Nutrient::Iron));
+    }
+
+    #[test]
+    fn portions_in_millilitres_are_left_out() {
+        let product = serde_json::json!({
+            "code": "4000000000017",
+            "serving_quantity": 250,
+            "serving_quantity_unit": "ml",
+            "product_quantity": "1000",
+            "product_quantity_unit": "ml"
+        });
+        let food = parse_product(&product, "2026-10-17").unwrap();
+        assert!(food.portions.is_empty());
     }
 
     #[test]

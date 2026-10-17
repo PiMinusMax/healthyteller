@@ -21,6 +21,7 @@ Hinweise:
 - Die Namenssuche liefert nur Barcode, Name und Marke. Wählt man einen Treffer, lädt die App das Produkt vollständig per Barcode, weil der Suchindex älter sein kann als die Produktdaten.
 - Open Food Facts garantiert weder Richtigkeit noch Vollständigkeit. Die App zeigt deshalb Vollständigkeit und Herkunft der Werte an.
 - Nährwerte sind Herstellerangaben und tragen in der App das Kennzeichen ∑. Fehlende Werte füllt die App aus `nutriments_estimated` (von Open Food Facts aus Zutaten berechnet, Kennzeichen ◐), siehe [ADR 0004](../docs/adr/0004-datenlage-und-schaetzung.md).
+- Portionsgrößen übernimmt die App aus `serving_quantity` (Portion laut Hersteller, Text aus `serving_size`) und `product_quantity` (Packung, Text aus `quantity`), nur in Gramm. Angaben in Millilitern bleiben außen vor, weil die Umrechnung eine Dichte bräuchte, die die Quelle nicht nennt.
 
 ## Ausweichweg Namenssuche
 

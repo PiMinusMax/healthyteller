@@ -5,7 +5,7 @@ use healthyteller_core::Preparation;
 
 use crate::Route;
 use crate::components::{Card, TopBar};
-use crate::i18n::tr;
+use crate::i18n::{tr, tr_args};
 use crate::labels;
 use crate::state::{default_portion, use_app_state};
 
@@ -16,7 +16,9 @@ pub fn PortionScreen(id: String) -> Element {
     let state = use_app_state();
     let s = state.read();
     let food = s.food(&id).cloned();
-    let start = s.my_food(&id).map_or_else(default_portion, |m| m.portion);
+    let start = food
+        .as_ref()
+        .map_or_else(default_portion, |f| s.usual_portion(f));
     drop(s);
     let mut grams = use_signal(|| start.grams.round() as u32);
     let mut prep = use_signal(|| start.preparation);
@@ -32,6 +34,12 @@ pub fn PortionScreen(id: String) -> Element {
         };
     };
     let source = labels::source_name(&food.source.id);
+    // The slider reaches at least the whole package.
+    let max_grams = food
+        .portions
+        .iter()
+        .map(|p| p.grams.round() as u32)
+        .fold(1000, u32::max);
     let kind = tr(match food.kind {
         healthyteller_core::FoodKind::Generic => "food-kind-generic",
         healthyteller_core::FoodKind::Brand => "food-kind-brand",
@@ -59,7 +67,7 @@ pub fn PortionScreen(id: String) -> Element {
                         class: "range",
                         r#type: "range",
                         min: "5",
-                        max: "1000",
+                        max: "{max_grams}",
                         step: "5",
                         value: "{grams}",
                         oninput: move |e| {
@@ -67,6 +75,29 @@ pub fn PortionScreen(id: String) -> Element {
                                 grams.set(v);
                             }
                         },
+                    }
+                    if !food.portions.is_empty() {
+                        div { class: "quick source-portions", role: "group", "aria-label": tr("portion-from-source"),
+                            for p in food.portions.clone() {
+                                {
+                                    let g = p.grams.round() as u32;
+                                    let name = tr(&format!("portion-kind-{}", p.kind.key()));
+                                    rsx! {
+                                        button {
+                                            key: "{p.kind.key()}",
+                                            class: "btn",
+                                            "aria-pressed": if grams() == g { "true" } else { "false" },
+                                            onclick: move |_| grams.set(g),
+                                            span { style: "display: flex; flex-direction: column; align-items: center;",
+                                                span { "{name}" }
+                                                span { class: "num small", "{g} g" }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        p { class: "small muted", {tr_args("portion-source-note", &[("source", source.clone())])} }
                     }
                     div { class: "quick", role: "group", "aria-label": tr("portion-quick"),
                         for g in QUICK {

@@ -191,6 +191,15 @@ mod tests {
                 .map(|c| format!("condition-{}", c.key())),
         );
         ids.extend(
+            [
+                PortionKind::Serving,
+                PortionKind::Package,
+                PortionKind::Piece,
+            ]
+            .iter()
+            .map(|k| format!("portion-kind-{}", k.key())),
+        );
+        ids.extend(
             MedicationGroup::ALL
                 .iter()
                 .map(|m| format!("medication-{}", m.key())),

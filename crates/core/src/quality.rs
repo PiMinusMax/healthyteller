@@ -171,6 +171,7 @@ mod tests {
             ingredients: None,
             nova_group: None,
             additives: Vec::new(),
+            portions: Vec::new(),
             source: SourceRef {
                 id: "test".into(),
                 version: "1".into(),
