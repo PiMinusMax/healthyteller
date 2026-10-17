@@ -508,3 +508,35 @@ scan-no-camera = Die Kamera ließ sich nicht öffnen. Bitte erlauben Sie den Zug
 scan-video-label = Kamerabild zum Scannen des Barcodes
 
 settings-language = Sprache
+
+## 23 Vergleich, 24 Fragen an den Arzt
+
+card-compare = Mit anderem Lebensmittel vergleichen
+compare-topbar = Vergleich
+compare-instead-of = Statt { $name }
+compare-pick = Womit vergleichen?
+compare-pick-lead = Wählen Sie ein Lebensmittel aus Meine Lebensmittel oder aus dem Speicher dieses Geräts.
+compare-none = Auf diesem Gerät ist noch kein zweites Lebensmittel gespeichert. Suchen Sie zuerst ein weiteres.
+compare-per-portion = Je { $grams } g.
+compare-note = Die Werte stammen unverändert aus der Quelle. Unbekannt heißt nicht null. Die App wählt nicht für Sie aus.
+compare-add = { $name } auf den Teller legen
+compare-open = Karte von { $name } öffnen
+questions-link = Fragen an den Arzt
+questions-topbar = Arzttermin
+questions-title = Fragen für den nächsten Termin
+questions-lead = Die App sammelt offene Fragen aus dem Profil von { $name }. Sie entscheidet sie nicht.
+questions-none = Zurzeit gibt es keine offenen Fragen aus dem Profil. Eigene Fragen können Sie unten notieren.
+questions-kind-conflict = Widerspruch
+questions-kind-missing = Vorgabe fehlt
+questions-kind-traces = Spurenhinweis
+questions-question = Frage
+questions-conflict-context = Für { $upper } und für { $lower } gelten hier gegensätzliche Regeln.
+questions-conflict = Wie viel { $nutrient } pro Tag ist für mich richtig?
+questions-missing-context = Wegen { $condition } ist das eine wichtige Kennzahl. Im Profil ist noch keine Vorgabe eingetragen.
+questions-missing = Gibt es für mich eine Grenze für { $nutrient } pro Tag?
+questions-traces-context = Die Daten nennen einen Spurenhinweis: { $allergens }.
+questions-traces = Sind Lebensmittel mit Spurenhinweis auf { $allergens } für mich in Ordnung?
+questions-include = In den Bericht aufnehmen
+questions-own = Eigene Frage
+questions-print = Bericht drucken oder als PDF speichern
+questions-count = { $chosen } von { $total } Fragen ausgewählt

@@ -35,6 +35,7 @@ Erste nutzbare Version:
 - Profil mit Erkrankungen, Allergien und Arztvorgaben
 - Produkte per Kamera-Scan, Barcode-Nummer oder Name aus [Open Food Facts](https://world.openfoodfacts.org)
 - Bewertung von Allergenen und eigenen Arztvorgaben, Teller mit Tagessummen, Meine Lebensmittel, Druckliste
+- Vergleich zweier Lebensmittel und eine Liste mit Fragen für den nächsten Arzttermin
 - Gerätewechsel über eine verschlüsselte Exportdatei
 - Deutsch und Englisch
 - Web, Desktop (Linux, Windows, macOS) und Android aus einer Codebasis

@@ -508,3 +508,35 @@ scan-no-camera = The camera could not be opened. Please allow access or enter th
 scan-video-label = Camera picture for scanning the barcode
 
 settings-language = Language
+
+## 23 Comparison, 24 Questions for the doctor
+
+card-compare = Compare with another food
+compare-topbar = Comparison
+compare-instead-of = Instead of { $name }
+compare-pick = Compare with what?
+compare-pick-lead = Choose a food from my foods or from the storage of this device.
+compare-none = No second food is stored on this device yet. Search for another one first.
+compare-per-portion = Per { $grams } g.
+compare-note = The values come unchanged from the source. Unknown does not mean zero. The app does not choose for you.
+compare-add = Put { $name } on the plate
+compare-open = Open the card of { $name }
+questions-link = Questions for the doctor
+questions-topbar = Doctor's appointment
+questions-title = Questions for the next appointment
+questions-lead = The app collects open questions from the profile of { $name }. It does not decide them.
+questions-none = There are no open questions from the profile at the moment. You can note your own questions below.
+questions-kind-conflict = Conflict
+questions-kind-missing = Limit missing
+questions-kind-traces = Trace warning
+questions-question = Question
+questions-conflict-context = Opposite rules apply here for { $upper } and for { $lower }.
+questions-conflict = How much { $nutrient } per day is right for me?
+questions-missing-context = Because of { $condition } this is an important figure. No limit is entered in the profile yet.
+questions-missing = Is there a limit for { $nutrient } per day for me?
+questions-traces-context = The data mention a trace warning: { $allergens }.
+questions-traces = Are foods with a trace warning for { $allergens } fine for me?
+questions-include = Include in the report
+questions-own = Own question
+questions-print = Print report or save as PDF
+questions-count = { $chosen } of { $total } questions selected

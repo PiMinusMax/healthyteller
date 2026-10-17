@@ -55,6 +55,12 @@ pub enum Route {
         PrintList {},
         #[route("/schaetzungen")]
         Estimates {},
+        #[route("/vergleich/:id/:grams")]
+        CompareStart { id: String, grams: u32 },
+        #[route("/vergleich/:id/:other/:grams")]
+        Compare { id: String, other: String, grams: u32 },
+        #[route("/arztfragen")]
+        DoctorQuestions {},
         #[route("/:..segments")]
         NotFound { segments: Vec<String> },
 }

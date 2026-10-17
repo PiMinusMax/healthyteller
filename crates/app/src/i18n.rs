@@ -245,6 +245,7 @@ mod tests {
             ids.push(format!("term-{t}-text"));
         }
         ids.extend((1..=3).map(|s| format!("profile-step-{s}")));
+        ids.extend(["conflict", "missing", "traces"].map(|k| format!("questions-kind-{k}")));
         let missing: Vec<&String> = ids.iter().filter(|id| !has(id)).collect();
         assert!(
             missing.is_empty(),

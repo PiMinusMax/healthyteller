@@ -124,6 +124,7 @@ pub fn Settings() -> Element {
                     (Route::Profiles {}, "profiles-title", IconName::Settings),
                     (Route::MyFoods {}, "my-foods-title", IconName::Menu),
                     (Route::PrintList {}, "print-create", IconName::Print),
+                    (Route::DoctorQuestions {}, "questions-link", IconName::Info),
                     (Route::Estimates {}, "estimates-all", IconName::Info),
                     (Route::About {}, "about-link", IconName::Info),
                 ] {

@@ -325,3 +325,10 @@ details.group > summary::-webkit-details-marker { display: none; }
 /* Camera scan */
 .scanner { display: flex; flex-direction: column; gap: 10px; }
 .scanner-video { width: 100%; max-height: 50vh; border-radius: var(--kt-radius-control); background: #000; object-fit: cover; }
+
+/* Comparison table */
+table.compare th, table.compare td { padding: 12px 10px; }
+table.compare thead th { border-bottom: 2px solid var(--kt-ink); }
+
+.print-only { display: none; }
+@media print { .print-only { display: block; } }

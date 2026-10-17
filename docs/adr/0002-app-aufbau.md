@@ -20,13 +20,14 @@ Mit den Mockups in `docs/mockups/` steht das Ziel der Oberfläche fest. Die App 
 - **Zusatzangaben ohne Urteil.** NOVA-Gruppe, Zusatzstoffe und Zutaten zeigt die Karte unverändert aus der Quelle, ohne Ampel, bis es dafür geprüfte Regeln gibt.
 - **Tests ohne Netz.** Die Ende-zu-Ende-Tests beantworten Anfragen an Open Food Facts mit den Fixtures aus `fixtures/open-food-facts/`.
 - **Farben im Dunkelmodus.** Die Mockup-Tokens definieren für Dunkel keine hellen Hintergrundflächen (soft). Diese Werte sind ergänzt und in `crates/app/assets/main.css` als „added“ markiert; axe prüft den Kontrast in Hell und Dunkel.
-
 - **Kamera-Scan in Rust.** Die Web-App liest Kamerabilder über `getUserMedia`, verkleinert sie auf 640 px Breite und erkennt EAN-13, EAN-8, UPC-A und UPC-E mit `rxing` im Crate `barcode`. Safari auf dem iPhone hat keine Barcode-Schnittstelle, deshalb läuft die Erkennung in WebAssembly. Nur die erkannte Nummer wird weiterverwendet.
+- **Vergleich und Arztfragen ohne Urteil.** Der Vergleich zweier Lebensmittel zeigt Werte der Quelle und die Ampeln je Dimension nebeneinander, wählt aber nicht aus. Die Fragen an den Arzt entstehen aus dem Profil (Widersprüche zwischen Regeln, fehlende Vorgaben, Spurenhinweise); die App beantwortet sie nicht.
+- **Quellen-Check.** Ein wöchentlicher Workflow lädt ein Produkt live von Open Food Facts, prüft es mit dem Adapter und fragt die Suchdienste ab. Bei einem Fehler legt er ein Issue an. Die geladenen Daten bleiben im Lauf.
 
 ## Noch nicht umgesetzt
 
 - Kamera-Scan in Desktop- und Android-App (in der Web-App vorhanden)
 - Referenzwerte (Soll) und damit Lücken und Vorschläge
-- Konfliktbericht als PDF, Alternativen, Schätzmethoden
+- automatische Vorschläge für Alternativen (brauchen geprüfte Regeln), Schätzmethoden
 - Verschlüsselung des lokalen Speichers selbst; bisher ist nur die Exportdatei verschlüsselt
 - Export auf Android (dort fehlt noch ein Ordner, auf den die Person zugreifen kann)

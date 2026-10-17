@@ -144,6 +144,11 @@ pub fn FoodCard(id: String, grams: u32, prep: String) -> Element {
                 to: Route::NutrientList { id: id.clone(), grams: grams_u, prep: prep_key.clone() },
                 {tr("card-all-nutrients")}
             }
+            Link {
+                class: "btn btn-quiet btn-large",
+                to: Route::CompareStart { id: id.clone(), grams: grams_u },
+                {tr("card-compare")}
+            }
             div { class: "btn-row",
                 button {
                     class: "btn btn-primary btn-large",
