@@ -454,6 +454,7 @@ search-online-title = Bei Open Food Facts suchen
 search-online-action = Online nach Name oder Marke suchen
 search-online-privacy = Nur der Suchbegriff verlässt das Gerät. Er geht an Open Food Facts.
 search-online-none = Open Food Facts hat dazu nichts gefunden.
+search-merged = { $count } Einträge zusammengefasst
 import-label = Oder Produktdatei importieren
 import-hint = Eine JSON-Datei, die Sie selbst bei Open Food Facts heruntergeladen haben. Sie bleibt auf diesem Gerät.
 import-read-error = Die Datei ließ sich nicht lesen.

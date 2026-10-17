@@ -10,6 +10,7 @@ use crate::format;
 use crate::i18n::{tr, tr_args};
 use crate::labels;
 use crate::state::{MyFood, default_portion, update, use_app_state};
+use healthyteller_ingest::search::SearchHit;
 
 #[derive(Clone, PartialEq)]
 struct Row {
@@ -170,7 +171,7 @@ fn AddMyFood() -> Element {
     let state = use_app_state();
     let mut query = use_signal(String::new);
     let mut barcode = use_signal(String::new);
-    let mut results = use_signal(Vec::<Food>::new);
+    let mut results = use_signal(Vec::<SearchHit>::new);
     let mut lookup = use_signal(|| Lookup::Idle);
     let mut last = use_signal(|| None::<String>);
 
@@ -243,7 +244,8 @@ fn AddMyFood() -> Element {
     // Foods already on this device come first, without a network request.
     let q = query().trim().to_lowercase();
     let s = state.read();
-    let mut shown: Vec<(Food, bool)> = if q.chars().count() < 2 {
+    // (food, already in my foods, search hit that still has to be loaded)
+    let mut shown: Vec<(Food, bool, bool)> = if q.chars().count() < 2 {
         Vec::new()
     } else {
         s.foods
@@ -257,14 +259,15 @@ fn AddMyFood() -> Element {
             })
             .map(|f| {
                 let mine = s.my_food(&f.id.0).is_some();
-                (f, mine)
+                (f, mine, false)
             })
             .collect()
     };
-    for f in results() {
-        if !shown.iter().any(|(x, _)| x.id == f.id) {
+    for hit in results() {
+        let f = hit.food;
+        if !shown.iter().any(|(x, _, _)| x.id == f.id) {
             let mine = s.my_food(&f.id.0).is_some();
-            shown.push((f, mine));
+            shown.push((f, mine, true));
         }
     }
     drop(s);
@@ -314,7 +317,7 @@ fn AddMyFood() -> Element {
             }
             if !shown.is_empty() {
                 ul { class: "list",
-                    for (food, mine) in shown {
+                    for (food, mine, _online) in shown {
                         li { key: "{food.id.0}", class: "food-row",
                             span { class: "grow food-name", {labels::food_title(&food)} }
                             if mine {

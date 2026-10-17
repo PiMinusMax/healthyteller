@@ -7,6 +7,7 @@
 pub mod adapter;
 pub mod off;
 pub mod rules;
+pub mod search;
 pub mod sources;
 
 pub use adapter::{FetchRequest, IngestError, RawArtifact, SourceAdapter, SourceMeta};
