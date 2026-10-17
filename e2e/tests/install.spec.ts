@@ -14,19 +14,23 @@ test("web app can be installed: manifest and icons", async ({ page, request }) =
   }
 });
 
-test("app starts offline after the first visit", async ({ page, context, browserName }) => {
-  test.skip(browserName !== "chromium", "Service workers in Playwright are reliable in Chromium only");
-  await acceptNotice(page);
-  await page.evaluate(async () => {
-    await navigator.serviceWorker.ready;
+test.describe("offline", () => {
+  test.use({ serviceWorkers: "allow" });
+
+  test("app starts offline after the first visit", async ({ page, context, browserName }) => {
+    test.skip(browserName !== "chromium", "Service workers in Playwright are reliable in Chromium only");
+    await acceptNotice(page);
+    await page.evaluate(async () => {
+      await navigator.serviceWorker.ready;
+    });
+    // A second load lets the service worker cache the hashed app files.
+    await page.reload();
+    await expect(page.getByRole("link", { name: /Lebensmittel prüfen/ })).toBeVisible();
+    await context.setOffline(true);
+    await page.reload();
+    await expect(page.getByRole("link", { name: /Lebensmittel prüfen/ })).toBeVisible();
+    await page.getByRole("link", { name: /Teller ansehen/ }).click();
+    await expect(page.getByRole("heading", { level: 1, name: "Heute" })).toBeVisible();
+    await context.setOffline(false);
   });
-  // A second load lets the service worker cache the hashed app files.
-  await page.reload();
-  await expect(page.getByRole("link", { name: /Lebensmittel prüfen/ })).toBeVisible();
-  await context.setOffline(true);
-  await page.reload();
-  await expect(page.getByRole("link", { name: /Lebensmittel prüfen/ })).toBeVisible();
-  await page.getByRole("link", { name: /Teller ansehen/ }).click();
-  await expect(page.getByRole("heading", { level: 1, name: "Heute" })).toBeVisible();
-  await context.setOffline(false);
 });

@@ -8,7 +8,12 @@ export default defineConfig({
   testDir: "./tests",
   forbidOnly: !!process.env.CI,
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
-  use: { baseURL: `http://127.0.0.1:${port}` },
+  use: {
+    baseURL: `http://127.0.0.1:${port}`,
+    // With a service worker in control, WebKit does not pass requests to page.route,
+    // so the Open Food Facts fixtures would not apply. Only the offline test allows it.
+    serviceWorkers: "block",
+  },
   webServer: {
     // -P: unknown paths fall back to index.html, so deep links work like in the app.
     command: `npx http-server ${webRoot} -p ${port} -a 127.0.0.1 -c-1 --silent -P http://127.0.0.1:${port}?`,
