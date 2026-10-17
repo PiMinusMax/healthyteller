@@ -1,0 +1,30 @@
+{
+  "_comment": "Fixture with invented values in the format of the Open Food Facts search (cgi/search.pl, json=1). Not real products.",
+  "count": 3,
+  "page": 1,
+  "page_size": 20,
+  "products": [
+    {
+      "code": "4000000000048",
+      "product_name_de": "Testquark mager",
+      "brands": "Fixture Molkerei",
+      "completeness": 0.7,
+      "allergens_tags": [],
+      "ingredients_text_de": "Magerquark",
+      "nutriments": { "energy-kcal_100g": 70, "proteins_100g": 12, "salt_100g": 0.1 }
+    },
+    {
+      "code": "4000000000055",
+      "product_name_de": "Testquark Vanille",
+      "brands": "Fixture Molkerei",
+      "allergens_tags": ["en:milk"],
+      "nova_group": 4,
+      "additives_tags": ["en:e1442", "en:e330"],
+      "ingredients_text_de": "Quark (Milch), Zucker, modifizierte Stärke, Aroma",
+      "nutriments": { "energy-kcal_100g": 120, "sugars_100g": 11 }
+    },
+    {
+      "product_name": "Entry without barcode"
+    }
+  ]
+}

@@ -4,6 +4,8 @@
 //! Values are stored as JSON per key. Encryption of the profile and the SQLite database
 //! for source data follow in later milestones (see docs/adr/0002-app-aufbau.md).
 
+pub mod export;
+
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::fmt;

@@ -1,6 +1,7 @@
 //! 03/04 Suche: search field, barcode, saved plates and the person's own foods.
 
 use dioxus::prelude::*;
+use healthyteller_core::Food;
 
 use crate::Route;
 use crate::components::{Card, Icon, IconName, TopBar};
@@ -8,6 +9,14 @@ use crate::fetch;
 use crate::i18n::{tr, tr_args};
 use crate::labels;
 use crate::state::{update, use_app_state};
+
+#[derive(Clone, PartialEq)]
+enum Online {
+    Idle,
+    Loading,
+    Results(Vec<Food>),
+    Failed(String),
+}
 
 #[derive(Clone, PartialEq)]
 enum Lookup {
@@ -23,6 +32,8 @@ pub fn Search() -> Element {
     let mut barcode = use_signal(String::new);
     let mut lookup = use_signal(|| Lookup::Idle);
     let mut last_added = use_signal(|| None::<(String, usize)>);
+    let mut online = use_signal(|| Online::Idle);
+    let mut import_error = use_signal(|| None::<String>);
 
     let s = state.read();
     let q = query().trim().to_lowercase();
@@ -79,6 +90,35 @@ pub fn Search() -> Element {
         .collect();
     drop(s);
 
+    let search_online = move |_| {
+        let terms = query();
+        online.set(Online::Loading);
+        spawn(async move {
+            match fetch::search_products(&terms).await {
+                Ok(foods) => online.set(Online::Results(foods)),
+                Err(e) => online.set(Online::Failed(tr(e.message_key()))),
+            }
+        });
+    };
+
+    let import_file = move |e: FormEvent| async move {
+        let Some(file) = e.files().into_iter().next() else {
+            return;
+        };
+        match file.read_bytes().await {
+            Ok(bytes) => match fetch::parse_product(&bytes) {
+                Ok(food) => {
+                    let id = food.id.0.clone();
+                    update(state, |s| s.cache_food(food));
+                    import_error.set(None);
+                    navigator().push(Route::PortionScreen { id });
+                }
+                Err(err) => import_error.set(Some(tr(err.message_key()))),
+            },
+            Err(_) => import_error.set(Some(tr("import-read-error"))),
+        }
+    };
+
     let check_barcode = move |_| {
         let code = barcode();
         lookup.set(Lookup::Loading);
@@ -131,6 +171,46 @@ pub fn Search() -> Element {
                     }
                     p { class: "card-body small muted", {tr("search-local-only")} }
                 }
+                Card { title: tr("search-online-title"), id: "search-online",
+                    div { class: "card-body",
+                        button {
+                            class: "btn btn-secondary",
+                            disabled: q.chars().count() < 2 || online() == Online::Loading,
+                            onclick: search_online,
+                            Icon { name: IconName::Search }
+                            if online() == Online::Loading { {tr("barcode-loading")} } else { {tr("search-online-action")} }
+                        }
+                        p { class: "small muted", {tr("search-online-privacy")} }
+                        if let Online::Failed(msg) = online() {
+                            p { class: "error", role: "alert", "{msg}" }
+                        }
+                    }
+                    if let Online::Results(foods) = online() {
+                        if foods.is_empty() {
+                            p { class: "card-row muted", {tr("search-online-none")} }
+                        }
+                        ul { class: "list",
+                            for food in foods {
+                                li { key: "{food.id.0}",
+                                    button {
+                                        class: "row-btn food-row",
+                                        onclick: {
+                                            let food = food.clone();
+                                            move |_| {
+                                                let id = food.id.0.clone();
+                                                let food = food.clone();
+                                                update(state, |s| s.cache_food(food));
+                                                navigator().push(Route::PortionScreen { id });
+                                            }
+                                        },
+                                        span { class: "grow food-name", {labels::food_title(&food)} }
+                                        Icon { name: IconName::ChevronRight }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
             Card { title: tr("barcode-title"),
                 div { class: "card-body",
@@ -157,6 +237,19 @@ pub fn Search() -> Element {
                     }
                     p { class: "small muted", {tr("barcode-privacy")} }
                     p { class: "small muted", {tr("barcode-camera-later")} }
+                    div { class: "field",
+                        label { r#for: "import-file", {tr("import-label")} }
+                        input {
+                            id: "import-file",
+                            r#type: "file",
+                            accept: ".json,application/json",
+                            onchange: import_file,
+                        }
+                        p { class: "small muted", {tr("import-hint")} }
+                        if let Some(msg) = import_error() {
+                            p { class: "error", role: "alert", "{msg}" }
+                        }
+                    }
                 }
             }
             if !plates.is_empty() {

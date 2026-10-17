@@ -119,6 +119,26 @@ pub fn FoodCard(id: String, grams: u32, prep: String) -> Element {
                 Notice { kind: NoticeKind::Allergens }
             }
 
+            if food.nova_group.is_some() || !food.additives.is_empty() || food.ingredients.is_some() {
+                Card { title: tr("card-more"), id: "card-more",
+                    dl { class: "card-body facts",
+                        if let Some(nova) = food.nova_group {
+                            dt { Link { to: Route::Term { term: "nova".into() }, {tr("term-nova-title")} } }
+                            dd { {tr_args("card-nova", &[("group", nova.to_string())])} }
+                        }
+                        if !food.additives.is_empty() {
+                            dt { {tr("card-additives")} }
+                            dd { {food.additives.join(", ")} }
+                        }
+                        if let Some(ingredients) = &food.ingredients {
+                            dt { {tr("card-ingredients")} }
+                            dd { "{ingredients}" }
+                        }
+                    }
+                    p { class: "card-row small muted", {tr("card-more-note")} }
+                }
+            }
+
             Link {
                 class: "btn btn-secondary btn-large",
                 to: Route::NutrientList { id: id.clone(), grams: grams_u, prep: prep_key.clone() },

@@ -447,3 +447,41 @@ print-group-avoid = Meiden
 print-group-unknown = Noch nicht bewertbar
 print-empty = Die Liste entsteht aus Meine Lebensmittel. Fügen Sie dort zuerst Lebensmittel hinzu.
 print-action = Drucken
+
+## Suche bei Open Food Facts, Datei-Import, weitere Angaben
+
+search-online-title = Bei Open Food Facts suchen
+search-online-action = Online nach Name oder Marke suchen
+search-online-privacy = Nur der Suchbegriff verlässt das Gerät. Er geht an Open Food Facts.
+search-online-none = Open Food Facts hat dazu nichts gefunden.
+import-label = Oder Produktdatei importieren
+import-hint = Eine JSON-Datei, die Sie selbst bei Open Food Facts heruntergeladen haben. Sie bleibt auf diesem Gerät.
+import-read-error = Die Datei ließ sich nicht lesen.
+card-more = Weitere Angaben der Quelle
+card-nova = Gruppe { $group } von 4
+card-additives = Zusatzstoffe
+card-ingredients = Zutaten
+card-more-note = Diese Angaben stammen unverändert aus der Quelle. Die App bewertet sie noch nicht.
+
+## Gerätewechsel
+
+transfer-title = Gerätewechsel
+transfer-lead = Profile, Meine Lebensmittel, gespeicherte Teller und Einstellungen lassen sich als verschlüsselte Datei übertragen. Ohne Passwort kann niemand die Datei lesen, auch nicht das Projekt.
+transfer-export = Exportieren
+transfer-pass = Passwort
+transfer-pass-repeat = Passwort wiederholen
+transfer-pass-hint = Mindestens { $min } Zeichen. Ohne dieses Passwort lässt sich die Datei nicht mehr öffnen.
+transfer-export-action = Verschlüsselte Datei erstellen
+transfer-save-file = Datei speichern
+transfer-saved = Gespeichert unter { $path }
+transfer-no-folder = Auf diesem Gerät gibt es keinen Ordner für Downloads.
+transfer-import = Importieren
+transfer-file = Exportdatei (.htx)
+transfer-import-warning = Der Import ersetzt Profile, Meine Lebensmittel, gespeicherte Teller und Einstellungen auf diesem Gerät.
+transfer-import-action = Importieren
+transfer-imported = Import abgeschlossen.
+transfer-pass-short = Das Passwort ist zu kurz.
+transfer-pass-mismatch = Die beiden Passwörter stimmen nicht überein.
+transfer-not-export = Das ist keine Exportdatei von Healthy Teller.
+transfer-wrong-pass = Das Passwort ist falsch oder die Datei ist beschädigt.
+transfer-crypto-error = Die Verschlüsselung ist fehlgeschlagen.

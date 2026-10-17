@@ -35,8 +35,7 @@ impl From<IngestError> for FetchError {
     }
 }
 
-pub async fn product_by_barcode(code: &str) -> Result<Food, FetchError> {
-    let request = OpenFoodFacts.request(code)?;
+async fn get(request: healthyteller_ingest::FetchRequest) -> Result<Vec<u8>, FetchError> {
     let mut builder = reqwest::Client::new().get(&request.url);
     // Browsers do not allow setting the User-Agent; they send their own.
     if !cfg!(target_arch = "wasm32") {
@@ -51,11 +50,26 @@ pub async fn product_by_barcode(code: &str) -> Result<Food, FetchError> {
     if response.status() == reqwest::StatusCode::NOT_FOUND {
         return Err(FetchError::NotFound);
     }
-    let bytes = response
+    response
         .bytes()
         .await
-        .map_err(|e| FetchError::Network(e.to_string()))?;
+        .map(|b| b.to_vec())
+        .map_err(|e| FetchError::Network(e.to_string()))
+}
+
+pub async fn product_by_barcode(code: &str) -> Result<Food, FetchError> {
+    let bytes = get(OpenFoodFacts.request(code)?).await?;
     parse_product(&bytes)
+}
+
+/// Searches Open Food Facts by name or brand. Only the search terms leave the device.
+pub async fn search_products(terms: &str) -> Result<Vec<Food>, FetchError> {
+    let bytes = get(OpenFoodFacts.search_request(terms)?).await?;
+    let raw = RawArtifact {
+        bytes,
+        retrieved_at: date::today(),
+    };
+    Ok(OpenFoodFacts.parse_search(&raw)?)
 }
 
 /// Parses a product file, from the API or picked by the person.

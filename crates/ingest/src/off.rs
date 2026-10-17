@@ -88,6 +88,52 @@ pub fn normalize_barcode(input: &str) -> Result<String, IngestError> {
     }
 }
 
+/// Percent-encoding for a query parameter.
+fn encode_query(text: &str) -> String {
+    let mut out = String::new();
+    for b in text.bytes() {
+        if b.is_ascii_alphanumeric() || b"-_.~".contains(&b) {
+            out.push(b as char);
+        } else if b == b' ' {
+            out.push('+');
+        } else {
+            out.push_str(&format!("%{b:02X}"));
+        }
+    }
+    out
+}
+
+impl OpenFoodFacts {
+    /// Full-text search by name or brand. Only the search terms leave the device.
+    pub fn search_request(&self, terms: &str) -> Result<FetchRequest, IngestError> {
+        let terms = terms.trim();
+        if terms.chars().count() < 2 {
+            return Err(IngestError::InvalidQuery(terms.to_owned()));
+        }
+        Ok(FetchRequest {
+            url: format!(
+                "https://world.openfoodfacts.org/cgi/search.pl?search_terms={}&search_simple=1&action=process&json=1&page_size=20&fields={FIELDS}",
+                encode_query(terms)
+            ),
+            headers: vec![("User-Agent", USER_AGENT.to_owned())],
+        })
+    }
+
+    /// Products of a search answer. Entries without a barcode are skipped.
+    pub fn parse_search(&self, raw: &RawArtifact) -> Result<Vec<Food>, IngestError> {
+        let json: Value =
+            serde_json::from_slice(&raw.bytes).map_err(|e| IngestError::Format(e.to_string()))?;
+        let products = json
+            .get("products")
+            .and_then(Value::as_array)
+            .ok_or_else(|| IngestError::Format("missing products".into()))?;
+        Ok(products
+            .iter()
+            .filter_map(|p| parse_product(p, &raw.retrieved_at).ok())
+            .collect())
+    }
+}
+
 impl SourceAdapter for OpenFoodFacts {
     fn meta(&self) -> SourceMeta {
         SourceMeta {
@@ -307,6 +353,27 @@ mod tests {
             OpenFoodFacts.parse(&fixture("product-not-found.json")),
             Err(IngestError::NotFound)
         );
+    }
+
+    #[test]
+    fn parses_search_results_and_skips_entries_without_code() {
+        let foods = OpenFoodFacts
+            .parse_search(&fixture("search-results.json"))
+            .unwrap();
+        let names: Vec<&str> = foods.iter().map(|f| f.name.as_str()).collect();
+        assert_eq!(names, vec!["Testquark mager", "Testquark Vanille"]);
+        assert!(foods[1].allergens.contains.contains(&Allergen::Milk));
+    }
+
+    #[test]
+    fn search_request_encodes_terms() {
+        let req = OpenFoodFacts.search_request(" Quark & Müsli ").unwrap();
+        assert!(
+            req.url.contains("search_terms=Quark+%26+M%C3%BCsli&"),
+            "{}",
+            req.url
+        );
+        assert!(OpenFoodFacts.search_request("q").is_err());
     }
 
     #[test]
