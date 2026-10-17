@@ -164,6 +164,7 @@ impl FixtureFood {
             ingredients: None,
             nova_group: None,
             additives: Vec::new(),
+            portions: Vec::new(),
             source,
         }
     }

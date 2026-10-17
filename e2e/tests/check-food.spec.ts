@@ -108,7 +108,20 @@ test("values calculated from ingredients are marked as such", async ({ page }) =
   await page.getByRole("link", { name: /Lebensmittel prüfen/ }).click();
   await typeBarcode(page, "4000000000062");
   await expect(page.getByRole("heading", { level: 1, name: "Testapfel" })).toBeVisible();
-  await page.getByRole("button", { name: "150 g" }).click();
+  await page.getByRole("button", { name: "150 g", exact: true }).click();
   await page.getByRole("link", { name: "Bewerten" }).click();
   await expect(page.locator(".quality-explanation .quality")).toContainText("hochgerechnet");
+});
+
+test("portions the source states can be picked", async ({ page }) => {
+  await createProfile(page);
+  await page.getByRole("link", { name: /Lebensmittel prüfen/ }).click();
+  await typeBarcode(page, "4000000000017");
+  const fromSource = page.getByRole("group", { name: "Portionen laut Quelle" });
+  await expect(fromSource.getByRole("button", { name: /1 Portion/ })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByText("Gewichte laut Open Food Facts.")).toBeVisible();
+  await fromSource.getByRole("button", { name: /ganze Packung/ }).click();
+  await expect(page.locator(".big-value")).toHaveText("500 g");
+  await page.getByRole("link", { name: "Bewerten" }).click();
+  await expect(page.getByText("500 g · roh")).toBeVisible();
 });

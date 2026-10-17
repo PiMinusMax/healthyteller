@@ -18,7 +18,9 @@ pub use allergen::Allergen;
 pub use evaluate::{
     Budget, Conflict, DimensionResult, Evaluation, Level, LimitOrigin, Options, Reason, evaluate,
 };
-pub use food::{AllergenData, Food, FoodId, FoodKind, Portion, Preparation};
+pub use food::{
+    AllergenData, Food, FoodId, FoodKind, Portion, PortionKind, Preparation, SourcePortion,
+};
 pub use nutrient::{Nutrient, NutrientGroup};
 pub use plate::{DayTotals, PlateItem, Total};
 pub use profile::{Condition, DoctorLimit, Focus, MedicationGroup, Profile, Sex};

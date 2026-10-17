@@ -160,6 +160,7 @@ mod tests {
                 ingredients: None,
                 nova_group: None,
                 additives: Vec::new(),
+                portions: Vec::new(),
                 source: SourceRef {
                     id: "off".into(),
                     version: "test".into(),

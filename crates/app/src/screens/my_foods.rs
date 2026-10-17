@@ -9,7 +9,7 @@ use crate::fetch;
 use crate::format;
 use crate::i18n::{tr, tr_args};
 use crate::labels;
-use crate::state::{MyFood, default_portion, update, use_app_state};
+use crate::state::{MyFood, source_portion, update, use_app_state};
 use healthyteller_ingest::search::SearchHit;
 
 #[derive(Clone, PartialEq)]
@@ -184,7 +184,7 @@ fn AddMyFood() -> Element {
             if s.my_food(&food.id.0).is_none() {
                 s.my_foods.push(MyFood {
                     food_id: food.id.clone(),
-                    portion: default_portion(),
+                    portion: source_portion(&food),
                 });
             }
             s.cache_food(food);

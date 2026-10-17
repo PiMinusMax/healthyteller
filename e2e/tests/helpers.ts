@@ -95,7 +95,7 @@ export async function checkFixtureFood(page: Page, grams = "150 g") {
   await page.getByRole("link", { name: /Lebensmittel prüfen/ }).click();
   await typeBarcode(page, FIXTURE_BARCODE);
   await expect(page.getByRole("heading", { level: 1, name: FIXTURE_NAME })).toBeVisible();
-  await page.getByRole("button", { name: grams }).click();
+  await page.getByRole("button", { name: grams, exact: true }).click();
   await page.getByRole("link", { name: "Bewerten" }).click();
   await expect(page.getByText("Ergebnis")).toBeVisible();
 }
