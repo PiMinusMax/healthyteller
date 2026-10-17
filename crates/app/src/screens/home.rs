@@ -3,7 +3,7 @@
 use dioxus::prelude::*;
 
 use crate::Route;
-use crate::components::{Card, Icon, IconName, Logo};
+use crate::components::{Card, Icon, IconName, Logo, Verdicts};
 use crate::i18n::{tr, tr_args};
 use crate::labels;
 use crate::state::{update, use_app_state};
@@ -21,14 +21,26 @@ pub fn Home() -> Element {
     } else {
         0
     };
-    let my_foods: Vec<(usize, String, String)> = s
+    type Row = (
+        usize,
+        String,
+        String,
+        Vec<(String, healthyteller_core::Level)>,
+    );
+    let my_foods: Vec<Row> = s
         .my_foods
         .iter()
         .enumerate()
         .take(HOME_MY_FOODS)
         .filter_map(|(i, m)| {
-            s.food(&m.food_id.0)
-                .map(|f| (i, f.name.clone(), labels::portion(&m.portion)))
+            s.food(&m.food_id.0).map(|f| {
+                (
+                    i,
+                    f.name.clone(),
+                    labels::portion(&m.portion),
+                    s.attention(&m.food_id.0),
+                )
+            })
         })
         .collect();
     let more = s.my_foods.len().saturating_sub(HOME_MY_FOODS);
@@ -84,7 +96,7 @@ pub fn Home() -> Element {
                 } else {
                     p { class: "card-body small muted", {tr("my-foods-hint")} }
                     ul { class: "list",
-                        for (i, name, portion) in my_foods {
+                        for (i, name, portion, verdicts) in my_foods {
                             li { key: "{i}", class: "food-row",
                                 button {
                                     class: "row-btn grow",
@@ -97,7 +109,10 @@ pub fn Home() -> Element {
                                         added.set(Some(name.clone()));
                                     },
                                     span { class: "plus", "aria-hidden": "true", "+" }
-                                    span { span { class: "food-name", "{name}" } ", {portion}" }
+                                    span { style: "display: flex; flex-direction: column; gap: 4px;",
+                                        span { span { class: "food-name", "{name}" } ", {portion}" }
+                                        Verdicts { items: verdicts }
+                                    }
                                 }
                             }
                         }

@@ -400,6 +400,25 @@ fn StepDoctor(draft: Signal<Option<Profile>>) -> Element {
                     }
                 }
             }
+            Card { title: tr("profile-meals"), id: "profile-meals",
+                div { class: "card-body",
+                    div { class: "field",
+                        label { r#for: "meals-per-day", {tr("profile-meals-label")} }
+                        input {
+                            id: "meals-per-day",
+                            class: "input num",
+                            style: "max-width: 120px;",
+                            inputmode: "numeric",
+                            value: p.meals_per_day.map(|n| n.to_string()).unwrap_or_default(),
+                            onchange: move |e| {
+                                let n = e.value().trim().parse::<u8>().ok().filter(|n| (1..=12).contains(n));
+                                if let Some(p) = draft.write().as_mut() { p.meals_per_day = n; }
+                            },
+                        }
+                        p { class: "small muted", {tr("profile-meals-hint")} }
+                    }
+                }
+            }
             Card { title: tr("profile-doctor-origin"),
                 div { class: "card-body",
                     div { class: "field",

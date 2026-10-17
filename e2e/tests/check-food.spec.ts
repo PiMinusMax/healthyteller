@@ -27,8 +27,31 @@ test("a condition without a reviewed rule stays unknown", async ({ page }) => {
   await expect(unknown.locator(".badge-unknown")).toHaveText("unbekannt");
 });
 
-test("a doctor's limit is used for the verdict", async ({ page }) => {
+test("without meals a day a portion within the day limit is not called good", async ({ page }) => {
   await createProfile(page, { conditions: ["Bluthochdruck"], saltLimit: "5" });
+  await checkFixtureFood(page);
+  const unknown = page.locator("#card-unknown").locator("..");
+  await expect(unknown).toContainText("Salz");
+  await expect(unknown).toContainText("wie viele Mahlzeiten Sie am Tag essen");
+});
+
+test("a portion that takes more than one meal's share is judged with care", async ({ page }) => {
+  // Invented limit: 0.3 g a day over 3 meals = 0.1 g per meal; the fixture portion has 0.18 g.
+  await createProfile(page, { conditions: ["Bluthochdruck"], saltLimit: "0,3", meals: "3" });
+  await checkFixtureFood(page);
+  const attention = page.locator("#card-attention").locator("..");
+  await expect(attention).toContainText("Salz");
+  await expect(attention.locator(".badge-caution")).toHaveText("mit Maß");
+  await expect(attention).toContainText("mehr als Ihr Anteil pro Mahlzeit von 0,1 g");
+  await expect(attention).toContainText("Davon passen pro Mahlzeit");
+  await page.goto("/pruefen");
+  await page.getByLabel("Lebensmittel suchen").fill("Testjoghurt");
+  await expect(page.locator("#search-results")).toContainText("Salz");
+  await expect(page.locator("#search-results .badge-caution")).toBeVisible();
+});
+
+test("a doctor's limit is used for the verdict", async ({ page }) => {
+  await createProfile(page, { conditions: ["Bluthochdruck"], saltLimit: "5", meals: "3" });
   await checkFixtureFood(page);
   const ok = page.locator("#card-unremarkable").locator("..");
   await expect(ok).toContainText("Salz");

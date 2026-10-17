@@ -7,7 +7,9 @@ use healthyteller_core::Food;
 use healthyteller_ingest::search::SearchHit;
 
 use crate::Route;
-use crate::components::{Icon, IconName, QualityLoading, QualityMark, QualityMarkFor, TopBar};
+use crate::components::{
+    Icon, IconName, QualityLoading, QualityMark, QualityMarkFor, TopBar, Verdicts,
+};
 use crate::fetch;
 use crate::i18n::{tr, tr_args};
 use crate::labels;
@@ -48,10 +50,16 @@ pub fn Search() -> Element {
 
     let s = state.read();
     let q = query().trim().to_lowercase();
-    let hits: Vec<(String, String, bool)> = if q.is_empty() {
+    type Hit = (
+        String,
+        String,
+        bool,
+        Vec<(String, healthyteller_core::Level)>,
+    );
+    let hits: Vec<Hit> = if q.is_empty() {
         Vec::new()
     } else {
-        let mut hits: Vec<(String, String, bool)> = s
+        let mut hits: Vec<Hit> = s
             .foods
             .values()
             .map(|c| &c.food)
@@ -67,11 +75,12 @@ pub fn Search() -> Element {
                     f.id.0.clone(),
                     labels::food_title(f),
                     s.my_food(&f.id.0).is_some(),
+                    s.attention(&f.id.0),
                 )
             })
             .collect();
         // Own foods first (concept: "Meine Lebensmittel stehen in der Suche zuerst").
-        hits.sort_by_key(|(_, name, mine)| (!*mine, name.clone()));
+        hits.sort_by_key(|(_, name, mine, _)| (!*mine, name.clone()));
         hits
     };
     drop(s);
@@ -157,7 +166,7 @@ pub fn Search() -> Element {
         });
     };
 
-    let local_ids: Vec<String> = hits.iter().map(|(id, _, _)| id.clone()).collect();
+    let local_ids: Vec<String> = hits.iter().map(|(id, _, _, _)| id.clone()).collect();
     let online_hits: Vec<SearchHit> = match online() {
         Online::Results(hits) => hits
             .into_iter()
@@ -236,10 +245,13 @@ pub fn Search() -> Element {
             if !q.is_empty() {
                 section { class: "card", id: "search-results", "aria-label": tr("search-results"),
                     ul { class: "list",
-                        for (id, name, mine) in hits {
+                        for (id, name, mine, verdicts) in hits {
                             li { key: "{id}",
                                 Link { class: "food-row", to: Route::PortionScreen { id: id.clone() },
-                                    span { class: "grow food-name", "{name}" }
+                                    span { class: "grow", style: "display: flex; flex-direction: column; gap: 4px;",
+                                        span { class: "food-name", "{name}" }
+                                        Verdicts { items: verdicts }
+                                    }
                                     if mine { span { class: "small muted", {tr("search-mine")} } }
                                     QualityMark { id: id.clone(), compact: true }
                                     Icon { name: IconName::ChevronRight }
@@ -254,7 +266,12 @@ pub fn Search() -> Element {
                                         let id = hit.food.id.0.clone();
                                         move |_| pick_result(id.clone())
                                     },
-                                    span { class: "grow food-name", {labels::food_title(&hit.food)} }
+                                    span { class: "grow", style: "display: flex; flex-direction: column; gap: 4px;",
+                                        span { class: "food-name", {labels::food_title(&hit.food)} }
+                                        if let Some(food) = details.read().get(&hit.food.id.0) {
+                                            Verdicts { items: state.read().attention_for(food) }
+                                        }
+                                    }
                                     if hit.merged > 1 {
                                         span { class: "small muted", {tr_args("search-merged", &[("count", hit.merged.to_string())])} }
                                     }

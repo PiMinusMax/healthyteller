@@ -2,7 +2,8 @@
 
 use dioxus::prelude::*;
 use healthyteller_core::{
-    Dimension, DimensionResult, Level, LimitOrigin, Portion, Preparation, Reason, evaluate,
+    Dimension, DimensionResult, Level, LimitOrigin, Portion, Preparation, Quantity, Reason,
+    evaluate,
 };
 
 use crate::Route;
@@ -100,17 +101,17 @@ pub fn FoodCard(id: String, grams: u32, prep: String) -> Element {
                 }
                 if e.attention().next().is_some() {
                     Card { title: tr("card-attention"), id: "card-attention",
-                        for r in e.attention() { ResultItem { result: r.clone(), open: true } }
+                        for r in e.attention() { ResultItem { result: r.clone(), open: true, grams: portion.grams } }
                     }
                 }
                 if e.unknown().next().is_some() {
                     Card { title: tr("card-unknown"), id: "card-unknown",
-                        for r in e.unknown() { ResultItem { result: r.clone(), open: false } }
+                        for r in e.unknown() { ResultItem { result: r.clone(), open: false, grams: portion.grams } }
                     }
                 }
                 if e.unremarkable().next().is_some() {
                     Card { title: tr("card-unremarkable"), id: "card-unremarkable",
-                        for r in e.unremarkable() { ResultItem { result: r.clone(), open: false } }
+                        for r in e.unremarkable() { ResultItem { result: r.clone(), open: false, grams: portion.grams } }
                     }
                 }
                 if e.results.is_empty() {
@@ -186,6 +187,14 @@ pub fn FoodCard(id: String, grams: u32, prep: String) -> Element {
     }
 }
 
+/// Grams of this food that contain `amount`: the limit divided by the content per gram.
+fn grams_for(amount: Quantity, r: &DimensionResult, grams: f64) -> Option<String> {
+    let per_portion = r.value_per_portion?;
+    let ratio = amount.ratio(per_portion)?;
+    (ratio.is_finite() && grams > 0.0)
+        .then(|| format!("{} g", format::number((ratio * grams).floor())))
+}
+
 fn reason_text(r: &DimensionResult) -> String {
     let value = r
         .value_per_portion
@@ -199,6 +208,17 @@ fn reason_text(r: &DimensionResult) -> String {
     let completeness = r
         .completeness
         .map_or_else(|| tr("completeness-unknown"), format::percent);
+    let per_meal = r.budget.as_ref().and_then(|b| b.per_meal);
+    let meals = r
+        .budget
+        .as_ref()
+        .and_then(|b| b.limit.ratio(b.per_meal?))
+        .map(|m| format::number(m.round()))
+        .unwrap_or_default();
+    let key = match (&r.reason, per_meal) {
+        (Reason::WithinLimit, Some(_)) => "within-meal-share",
+        (reason, _) => reason.key(),
+    };
     let args: Vec<(&str, String)> = match &r.reason {
         Reason::AllergenFound(list) | Reason::AllergenTraces(list) => {
             let names: Vec<String> = list.iter().map(|&a| labels::allergen(a)).collect();
@@ -214,14 +234,16 @@ fn reason_text(r: &DimensionResult) -> String {
         _ => vec![
             ("value", value),
             ("limit", limit),
+            ("share", per_meal.map(format::quantity).unwrap_or_default()),
+            ("meals", meals),
             ("completeness", completeness),
         ],
     };
-    tr_args(&format!("reason-{}", r.reason.key()), &args)
+    tr_args(&format!("reason-{key}"), &args)
 }
 
 #[component]
-fn ResultItem(result: DimensionResult, open: bool) -> Element {
+fn ResultItem(result: DimensionResult, open: bool, grams: f64) -> Element {
     let r = result;
     let title = labels::result_title(&r);
     let why = labels::result_why(&r);
@@ -271,6 +293,18 @@ fn ResultItem(result: DimensionResult, open: bool) -> Element {
                         if b.basis == healthyteller_core::RuleBasis::Day {
                             dt { {tr("fact-today")} }
                             dd { class: "num", {format::quantity(b.used)} }
+                            if let Some(share) = b.per_meal {
+                                dt { {tr("fact-per-meal")} }
+                                dd { class: "num", {format::quantity(share)} }
+                                if let Some(g) = grams_for(share, &r, grams) {
+                                    dt { {tr("fact-grams-per-meal")} }
+                                    dd { class: "num", "{g}" }
+                                }
+                            }
+                            if let Some(g) = grams_for(b.limit, &r, grams) {
+                                dt { {tr("fact-grams-per-day")} }
+                                dd { class: "num", "{g}" }
+                            }
                         }
                     }
                     if !sources.is_empty() {

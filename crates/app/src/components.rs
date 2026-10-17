@@ -93,6 +93,23 @@ pub fn Logo(#[props(default = 40)] size: u32) -> Element {
     }
 }
 
+/// Compact verdicts for list rows: only what needs attention, each with its dimension.
+#[component]
+pub fn Verdicts(items: Vec<(String, Level)>) -> Element {
+    rsx! {
+        if !items.is_empty() {
+            span { class: "verdicts",
+                for (name, level) in items {
+                    span { key: "{name}", class: "verdict",
+                        span { class: "small", "{name}" }
+                        Badge { level, small: true }
+                    }
+                }
+            }
+        }
+    }
+}
+
 /// Verdict as shape, icon and word, never colour alone.
 #[component]
 pub fn Badge(level: Level, #[props(default = false)] small: bool) -> Element {
