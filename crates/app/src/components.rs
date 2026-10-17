@@ -1,7 +1,7 @@
 //! Shared building blocks of the UI.
 
 use dioxus::prelude::*;
-use healthyteller_core::{DataQuality, Level, QualityReport, assess};
+use healthyteller_core::{DataQuality, Food, Level, QualityReport, assess};
 
 use crate::Route;
 use crate::i18n::{tr, tr_args};
@@ -151,10 +151,36 @@ pub fn quality_of(id: &str) -> Option<QualityReport> {
 /// the symbol and keep the word for screen readers and the tooltip.
 #[component]
 pub fn QualityMark(id: String, #[props(default = false)] compact: bool) -> Element {
-    let Some(report) = quality_of(&id) else {
-        return rsx! {};
+    match quality_of(&id) {
+        Some(report) => quality_view(report.level, compact),
+        None => rsx! {},
+    }
+}
+
+/// Like [`QualityMark`], for a food that is loaded but not stored, e.g. a search hit.
+#[component]
+pub fn QualityMarkFor(food: Food, #[props(default = false)] compact: bool) -> Element {
+    let state = use_app_state();
+    let level = {
+        let s = state.read();
+        assess(&food, s.active_profile(), &s.rules).level
     };
-    let level = report.level;
+    quality_view(level, compact)
+}
+
+/// Placeholder while the data of a search hit is still loading.
+#[component]
+pub fn QualityLoading() -> Element {
+    let label = tr("quality-loading");
+    rsx! {
+        span { class: "quality quality-loading", title: "{label}",
+            span { class: "quality-symbol", "aria-hidden": "true", "…" }
+            span { class: "visually-hidden", "{label}" }
+        }
+    }
+}
+
+fn quality_view(level: DataQuality, compact: bool) -> Element {
     let word = tr(&format!("quality-{}", level.key()));
     let label = tr_args("quality-label", &[("level", word.clone())]);
     rsx! {

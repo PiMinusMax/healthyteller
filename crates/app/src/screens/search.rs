@@ -1,10 +1,13 @@
 //! 03/04 Suche: one search field, the camera scan and the number as fallback.
 
+use std::collections::HashMap;
+
 use dioxus::prelude::*;
+use healthyteller_core::Food;
 use healthyteller_ingest::search::SearchHit;
 
 use crate::Route;
-use crate::components::{Icon, IconName, QualityMark, TopBar};
+use crate::components::{Icon, IconName, QualityLoading, QualityMark, QualityMarkFor, TopBar};
 use crate::fetch;
 use crate::i18n::{tr, tr_args};
 use crate::labels;
@@ -17,6 +20,12 @@ enum Online {
     Results(Vec<SearchHit>),
     Failed(String),
 }
+
+/// Search hits whose full data is loaded in the background, so the list can show
+/// their data quality. Kept in memory only.
+const DETAILS_FOR: usize = 20;
+/// Parallel requests to Open Food Facts while loading hit details.
+const DETAIL_WORKERS: usize = 4;
 
 #[derive(Clone, PartialEq)]
 enum Lookup {
@@ -33,6 +42,9 @@ pub fn Search() -> Element {
     let mut lookup = use_signal(|| Lookup::Idle);
     let mut online = use_signal(|| Online::Idle);
     let scanning = use_signal(|| false);
+    // Full products of search hits by food id, and the search they belong to.
+    let mut details = use_signal(HashMap::<String, Food>::new);
+    let mut generation = use_signal(|| 0u32);
 
     let s = state.read();
     let q = query().trim().to_lowercase();
@@ -70,16 +82,53 @@ pub fn Search() -> Element {
             return;
         }
         online.set(Online::Loading);
+        details.write().clear();
+        let current = generation() + 1;
+        generation.set(current);
         spawn(async move {
             match fetch::search_products(&terms).await {
-                Ok(foods) => online.set(Online::Results(foods)),
+                Ok(hits) => {
+                    // Load the first hits by barcode, a few at a time, for their data quality.
+                    let codes: Vec<String> = hits
+                        .iter()
+                        .take(DETAILS_FOR)
+                        .map(|h| h.food.id.0.trim_start_matches("off:").to_owned())
+                        .collect();
+                    online.set(Online::Results(hits));
+                    for worker in 0..DETAIL_WORKERS {
+                        let mine: Vec<String> = codes
+                            .iter()
+                            .skip(worker)
+                            .step_by(DETAIL_WORKERS)
+                            .cloned()
+                            .collect();
+                        spawn(async move {
+                            for code in mine {
+                                if generation() != current {
+                                    return;
+                                }
+                                if let Ok(food) = fetch::product_by_barcode(&code).await
+                                    && generation() == current
+                                {
+                                    details.write().insert(food.id.0.clone(), food);
+                                }
+                            }
+                        });
+                    }
+                }
                 Err(e) => online.set(Online::Failed(tr(e.message_key()))),
             }
         });
     };
 
-    // Search hits carry only name and brand; the full product is loaded by barcode.
+    // Search hits carry only name and brand; the full product is loaded by barcode,
+    // unless the background loading already has it.
     let pick_result = move |id: String| {
+        if let Some(food) = details.read().get(&id).cloned() {
+            update(state, |s| s.cache_food(food));
+            navigator().push(Route::PortionScreen { id });
+            return;
+        }
         let code = id.trim_start_matches("off:").to_owned();
         spawn(async move {
             match fetch::product_by_barcode(&code).await {
@@ -208,6 +257,10 @@ pub fn Search() -> Element {
                                     span { class: "grow food-name", {labels::food_title(&hit.food)} }
                                     if hit.merged > 1 {
                                         span { class: "small muted", {tr_args("search-merged", &[("count", hit.merged.to_string())])} }
+                                    }
+                                    match details.read().get(&hit.food.id.0).cloned() {
+                                        Some(food) => rsx! { QualityMarkFor { food, compact: true } },
+                                        None => rsx! { QualityLoading {} },
                                     }
                                     Icon { name: IconName::ChevronRight }
                                 }

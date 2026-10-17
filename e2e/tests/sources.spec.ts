@@ -30,6 +30,18 @@ test("search by name at Open Food Facts", async ({ page }) => {
   await expect(more).toContainText("E1442, E330");
 });
 
+test("search hits show their data quality once loaded", async ({ page }) => {
+  await page.getByLabel("Lebensmittel suchen").fill("Quark");
+  await page.getByRole("button", { name: "Suchen", exact: true }).click();
+  const row = page.getByRole("button", { name: /Testquark mager/ });
+  // The fixture product lacks label values such as fat, so it is incomplete.
+  await expect(row.locator(".quality-incomplete")).toBeVisible();
+  await expect(row).toContainText("Datenlage: unvollständig");
+  // The text keeps its distance from the frame.
+  const padding = await row.evaluate((el) => parseFloat(getComputedStyle(el).paddingLeft));
+  expect(padding).toBeGreaterThanOrEqual(12);
+});
+
 test("Enter starts the online search", async ({ page }) => {
   await page.getByLabel("Lebensmittel suchen").fill("Quark");
   await page.getByLabel("Lebensmittel suchen").press("Enter");
