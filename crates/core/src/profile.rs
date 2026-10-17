@@ -58,6 +58,38 @@ impl Condition {
     }
 }
 
+/// Drug groups with known food interactions (concept: one rule per drug group).
+/// The app only records the group; it never checks a drug or a dose.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum MedicationGroup {
+    VitaminKAntagonist,
+    Statin,
+    MaoInhibitor,
+    PotassiumRaising,
+    ThyroidHormone,
+}
+
+impl MedicationGroup {
+    pub const ALL: [MedicationGroup; 5] = [
+        MedicationGroup::VitaminKAntagonist,
+        MedicationGroup::Statin,
+        MedicationGroup::MaoInhibitor,
+        MedicationGroup::PotassiumRaising,
+        MedicationGroup::ThyroidHormone,
+    ];
+
+    pub fn key(self) -> &'static str {
+        match self {
+            MedicationGroup::VitaminKAntagonist => "vitamin-k-antagonist",
+            MedicationGroup::Statin => "statin",
+            MedicationGroup::MaoInhibitor => "mao-inhibitor",
+            MedicationGroup::PotassiumRaising => "potassium-raising",
+            MedicationGroup::ThyroidHormone => "thyroid-hormone",
+        }
+    }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Sex {
@@ -94,6 +126,8 @@ pub struct Profile {
     pub sex: Option<Sex>,
     pub conditions: BTreeSet<Condition>,
     pub allergies: BTreeSet<Allergen>,
+    #[serde(default)]
+    pub medications: BTreeSet<MedicationGroup>,
     /// Set by the person; otherwise derived from the conditions.
     pub focus_override: Option<Focus>,
     pub doctor_limits: Vec<DoctorLimit>,
@@ -108,6 +142,7 @@ impl Profile {
             sex: None,
             conditions: BTreeSet::new(),
             allergies: BTreeSet::new(),
+            medications: BTreeSet::new(),
             focus_override: None,
             doctor_limits: Vec::new(),
         }
@@ -193,6 +228,7 @@ mod tests {
         let json = r#"{"id":"p1","name":"Test","age":70,"sex":null,"conditions":[],"allergies":[],"focus_override":null,"doctor_limits":[]}"#;
         let p: Profile = serde_json::from_str(json).unwrap();
         assert_eq!(p.birth_date, None);
+        assert!(p.medications.is_empty());
     }
 
     #[test]

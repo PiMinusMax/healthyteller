@@ -6,7 +6,7 @@ use crate::allergen::Allergen;
 use crate::food::{Food, Portion};
 use crate::nutrient::Nutrient;
 use crate::plate::DayTotals;
-use crate::profile::{Condition, DoctorLimit, Profile};
+use crate::profile::{Condition, DoctorLimit, MedicationGroup, Profile};
 use crate::quantity::Quantity;
 use crate::rule::{Dimension, Evidence, LimitKind, Rule, RuleBasis, RuleStatus};
 
@@ -95,6 +95,8 @@ pub struct DimensionResult {
     pub dimension: Dimension,
     /// Conditions that make this dimension relevant; empty for allergies.
     pub conditions: Vec<Condition>,
+    /// Drug groups that make the medication dimension relevant.
+    pub medications: Vec<MedicationGroup>,
     pub level: Level,
     pub nutrient: Option<Nutrient>,
     pub value_per_portion: Option<Quantity>,
@@ -114,6 +116,7 @@ impl DimensionResult {
         Self {
             dimension,
             conditions: Vec::new(),
+            medications: Vec::new(),
             level,
             nutrient: None,
             value_per_portion: None,
@@ -232,6 +235,17 @@ pub fn evaluate(
                 results.push(r);
             }
         }
+    }
+
+    // No food-drug rule is reviewed yet: each group stays unknown instead of looking unremarkable.
+    if !profile.medications.is_empty() {
+        let mut r = DimensionResult::new(
+            Dimension::Medication,
+            Level::Unknown,
+            Reason::NoReviewedRule,
+        );
+        r.medications = profile.medications.iter().copied().collect();
+        results.push(r);
     }
 
     results.sort_by_key(|r| {
@@ -647,6 +661,30 @@ mod tests {
         );
         assert_eq!(e.results.len(), 2);
         assert!(e.results.iter().all(|r| r.reason == Reason::NoReviewedRule));
+    }
+
+    #[test]
+    fn medication_group_without_rule_is_unknown() {
+        let mut p = Profile::new("p", "Test");
+        p.medications.insert(MedicationGroup::Statin);
+        p.medications.insert(MedicationGroup::VitaminKAntagonist);
+        let e = evaluate(
+            &fixture_food(&[]),
+            &portion(100.0),
+            &p,
+            &[],
+            &DayTotals::new(),
+            Options::default(),
+        );
+        assert_eq!(e.results.len(), 1);
+        let r = &e.results[0];
+        assert_eq!(r.dimension, Dimension::Medication);
+        assert_eq!(r.level, Level::Unknown);
+        assert_eq!(r.reason, Reason::NoReviewedRule);
+        assert_eq!(
+            r.medications,
+            vec![MedicationGroup::VitaminKAntagonist, MedicationGroup::Statin]
+        );
     }
 
     #[test]

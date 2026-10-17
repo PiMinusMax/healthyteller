@@ -40,3 +40,17 @@ test("questions for the doctor come from the profile", async ({ page }) => {
   await expect(page.getByRole("status")).toHaveText("1 von 2 Fragen ausgewählt");
   await expect(page.locator('[data-notice="doctor"]')).toBeVisible();
 });
+
+test("medication groups are recorded, stay unknown on the card and become questions", async ({ page }) => {
+  await createProfile(page, { medications: ["Cholesterinsenker aus der Gruppe der Statine"] });
+  await expect(page.getByText(/Statine/)).toBeVisible();
+  await checkFixtureFood(page);
+  const unknown = page.locator(".result", { hasText: "wegen Ihrer Medikamente" });
+  await expect(unknown).toContainText("Medikamente");
+  await expect(unknown).toContainText("unbekannt");
+  await page.goto("/arztfragen");
+  await expect(
+    page.getByText("Worauf muss ich beim Essen achten, solange ich Cholesterinsenker aus der Gruppe der Statine nehme?"),
+  ).toBeVisible();
+  await expect(page.locator('[data-notice="doctor"]')).toBeVisible();
+});
