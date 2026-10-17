@@ -77,7 +77,8 @@ pub fn NutrientList(id: String, grams: u32, prep: String) -> Element {
                 ul { class: "card-body list", style: "display: grid; grid-template-columns: 1fr 1fr; gap: 10px;",
                     li { style: "border: none;", Mark { derivation: Some(Derivation::Measured) } " " {tr("origin-measured")} }
                     li { style: "border: none;", Mark { derivation: Some(Derivation::Calculated) } " " {tr("origin-calculated")} }
-                    li { style: "border: none;", Mark { derivation: Some(Derivation::Estimated { basis: String::new() }) } " " {tr("origin-estimate")} }
+                    li { style: "border: none;", Mark { derivation: Some(Derivation::Interpolated) } " " {tr("origin-interpolated")} }
+                    li { style: "border: none;", Mark { derivation: Some(Derivation::Estimated { basis: String::new(), method: Default::default() }) } " " {tr("origin-estimate")} }
                     li { style: "border: none;", Mark { derivation: None } " " {tr("origin-unknown")} }
                 }
             }
@@ -126,13 +127,14 @@ pub fn NutrientList(id: String, grams: u32, prep: String) -> Element {
     }
 }
 
-/// Origin mark: ● measured, ∑ calculated or declared, ≈ estimate, ? unknown.
+/// Origin mark: ● measured, ∑ calculated or declared, ◐ calculated from ingredients, ≈ estimate, ? unknown.
 #[component]
 fn Mark(derivation: Option<Derivation>) -> Element {
     let (class, symbol, label) = match &derivation {
         Some(Derivation::Measured) => ("mark-measured", "●", tr("origin-measured")),
         Some(Derivation::Calculated) => ("mark-calculated", "∑", tr("origin-calculated")),
         Some(Derivation::Declared) => ("mark-calculated", "∑", tr("origin-declared")),
+        Some(Derivation::Interpolated) => ("mark-interpolated", "◐", tr("origin-interpolated")),
         Some(Derivation::Estimated { .. }) => ("mark-estimate", "≈", tr("origin-estimate")),
         None => ("mark-unknown", "?", tr("origin-unknown")),
     };

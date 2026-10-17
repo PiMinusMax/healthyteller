@@ -6,7 +6,9 @@ use healthyteller_core::{
 };
 
 use crate::Route;
-use crate::components::{Badge, Card, Icon, IconName, Notice, NoticeKind, TopBar};
+use crate::components::{
+    Badge, Card, Icon, IconName, Notice, NoticeKind, QualityExplanation, TopBar,
+};
 use crate::format;
 use crate::i18n::{tr, tr_args};
 use crate::labels;
@@ -65,6 +67,7 @@ pub fn FoodCard(id: String, grams: u32, prep: String) -> Element {
                 div { style: "display: flex; flex-direction: column; gap: 4px;",
                     h1 { class: "title", "{food.name}" }
                     p { class: "subtitle", {labels::portion(&portion)} }
+                    QualityExplanation { id: id.clone() }
                     if let Some(p) = &profile {
                         p { class: "muted", {tr_args("card-checked-for", &[("name", p.name.clone())])} }
                     }

@@ -4,7 +4,7 @@ use dioxus::prelude::*;
 use healthyteller_core::{Food, Level, Options, evaluate};
 
 use crate::Route;
-use crate::components::{Badge, Card, Icon, IconName, TopBar};
+use crate::components::{Badge, Card, Icon, IconName, QualityMark, TopBar};
 use crate::fetch;
 use crate::format;
 use crate::i18n::{tr, tr_args};
@@ -101,7 +101,10 @@ pub fn MyFoods() -> Element {
                                 }
                             }
                             div { class: "grow", style: "display: flex; flex-direction: column; gap: 8px;",
-                                Link { class: "food-name", to: Route::FoodCard { id: row.id.clone(), grams: 0, prep: "mine".into() }, "{row.name}" }
+                                div { style: "display: flex; gap: 10px; align-items: center;",
+                                    Link { class: "food-name", to: Route::FoodCard { id: row.id.clone(), grams: 0, prep: "mine".into() }, "{row.name}" }
+                                    QualityMark { id: row.id.clone(), compact: true }
+                                }
                                 label { class: "input-unit",
                                     span { class: "muted", {tr("my-foods-portion")} }
                                     input {
@@ -317,9 +320,10 @@ fn AddMyFood() -> Element {
             }
             if !shown.is_empty() {
                 ul { class: "list",
-                    for (food, mine, _online) in shown {
+                    for (food, mine, online) in shown {
                         li { key: "{food.id.0}", class: "food-row",
                             span { class: "grow food-name", {labels::food_title(&food)} }
+                            if !online { QualityMark { id: food.id.0.clone(), compact: true } }
                             if mine {
                                 span { class: "small muted", {tr("my-foods-already")} }
                             } else {

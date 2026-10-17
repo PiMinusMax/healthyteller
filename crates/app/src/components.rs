@@ -1,7 +1,7 @@
 //! Shared building blocks of the UI.
 
 use dioxus::prelude::*;
-use healthyteller_core::Level;
+use healthyteller_core::{DataQuality, Level, QualityReport, assess};
 
 use crate::Route;
 use crate::i18n::{tr, tr_args};
@@ -135,6 +135,65 @@ pub fn Badge(level: Level, #[props(default = false)] small: bool) -> Element {
                 }
             }
             "{word}"
+        }
+    }
+}
+
+/// Data quality of a stored food for the active profile, or `None` if the food is not stored.
+pub fn quality_of(id: &str) -> Option<QualityReport> {
+    let state = use_app_state();
+    let s = state.read();
+    let food = s.food(id)?;
+    Some(assess(food, s.active_profile(), &s.rules))
+}
+
+/// Data quality as fill symbol and word, never colour alone. Compact rows show
+/// the symbol and keep the word for screen readers and the tooltip.
+#[component]
+pub fn QualityMark(id: String, #[props(default = false)] compact: bool) -> Element {
+    let Some(report) = quality_of(&id) else {
+        return rsx! {};
+    };
+    let level = report.level;
+    let word = tr(&format!("quality-{}", level.key()));
+    let label = tr_args("quality-label", &[("level", word.clone())]);
+    rsx! {
+        span { class: "quality quality-{level.key()}", title: "{label}",
+            span { class: "quality-symbol", "aria-hidden": "true", "{level.symbol()}" }
+            if compact {
+                span { class: "visually-hidden", "{label}" }
+            } else {
+                span { "{word}" }
+            }
+        }
+    }
+}
+
+/// What the data quality means for this food: which values are missing or how they came about.
+#[component]
+pub fn QualityExplanation(id: String) -> Element {
+    let Some(report) = quality_of(&id) else {
+        return rsx! {};
+    };
+    let mut lines = Vec::new();
+    if !report.missing.is_empty() {
+        let names: Vec<String> = report
+            .missing
+            .iter()
+            .map(|n| crate::labels::nutrient(*n))
+            .collect();
+        lines.push(tr_args("quality-missing", &[("list", names.join(", "))]));
+    }
+    if report.allergens_unknown {
+        lines.push(tr("quality-allergens-unknown"));
+    }
+    if report.level != DataQuality::Incomplete {
+        lines.push(tr(&format!("quality-{}-hint", report.level.key())));
+    }
+    rsx! {
+        div { class: "quality-explanation small",
+            QualityMark { id: id.clone() }
+            for line in lines { p { class: "muted", "{line}" } }
         }
     }
 }
