@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=390">
+<title>Arztvorgaben eintragen</title>
+<link rel="stylesheet" href="../assets/fonts.css">
+<style>
+body{margin:0}
+a{color:#1D3B8F}a:hover{color:#132A66}
+:focus-visible{outline:3px solid #1D3B8F;outline-offset:2px}
+</style>
+</head>
+<body>
+<main style="width: 390px; height: 1350px; box-sizing: border-box; background: #F5F3ED; color: #15181C; font-family: 'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', system-ui, sans-serif; font-size: 18px; line-height: 1.45; display: flex; flex-direction: column; overflow: hidden">
+  <header style="display: flex; align-items: center; gap: 12px; padding: 12px 16px">
+    <a href="18-profil-erkrankungen-fokus.html" aria-label="Zurück zu Schritt 3" style="flex: none; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 24px; background: #FFFFFF; border: 1px solid #D8D4CA; color: #15181C">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
+    </a>
+    <p style="flex: 1; margin: 0; font-size: 17px; font-weight: 700; color: #474C54">Profil für Erika Mustermann</p>
+  </header>
+
+  <div style="flex: 1; display: flex; flex-direction: column; gap: 20px; padding: 4px 20px 24px 20px">
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <div role="img" aria-label="Schritt 4 von 4" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px">
+        <span style="height: 8px; border-radius: 4px; background: #1D3B8F"></span>
+        <span style="height: 8px; border-radius: 4px; background: #1D3B8F"></span>
+        <span style="height: 8px; border-radius: 4px; background: #1D3B8F"></span>
+        <span style="height: 8px; border-radius: 4px; background: #1D3B8F"></span>
+      </div>
+      <p style="margin: 0; font-size: 15px; color: #474C54">Schritt 4 von 4 · Arztvorgaben</p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <h1 style="margin: 0; font-size: 28px; font-weight: 800; line-height: 1.15">Arztvorgaben eintragen</h1>
+      <p style="margin: 0; font-size: 17px; line-height: 1.45; color: #474C54">Optional. Tragen Sie nur Werte ein, die Ihnen Ihre Ärztin oder Ihr Arzt genannt hat. Jede Vorgabe ersetzt den Standardwert dieser Kennzahl. Leere Felder behalten den Standardwert.</p>
+    </div>
+
+    <section aria-labelledby="werte" style="background: #FFFFFF; border: 1px solid #D8D4CA; border-radius: 18px; padding: 0 18px 18px 18px; margin-top: 6px; display: flex; flex-direction: column; gap: 18px">
+      <h2 id="werte" style="align-self: flex-start; margin: -14px 0 0 0px; padding: 0 6px; font-size: 18px; font-weight: 800; line-height: 28px; background: linear-gradient(#F5F3ED 0 14px, #FFFFFF 14px)">Kennzahlen pro Tag</h2>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <label for="harnsaeure" style="font-size: 17px; font-weight: 700">Harnsäure</label>
+        <div style="display: flex; align-items: center; gap: 8px; height: 56px; padding: 0 16px; box-sizing: border-box; border: 2px solid #474C54; border-radius: 12px; background: #FFFFFF">
+          <input id="harnsaeure" type="number" inputmode="numeric" aria-describedby="harnsaeure-hinweis" style="flex: 1; min-width: 0; height: 44px; border: 0; background: transparent; color: #15181C; font: inherit; font-size: 20px">
+          <span style="font-size: 17px; font-weight: 700; color: #474C54">mg</span>
+        </div>
+        <p id="harnsaeure-hinweis" style="margin: 0; font-size: 15px; color: #474C54">Leer, es gilt der Standardwert 500 mg (Regel Gicht).</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <label for="salz" style="font-size: 17px; font-weight: 700">Salz</label>
+        <div style="display: flex; align-items: center; gap: 8px; height: 56px; padding: 0 16px; box-sizing: border-box; border: 2px solid #1D3B8F; border-radius: 12px; background: #FFFFFF">
+          <input id="salz" type="number" inputmode="decimal" value="5" aria-describedby="salz-hinweis" style="flex: 1; min-width: 0; height: 44px; border: 0; background: transparent; color: #15181C; font: inherit; font-size: 20px; font-weight: 700">
+          <span style="font-size: 17px; font-weight: 700; color: #474C54">g</span>
+        </div>
+        <p id="salz-hinweis" style="margin: 0; font-size: 15px; color: #474C54">Ihre Vorgabe ersetzt den Standardwert 6 g (DGE/ÖGE).</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <label for="zucker" style="font-size: 17px; font-weight: 700">Zucker</label>
+        <div style="display: flex; align-items: center; gap: 8px; height: 56px; padding: 0 16px; box-sizing: border-box; border: 2px solid #474C54; border-radius: 12px; background: #FFFFFF">
+          <input id="zucker" type="number" inputmode="numeric" aria-describedby="zucker-hinweis" style="flex: 1; min-width: 0; height: 44px; border: 0; background: transparent; color: #15181C; font: inherit; font-size: 20px">
+          <span style="font-size: 17px; font-weight: 700; color: #474C54">g</span>
+        </div>
+        <p id="zucker-hinweis" style="margin: 0; font-size: 15px; color: #474C54">Leer, es gilt der Standardwert 50 g (DGE/ÖGE).</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="herkunft" style="background: #FFFFFF; border: 1px solid #D8D4CA; border-radius: 18px; padding: 0 18px 18px 18px; margin-top: 6px; display: flex; flex-direction: column; gap: 14px">
+      <h2 id="herkunft" style="align-self: flex-start; margin: -14px 0 0 0px; padding: 0 6px; font-size: 18px; font-weight: 800; line-height: 28px; background: linear-gradient(#F5F3ED 0 14px, #FFFFFF 14px)">Woher stammt die Vorgabe?</h2>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <label for="praxis" style="font-size: 17px; font-weight: 700">Praxis</label>
+        <input id="praxis" type="text" value="Hausarztpraxis" style="height: 56px; padding: 0 16px; box-sizing: border-box; border: 2px solid #474C54; border-radius: 12px; background: #FFFFFF; color: #15181C; font: inherit; font-size: 19px">
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <label for="datum" style="font-size: 17px; font-weight: 700">Datum der Vorgabe</label>
+        <input id="datum" type="date" value="2026-09-30" style="height: 56px; padding: 0 16px; box-sizing: border-box; border: 2px solid #474C54; border-radius: 12px; background: #FFFFFF; color: #15181C; font: inherit; font-size: 19px">
+      </div>
+    </section>
+
+    <div style="display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border-radius: 14px; background: #E3E9F7; color: #15181C">
+      <p style="margin: 0; display: flex; gap: 10px; align-items: flex-start; font-size: 16px; line-height: 1.45">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1D3B8F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 1px"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8v.01"></path></svg>
+        <span>Die App übernimmt Vorgaben nur. Sie berechnet keine Medikamenten- oder Insulindosis.</span>
+      </p>
+      <p style="margin: 0; display: flex; gap: 10px; align-items: center; font-size: 16px">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1D3B8F" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="flex: none"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>
+        <span>Gespeichert nur auf diesem Gerät, verschlüsselt.</span>
+      </p>
+    </div>
+
+    <div style="margin-top: auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+      <a href="18-profil-erkrankungen-fokus.html" style="display: flex; align-items: center; justify-content: center; height: 60px; border-radius: 16px; background: #FFFFFF; border: 2px solid #1D3B8F; color: #1D3B8F; font-size: 18px; font-weight: 700; text-decoration: none">Zurück</a>
+      <a href="02-start.html" style="display: flex; align-items: center; justify-content: center; height: 60px; border-radius: 16px; background: #1D3B8F; color: #FFFFFF; font-size: 19px; font-weight: 800; text-decoration: none">Speichern</a>
+    </div>
+  </div>
+</main>
+</body>
+</html>

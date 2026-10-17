@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=390">
+<title>Zu Meine Lebensmittel hinzugefügt</title>
+<link rel="stylesheet" href="../assets/fonts.css">
+<style>
+body{margin:0}
+a{color:#1D3B8F}a:hover{color:#132A66}
+:focus-visible{outline:3px solid #1D3B8F;outline-offset:2px}
+</style>
+</head>
+<body>
+<main style="position: relative; width: 390px; height: 920px; box-sizing: border-box; background: #F5F3ED; color: #15181C; font-family: 'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', system-ui, sans-serif; font-size: 18px; line-height: 1.45; overflow: hidden">
+  <div aria-hidden="true" style="display: flex; flex-direction: column; gap: 20px; padding: 12px 16px">
+    <div style="display: flex; align-items: center; gap: 12px">
+      <span style="width: 48px; height: 48px; border-radius: 24px; background: #FFFFFF; border: 1px solid #D8D4CA"></span>
+      <span style="flex: 1; font-size: 17px; font-weight: 700; color: #474C54">Vorschläge</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px; padding: 0 4px">
+      <span style="font-size: 28px; font-weight: 800; line-height: 1.1">Was heute noch passt</span>
+    </div>
+  </div>
+  <div aria-hidden="true" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; background: rgba(21, 24, 28, 0.62)"></div>
+
+  <section role="dialog" aria-modal="true" aria-labelledby="neu-titel" style="position: absolute; left: 0; right: 0; bottom: 0; background: #FFFFFF; border-radius: 26px 26px 0 0; padding: 12px 20px 24px 20px; display: flex; flex-direction: column; gap: 16px">
+    <span aria-hidden="true" style="align-self: center; width: 48px; height: 5px; border-radius: 3px; background: #B9B4A8"></span>
+    <div style="display: flex; align-items: flex-start; gap: 12px">
+      <span style="flex: none; width: 44px; height: 44px; border-radius: 22px; background: #1E7A45; color: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+      <div style="display: flex; flex-direction: column; gap: 2px">
+        <h2 id="neu-titel" style="margin: 0; font-size: 23px; font-weight: 800; line-height: 1.2">Leinsamen, geschrotet ist jetzt in Meine Lebensmittel</h2>
+        <p style="margin: 0; font-size: 16px; color: #474C54">Gespeicherte Portion 10 g</p>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <div style="margin-top: 8px; padding: 0 16px 14px 16px; border-radius: 14px; background: #DCEFE3; border: 1px solid #1E7A45; display: flex; flex-direction: column">
+        <h3 style="align-self: flex-start; margin: -14px 0 2px 2px; padding: 0 6px; font-size: 17px; font-weight: 800; line-height: 28px; color: #0F3D22; background: linear-gradient(#FFFFFF 0 14px, #DCEFE3 14px)">Schließt diese Lücken</h3>
+        <p style="margin: 0; font-size: 16px; line-height: 1.45">Ballaststoffe, eine Portion liefert 4 g. Omega-3-Fettsäuren.</p>
+      </div>
+      <div style="margin-top: 8px; padding: 0 16px 14px 16px; border-radius: 14px; background: #FCEFC7; border: 1px solid #B57A00; display: flex; flex-direction: column">
+        <h3 style="align-self: flex-start; margin: -14px 0 2px 2px; padding: 0 6px; font-size: 17px; font-weight: 800; line-height: 28px; color: #2A1C00; background: linear-gradient(#FFFFFF 0 14px, #FCEFC7 14px)">Belastet diese Budgets</h3>
+        <p style="margin: 0; font-size: 16px; line-height: 1.45">Purin leicht, 15 mg Harnsäure pro Portion.</p>
+      </div>
+      <div style="margin-top: 8px; padding: 0 16px 14px 16px; border-radius: 14px; background: #E3E9F7; border: 1px solid #1D3B8F; display: flex; flex-direction: column">
+        <h3 style="align-self: flex-start; margin: -14px 0 2px 2px; padding: 0 6px; font-size: 17px; font-weight: 800; line-height: 28px; color: #132A66; background: linear-gradient(#FFFFFF 0 14px, #E3E9F7 14px)">Passt gut zu</h3>
+        <p style="margin: 0; font-size: 16px; line-height: 1.45">Magerquark und Haferflocken aus Meine Lebensmittel.</p>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding-top: 4px">
+      <a href="15-meine-lebensmittel-bearbeiten.html" style="display: flex; align-items: center; justify-content: center; height: 56px; border-radius: 16px; background: #FFFFFF; border: 2px solid #1D3B8F; color: #1D3B8F; font-size: 18px; font-weight: 700; text-decoration: none">Portion ändern</a>
+      <a href="14-vorschlaege.html" style="display: flex; align-items: center; justify-content: center; height: 56px; border-radius: 16px; background: #1D3B8F; color: #FFFFFF; font-size: 18px; font-weight: 800; text-decoration: none">Fertig</a>
+    </div>
+  </section>
+</main>
+</body>
+</html>

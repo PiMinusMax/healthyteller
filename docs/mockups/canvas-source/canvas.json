@@ -1,0 +1,276 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "Alternativen.dc.html": {
+      "h": 910,
+      "is_interactive": true,
+      "title": "23 Alternativen (Ausbau)",
+      "w": 390,
+      "x": 874,
+      "y": 7650
+    },
+    "Arztfragen.dc.html": {
+      "h": 1830,
+      "is_interactive": true,
+      "title": "24 Fragen an den Arzt (Ausbau)",
+      "w": 390,
+      "x": 1344,
+      "y": 7650
+    },
+    "Details.dc.html": {
+      "h": 1640,
+      "is_interactive": true,
+      "title": "08 Detail und Quelle",
+      "w": 390,
+      "x": 3290,
+      "y": 0
+    },
+    "Druckliste.dc.html": {
+      "h": 1123,
+      "title": "22 Druckliste A4",
+      "w": 794,
+      "x": 0,
+      "y": 7650
+    },
+    "Erklaerung.dc.html": {
+      "h": 850,
+      "is_interactive": true,
+      "title": "09 Fachbegriff erklärt",
+      "w": 390,
+      "x": 3760,
+      "y": 0
+    },
+    "Essensliste.dc.html": {
+      "h": 1400,
+      "is_interactive": true,
+      "title": "15 Meine Lebensmittel bearbeiten",
+      "w": 390,
+      "x": 2350,
+      "y": 2510
+    },
+    "EssenslisteNeu.dc.html": {
+      "h": 920,
+      "is_interactive": true,
+      "title": "16 Rückmeldung beim Hinzufügen",
+      "w": 390,
+      "x": 2820,
+      "y": 2510
+    },
+    "Grenzwerte.dc.html": {
+      "h": 1350,
+      "is_interactive": true,
+      "title": "19 Arztvorgaben",
+      "w": 390,
+      "x": 940,
+      "y": 5140
+    },
+    "Karte.dc.html": {
+      "h": 2050,
+      "is_interactive": true,
+      "title": "07 Lebensmittelkarte",
+      "w": 390,
+      "x": 2820,
+      "y": 0
+    },
+    "KarteDunkel.dc.html": {
+      "h": 2050,
+      "is_interactive": true,
+      "title": "21 Lebensmittelkarte dunkel",
+      "w": 390,
+      "x": 1880,
+      "y": 5140
+    },
+    "Main.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "02 Start",
+      "w": 390,
+      "x": 470,
+      "y": 0
+    },
+    "Naehrwerte.dc.html": {
+      "h": 2260,
+      "is_interactive": true,
+      "title": "10 Vollständige Nährwertliste",
+      "w": 390,
+      "x": 0,
+      "y": 2510
+    },
+    "Portion.dc.html": {
+      "h": 850,
+      "is_interactive": true,
+      "title": "06 Portion und Zubereitung",
+      "w": 390,
+      "x": 2350,
+      "y": 0
+    },
+    "Profil.dc.html": {
+      "h": 1460,
+      "is_interactive": true,
+      "title": "18 Profil, Erkrankungen und Fokus",
+      "w": 390,
+      "x": 470,
+      "y": 5140
+    },
+    "ProfilPerson.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "17 Profil, Person",
+      "w": 390,
+      "x": 0,
+      "y": 5140
+    },
+    "Quellen.dc.html": {
+      "h": 2000,
+      "is_interactive": true,
+      "title": "20 Einstellungen und Datenquellen",
+      "w": 390,
+      "x": 1410,
+      "y": 5140
+    },
+    "Scan.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "05 Barcode-Scan",
+      "w": 390,
+      "x": 1880,
+      "y": 0
+    },
+    "Schaetzungen.dc.html": {
+      "h": 1120,
+      "is_interactive": true,
+      "title": "11 Alle Schätzungen",
+      "w": 390,
+      "x": 470,
+      "y": 2510
+    },
+    "Suche.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "04 Suche beim Tippen",
+      "w": 390,
+      "x": 1410,
+      "y": 0
+    },
+    "SucheLeer.dc.html": {
+      "h": 1160,
+      "is_interactive": true,
+      "title": "03 Suche mit Meine Lebensmittel",
+      "w": 390,
+      "x": 940,
+      "y": 0
+    },
+    "Teller.dc.html": {
+      "h": 1900,
+      "is_interactive": true,
+      "title": "12 Teller, Fokus Erkrankungen",
+      "w": 390,
+      "x": 940,
+      "y": 2510
+    },
+    "TellerNaehrstoffe.dc.html": {
+      "h": 1640,
+      "is_interactive": true,
+      "title": "13 Teller, Fokus Nährstoffe",
+      "w": 390,
+      "x": 1410,
+      "y": 2510
+    },
+    "Vorschlaege.dc.html": {
+      "h": 1260,
+      "is_interactive": true,
+      "title": "14 Vorschläge",
+      "w": 390,
+      "x": 1880,
+      "y": 2510
+    },
+    "Willkommen.dc.html": {
+      "h": 930,
+      "is_interactive": true,
+      "title": "01 Grundhinweis beim ersten Start",
+      "w": 390,
+      "x": 0,
+      "y": 0
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-10-16T09:41:37Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "notes": {
+    "n1": {
+      "fill": "orange",
+      "maxH": 460,
+      "size": 24,
+      "text": "Healthy Teller\n\nAlle Profile sind erfunden (Erika und Max Mustermann), alle Zahlen sind Beispielwerte ohne Quellenprüfung. So bleibt das Material repo-tauglich (Projektregeln 2 und 17).\n\nHinweistexte stehen im festen Wortlaut. Im Play-Modus sind die Screens verlinkt.",
+      "w": 380,
+      "x": 4230,
+      "y": 0
+    },
+    "t1": {
+      "kind": "title1",
+      "maxW": 4150,
+      "text": "Start und Lebensmittel prüfen",
+      "w": 240,
+      "x": 0,
+      "y": -300
+    },
+    "t2": {
+      "kind": "title1",
+      "maxW": 3210,
+      "text": "Nährwerte, Teller, Vorschläge, Meine Lebensmittel",
+      "w": 240,
+      "x": 0,
+      "y": 2210
+    },
+    "t3": {
+      "kind": "title1",
+      "maxW": 2270,
+      "text": "Profil, Einstellungen, Dunkelmodus",
+      "w": 240,
+      "x": 0,
+      "y": 4840
+    },
+    "t4": {
+      "kind": "title1",
+      "maxW": 1734,
+      "text": "Druckliste (MVP) und Ausbau",
+      "w": 240,
+      "x": 0,
+      "y": 7350
+    }
+  },
+  "order": [
+    "Willkommen.dc.html",
+    "Main.dc.html",
+    "SucheLeer.dc.html",
+    "Suche.dc.html",
+    "Scan.dc.html",
+    "Portion.dc.html",
+    "Karte.dc.html",
+    "Details.dc.html",
+    "Erklaerung.dc.html",
+    "Naehrwerte.dc.html",
+    "Schaetzungen.dc.html",
+    "Teller.dc.html",
+    "TellerNaehrstoffe.dc.html",
+    "Vorschlaege.dc.html",
+    "Essensliste.dc.html",
+    "EssenslisteNeu.dc.html",
+    "ProfilPerson.dc.html",
+    "Profil.dc.html",
+    "Grenzwerte.dc.html",
+    "Quellen.dc.html",
+    "KarteDunkel.dc.html",
+    "Druckliste.dc.html",
+    "Alternativen.dc.html",
+    "Arztfragen.dc.html"
+  ],
+  "pages": [],
+  "title": "Healthy Teller Mockups"
+}

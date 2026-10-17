@@ -1,0 +1,11 @@
+[package]
+name = "healthyteller-barcode"
+description = "Barcode recognition for Healthy Teller, also as WebAssembly"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true

@@ -384,7 +384,7 @@ Textentwürfe (Anrede in der App: Sie):
 
 ## Name
 
-Entschieden ist **Healthy Teller**, als Repo `healthy-teller`. Die Mischung aus Englisch und Deutsch ist in beiden Sprachen verständlich und sagt direkt, worum es geht. Marken-, Domain- und Store-Prüfung stehen noch aus; bis dahin bleiben die übrigen Vorschläge als Ausweichnamen.
+Entschieden ist **Healthy Teller**, als Repo `healthyteller`. Die Mischung aus Englisch und Deutsch ist in beiden Sprachen verständlich und sagt direkt, worum es geht. Marken-, Domain- und Store-Prüfung stehen noch aus; bis dahin bleiben die übrigen Vorschläge als Ausweichnamen.
 
 | Name | Repo | Idee |
 | --- | --- | --- |
@@ -427,7 +427,7 @@ Diese Regeln stehen wörtlich in der AGENTS.md und gelten für Menschen wie für
 - [x] Plattform: Rust-Kern mit Dioxus-Oberfläche; iOS über die Web-App ohne Apple-Lizenz.
 - [x] Code-Lizenz GPL-3.0-or-later.
 - [x] Fremddaten nicht im Repo; die App lädt sie selbst von den Originalquellen.
-- [x] Name Healthy Teller, Repo healthy-teller.
+- [x] Name Healthy Teller, Repo healthyteller.
 - [x] Anrede in der App: Sie.
 - [x] Referenzwerte: DGE/ÖGE als Standard, EFSA für Lücken und Höchstmengen.
 - [ ] Marken-, Domain- und Store-Prüfung für Healthy Teller, danach Repo anlegen.
@@ -439,7 +439,7 @@ Diese Regeln stehen wörtlich in der AGENTS.md und gelten für Menschen wie für
 
 ## Prompt für KI-Agenten
 
-Der folgende Prompt ist der Startauftrag für Claude Code oder andere Agenten. Er gehört als docs/auftrag.md ins Repo; die AGENTS.md enthält die Projektregeln von oben wörtlich, die CLAUDE.md besteht nur aus dem Verweis @AGENTS.md. Im Dev Container startet der Agent wie gewohnt mit `IS_SANDBOX=1 claude --dangerously-skip-permissions`, das Repo entsteht vorher mit `gh repo create healthy-teller --public --license gpl-3.0`.
+Der folgende Prompt ist der Startauftrag für Claude Code oder andere Agenten. Er gehört als docs/auftrag.md ins Repo; die AGENTS.md enthält die Projektregeln von oben wörtlich, die CLAUDE.md besteht nur aus dem Verweis @AGENTS.md. Im Dev Container startet der Agent wie gewohnt mit `IS_SANDBOX=1 claude --dangerously-skip-permissions`, das Repo entsteht vorher mit `gh repo create healthyteller --public --license gpl-3.0`.
 
 ```markdown
 # Auftrag

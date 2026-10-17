@@ -1,0 +1,24 @@
+{
+  "name": "Healthy Teller",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "22"
+    },
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1": {}
+  },
+  "postCreateCommand": "cd e2e && npm ci && npx playwright install --with-deps chromium firefox webkit",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "rust-lang.rust-analyzer",
+        "tamasfe.even-better-toml",
+        "DioxusLabs.dioxus",
+        "ms-playwright.playwright"
+      ]
+    }
+  },
+  "remoteUser": "vscode"
+}
