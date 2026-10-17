@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=390">
+<title>Teller, Fokus Erkrankungen</title>
+<link rel="stylesheet" href="../assets/fonts.css">
+<style>
+body{margin:0}
+a{color:#1D3B8F}a:hover{color:#132A66}
+:focus-visible{outline:3px solid #1D3B8F;outline-offset:2px}
+summary{list-style:none;cursor:pointer}summary::-webkit-details-marker{display:none}
+</style>
+</head>
+<body>
+<main style="width: 390px; height: 1900px; box-sizing: border-box; background: #F5F3ED; color: #15181C; font-family: 'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', system-ui, sans-serif; font-size: 18px; line-height: 1.45; display: flex; flex-direction: column; overflow: hidden">
+  <header style="display: flex; align-items: center; gap: 12px; padding: 12px 16px">
+    <a href="02-start.html" aria-label="Zurück zum Start" style="flex: none; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 24px; background: #FFFFFF; border: 1px solid #D8D4CA; color: #15181C">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
+    </a>
+    <p style="flex: 1; margin: 0; font-size: 17px; font-weight: 700; color: #474C54">Teller</p>
+    <a href="18-profil-erkrankungen-fokus.html" aria-label="Profil Erika Mustermann, wechseln" style="flex: none; display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 14px 0 6px; border-radius: 22px; background: #FFFFFF; border: 1px solid #D8D4CA; color: #15181C; text-decoration: none; font-size: 16px; font-weight: 700">
+      <span style="width: 32px; height: 32px; border-radius: 16px; background: #1D3B8F; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700">EM</span>
+      <span>Erika</span>
+    </a>
+  </header>
+
+  <div style="flex: 1; display: flex; flex-direction: column; gap: 20px; padding: 4px 20px 24px 20px">
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <h1 style="margin: 0; font-size: 32px; font-weight: 800; line-height: 1.1">Heute</h1>
+      <p style="margin: 0; font-size: 17px; color: #474C54">Freitag, 16. Oktober</p>
+    </div>
+
+    <nav aria-label="Fokus" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 4px; border-radius: 16px; background: #ECE9E0; border: 1px solid #D8D4CA">
+      <a href="12-teller-fokus-erkrankungen.html" aria-current="page" style="display: flex; align-items: center; justify-content: center; height: 52px; border-radius: 12px; background: #1D3B8F; color: #FFFFFF; font-size: 17px; font-weight: 800; text-decoration: none">Erkrankungen</a>
+      <a href="13-teller-fokus-naehrstoffe.html" style="display: flex; align-items: center; justify-content: center; height: 52px; border-radius: 12px; color: #15181C; font-size: 17px; font-weight: 700; text-decoration: none">Nährstoffe</a>
+    </nav>
+
+    <section aria-label="Wichtige Hinweise" style="display: flex; flex-direction: column; gap: 10px">
+      <div role="alert" style="display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; border-radius: 16px; background: #F9DEDB; border: 2px solid #B3261E">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#8C1D18" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M8.2 2.5h7.6l5.7 5.7v7.6l-5.7 5.7H8.2l-5.7-5.7V8.2z"></path><path d="M9 9l6 6M15 9l-6 6"></path></svg>
+        <span style="display: flex; flex-direction: column; gap: 2px; color: #3A0A07"><strong style="font-size: 18px">Ei gefunden</strong><span style="font-size: 16px">Eiernudeln auf dem aktuellen Teller enthalten eine Ei-Zutat.</span></span>
+      </div>
+      <div role="alert" style="display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; border-radius: 16px; background: #F9DEDB; border: 2px solid #B3261E">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#8C1D18" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 2px"><path d="M8.2 2.5h7.6l5.7 5.7v7.6l-5.7 5.7H8.2l-5.7-5.7V8.2z"></path><path d="M9 9l6 6M15 9l-6 6"></path></svg>
+        <span style="display: flex; flex-direction: column; gap: 2px; color: #3A0A07"><strong style="font-size: 18px">Salz über Max</strong><span style="font-size: 16px">Heute 6,4 g, Ihre Arztvorgabe liegt bei 5 g.</span></span>
+      </div>
+    </section>
+
+    <section aria-labelledby="kennzahlen" style="background: #FFFFFF; border: 1px solid #D8D4CA; border-radius: 18px; padding: 0 18px 18px 18px; margin-top: 6px; display: flex; flex-direction: column; gap: 22px">
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <h2 id="kennzahlen" style="align-self: flex-start; margin: -14px 0 0 0px; padding: 0 6px; font-size: 18px; font-weight: 800; line-height: 28px; background: linear-gradient(#F5F3ED 0 14px, #FFFFFF 14px)">Kennzahlen Ihrer Erkrankungen</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: 14px; color: #474C54">
+          <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 18px; height: 12px; border-radius: 3px; background: #A9B6D8"></span>gespeicherte Teller</span>
+          <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 18px; height: 12px; border-radius: 3px; background: #1D3B8F"></span>aktueller Teller</span>
+          <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 18px; height: 12px; border-radius: 3px; border: 1px solid #8A867C; background: repeating-linear-gradient(135deg, #ECE9E0 0 4px, #D2CDC1 4px 8px)"></span>Lücke</span>
+          <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 18px; height: 12px; border-radius: 3px; border: 1px solid #8A867C; background: #DCEFE3"></span>Zielbereich</span>
+          <span style="display: inline-flex; align-items: center; gap: 6px"><span style="width: 18px; height: 12px; border-radius: 3px; border: 1px solid #8A867C; background: #F9DEDB"></span>über Max</span>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px"><h3 style="margin: 0; font-size: 18px; font-weight: 800">Purin</h3><span style="font-size: 16px"><strong>480</strong> mg Harnsäure</span></div>
+        <div style="position: relative; height: 62px">
+          <div style="position: absolute; left: 0; right: 0; top: 32px; height: 22px; box-sizing: border-box; border: 1px solid #8A867C; border-radius: 6px; overflow: hidden; display: flex"><span style="width: 80%; background: #DCEFE3"></span><span style="flex: 1; background: #F9DEDB"></span></div>
+          <span style="position: absolute; top: 37px; left: 1%; width: 45.4%; height: 12px; border-radius: 3px 0 0 3px; background: #A9B6D8"></span>
+          <span style="position: absolute; top: 37px; left: 46.4%; width: 30.4%; height: 12px; border-radius: 0 3px 3px 0; background: #1D3B8F"></span>
+          <span style="position: absolute; top: 22px; left: calc(80% - 1.5px); width: 3px; height: 38px; background: #15181C"></span>
+          <button type="button" aria-label="Max 500 mg, Herkunft anzeigen" style="position: absolute; top: 0; left: calc(80% - 26px); width: 52px; height: 44px; padding: 0; border: 0; background: none; display: flex; justify-content: center; align-items: flex-start; cursor: pointer"><span style="height: 22px; padding: 0 7px; border-radius: 6px; background: #15181C; color: #FFFFFF; font-size: 14px; font-weight: 800; line-height: 22px">Max</span></button>
+        </div>
+        <p style="margin: 0; font-size: 15px; color: #474C54">Zielbereich, noch 20 mg bis Max</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px"><h3 style="margin: 0; font-size: 18px; font-weight: 800">Zucker</h3><span style="font-size: 16px"><strong>24</strong> g</span></div>
+        <div style="position: relative; height: 62px">
+          <div style="position: absolute; left: 0; right: 0; top: 32px; height: 22px; box-sizing: border-box; border: 1px solid #8A867C; border-radius: 6px; overflow: hidden; display: flex"><span style="width: 80%; background: #DCEFE3"></span><span style="flex: 1; background: #F9DEDB"></span></div>
+          <span style="position: absolute; top: 37px; left: 1%; width: 27.8%; height: 12px; border-radius: 3px 0 0 3px; background: #A9B6D8"></span>
+          <span style="position: absolute; top: 37px; left: 28.8%; width: 9.6%; height: 12px; border-radius: 0 3px 3px 0; background: #1D3B8F"></span>
+          <span style="position: absolute; top: 22px; left: calc(80% - 1.5px); width: 3px; height: 38px; background: #15181C"></span>
+          <button type="button" aria-label="Max 50 g, Herkunft anzeigen" style="position: absolute; top: 0; left: calc(80% - 26px); width: 52px; height: 44px; padding: 0; border: 0; background: none; display: flex; justify-content: center; align-items: flex-start; cursor: pointer"><span style="height: 22px; padding: 0 7px; border-radius: 6px; background: #15181C; color: #FFFFFF; font-size: 14px; font-weight: 800; line-height: 22px">Max</span></button>
+        </div>
+        <p style="margin: 0; font-size: 15px; color: #474C54">Zielbereich, noch 26 g bis Max</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px"><h3 style="margin: 0; font-size: 18px; font-weight: 800">Glykämische Last</h3><span style="font-size: 16px"><strong>56</strong></span></div>
+        <div style="position: relative; height: 62px">
+          <div style="position: absolute; left: 0; right: 0; top: 32px; height: 22px; box-sizing: border-box; border: 1px solid #8A867C; border-radius: 6px; overflow: hidden; display: flex"><span style="width: 80%; background: #DCEFE3"></span><span style="flex: 1; background: #F9DEDB"></span></div>
+          <span style="position: absolute; top: 37px; left: 1%; width: 31%; height: 12px; border-radius: 3px 0 0 3px; background: #A9B6D8"></span>
+          <span style="position: absolute; top: 37px; left: 32%; width: 24%; height: 12px; border-radius: 0 3px 3px 0; background: #1D3B8F"></span>
+          <span style="position: absolute; top: 22px; left: calc(80% - 1.5px); width: 3px; height: 38px; background: #15181C"></span>
+          <button type="button" aria-label="Max 80, Herkunft anzeigen" style="position: absolute; top: 0; left: calc(80% - 26px); width: 52px; height: 44px; padding: 0; border: 0; background: none; display: flex; justify-content: center; align-items: flex-start; cursor: pointer"><span style="height: 22px; padding: 0 7px; border-radius: 6px; background: #15181C; color: #FFFFFF; font-size: 14px; font-weight: 800; line-height: 22px">Max</span></button>
+        </div>
+        <p style="margin: 0; font-size: 15px; color: #474C54">Zielbereich, noch 24 bis Max</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px"><h3 style="margin: 0; font-size: 18px; font-weight: 800">Salz</h3><span style="font-size: 16px"><strong>6,4</strong> g</span></div>
+        <div style="position: relative; height: 62px">
+          <div style="position: absolute; left: 0; right: 0; top: 32px; height: 22px; box-sizing: border-box; border: 1px solid #8A867C; border-radius: 6px; overflow: hidden; display: flex"><span style="width: 66.7%; background: #DCEFE3"></span><span style="flex: 1; background: #F9DEDB"></span></div>
+          <span style="position: absolute; top: 37px; left: 1%; width: 49.7%; height: 12px; border-radius: 3px 0 0 3px; background: #A9B6D8"></span>
+          <span style="position: absolute; top: 37px; left: 50.7%; width: 34.6%; height: 12px; border-radius: 0 3px 3px 0; background: #1D3B8F"></span>
+          <span style="position: absolute; top: 22px; left: calc(66.7% - 1.5px); width: 3px; height: 38px; background: #15181C"></span>
+          <button type="button" aria-label="Max 5 g, Herkunft anzeigen" aria-expanded="true" style="position: absolute; top: 0; left: calc(66.7% - 26px); width: 52px; height: 44px; padding: 0; border: 0; background: none; display: flex; justify-content: center; align-items: flex-start; cursor: pointer"><span style="height: 22px; padding: 0 7px; border-radius: 6px; background: #1D3B8F; color: #FFFFFF; font-size: 14px; font-weight: 800; line-height: 22px; outline: 3px solid #E3E9F7">Max</span></button>
+        </div>
+        <p style="margin: 0; font-size: 15px; font-weight: 700; color: #8C1D18">Über Max, 1,4 g darüber</p>
+        <div style="position: relative; margin-top: 10px; padding: 12px 14px; border-radius: 12px; background: #E3E9F7; border: 1px solid #1D3B8F">
+          <span style="position: absolute; top: -8px; left: calc(66.7% - 8px); width: 14px; height: 14px; background: #E3E9F7; border-left: 1px solid #1D3B8F; border-top: 1px solid #1D3B8F; transform: rotate(45deg)"></span>
+          <p style="margin: 0; font-size: 16px; line-height: 1.4"><strong>Max 5 g</strong> · Herkunft Arztvorgabe, Hausarztpraxis, 30.09.2026. Ersetzt den DGE-Wert von 6 g.</p>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px"><h3 style="margin: 0; font-size: 18px; font-weight: 800">Kalium</h3><span style="font-size: 16px"><strong>2.600</strong> mg</span></div>
+        <div style="position: relative; height: 62px">
+          <div style="position: absolute; left: 0; right: 0; top: 32px; height: 22px; box-sizing: border-box; border: 1px solid #8A867C; border-radius: 6px; overflow: hidden; display: flex"><span style="width: 75%; background: repeating-linear-gradient(135deg, #ECE9E0 0 4px, #D2CDC1 4px 8px)"></span><span style="flex: 1; background: #DCEFE3"></span></div>
+          <span style="position: absolute; top: 37px; left: 1%; width: 34.6%; height: 12px; border-radius: 3px 0 0 3px; background: #A9B6D8"></span>
+          <span style="position: absolute; top: 37px; left: 35.6%; width: 13.1%; height: 12px; border-radius: 0 3px 3px 0; background: #1D3B8F"></span>
+          <span style="position: absolute; top: 22px; left: calc(75% - 1.5px); width: 3px; height: 38px; background: #15181C"></span>
+          <button type="button" aria-label="Soll 4.000 mg, Herkunft anzeigen" style="position: absolute; top: 0; left: calc(75% - 26px); width: 52px; height: 44px; padding: 0; border: 0; background: none; display: flex; justify-content: center; align-items: flex-start; cursor: pointer"><span style="height: 22px; padding: 0 7px; border-radius: 6px; background: #15181C; color: #FFFFFF; font-size: 14px; font-weight: 800; line-height: 22px">Soll</span></button>
+        </div>
+        <p style="margin: 0; font-size: 15px; color: #474C54">Lücke, noch 1.400 mg bis Soll</p>
+      </div>
+    </section>
+
+    <details style="margin-top: 6px; background: #FFFFFF; border: 1px solid #D8D4CA; border-radius: 18px">
+      <summary style="display: flex; flex-direction: column; padding: 0 18px 10px 18px"><span style="display: block; align-self: flex-start; margin: -14px 0 0 0px; padding: 0 6px; font-size: 18px; font-weight: 800; line-height: 28px; background: linear-gradient(#F5F3ED 0 14px, #FFFFFF 14px)">Nährstoffversorgung</span><span style="display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px"><span style="font-size: 16px; color: #474C54">4 Lücken, keine Überschreitung</span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1D3B8F" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></span></summary>
+      <p style="margin: 0; padding: 0 18px 16px 18px; font-size: 16px">Vitamin D, Jod, Ballaststoffe und Folat liegen unter Soll.</p>
+    </details>
+
+    <section aria-labelledby="aktuell" style="background: #FFFFFF; border: 2px solid #1D3B8F; border-radius: 18px; padding: 0 18px 16px 18px; margin-top: 6px; display: flex; flex-direction: column; gap: 8px">
+      <h2 id="aktuell" style="align-self: flex-start; margin: -15px 0 0 0px; padding: 0 6px; font-size: 18px; font-weight: 800; line-height: 28px; background: linear-gradient(#F5F3ED 0 14px, #FFFFFF 14px)">Aktueller Teller · Abendessen</h2>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column">
+        <li style="display: flex; justify-content: space-between; gap: 12px; padding: 10px 0"><span>Lachsfilet, gebraten</span><span style="color: #474C54">125 g</span></li>
+        <li style="display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid #E6E2D8"><span style="display: inline-flex; align-items: center; gap: 8px">Eiernudeln, gekocht<span style="display: inline-flex; align-items: center; gap: 4px; height: 26px; padding: 0 8px 0 5px; border-radius: 13px; background: #B3261E; color: #FFFFFF; font-size: 13px; font-weight: 800"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8.2 2.5h7.6l5.7 5.7v7.6l-5.7 5.7H8.2l-5.7-5.7V8.2z"></path><path d="M9 9l6 6M15 9l-6 6"></path></svg>meiden</span></span><span style="color: #474C54">125 g</span></li>
+        <li style="display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid #E6E2D8"><span>Brokkoli, gedünstet</span><span style="color: #474C54">150 g</span></li>
+      </ul>
+      <p style="margin: 0; font-size: 15px; color: #474C54">Heute gespeichert: Frühstück, Mittagessen</p>
+    </section>
+
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <a href="03-suche-meine-lebensmittel.html" style="display: flex; align-items: center; justify-content: center; gap: 8px; height: 60px; border-radius: 16px; background: #1D3B8F; color: #FFFFFF; font-size: 19px; font-weight: 800; text-decoration: none">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+        <span>Lebensmittel hinzufügen</span>
+      </a>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+        <a href="14-vorschlaege.html" style="display: flex; align-items: center; justify-content: center; height: 56px; border-radius: 16px; background: #FFFFFF; border: 2px solid #1D3B8F; color: #1D3B8F; font-size: 18px; font-weight: 700; text-decoration: none">Vorschläge</a>
+        <button type="button" style="height: 56px; border-radius: 16px; background: #FFFFFF; border: 2px solid #1D3B8F; color: #1D3B8F; font: inherit; font-size: 18px; font-weight: 700; cursor: pointer">Teller speichern</button>
+      </div>
+    </div>
+  </div>
+</main>
+</body>
+</html>

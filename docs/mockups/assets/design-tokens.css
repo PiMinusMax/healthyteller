@@ -1,0 +1,92 @@
+/*
+ * Healthy Teller design tokens, taken from the mockups in docs/mockups.
+ * Reference for the Dioxus UI (crates/app). Values are design decisions,
+ * not nutrition data.
+ *
+ * Verdict colors always come with a shape, an icon and a word:
+ *   gut      = circle with check
+ *   mit Maß  = triangle with exclamation mark
+ *   meiden   = octagon with cross
+ *   unbekannt = dashed circle with question mark, white fill, dashed border
+ * The three fills also differ in lightness, so they stay apart in grayscale.
+ */
+
+:root {
+  /* Type */
+  --kt-font: 'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', system-ui, sans-serif;
+  --kt-font-mono: 'Atkinson Hyperlegible Mono', ui-monospace, monospace;
+  --kt-text-body: 18px;
+  --kt-text-small: 15px;
+  --kt-text-meta: 14px;
+  --kt-text-title: 32px;
+  --kt-line-height: 1.45;
+
+  /* Shape and touch */
+  --kt-radius-card: 18px;
+  --kt-radius-control: 14px;
+  --kt-radius-pill: 999px;
+  --kt-touch-min: 44px;
+  --kt-button-height: 60px;
+  --kt-gutter: 20px;
+
+  /* Surfaces and text (light) */
+  --kt-ground: #F5F3ED;
+  --kt-surface: #FFFFFF;
+  --kt-surface-muted: #ECE9E0;
+  --kt-ink: #15181C;
+  --kt-ink-2: #474C54;
+  --kt-line: #D8D4CA;
+  --kt-line-soft: #E6E2D8;
+  --kt-control-border: #B9B4A8;
+  --kt-unknown-border: #9A968C;
+
+  /* Action */
+  --kt-primary: #1D3B8F;
+  --kt-on-primary: #FFFFFF;
+  --kt-primary-soft: #E3E9F7;
+
+  /* Verdicts */
+  --kt-gut: #1E7A45;
+  --kt-on-gut: #FFFFFF;
+  --kt-gut-soft: #DCEFE3;
+  --kt-mass: #F2B53A;
+  --kt-on-mass: #2A1C00;
+  --kt-mass-strong: #B57A00; /* budget bars and outlines on white */
+  --kt-mass-soft: #FCEFC7;
+  --kt-meiden: #B3261E;
+  --kt-on-meiden: #FFFFFF;
+}
+
+:root[data-theme="dark"] {
+  --kt-ground: #111417;
+  --kt-surface: #1B1F24;
+  --kt-surface-muted: #23272E;
+  --kt-ink: #F2F0EA;
+  --kt-ink-2: #B8BDC5;
+  --kt-line: #343A42;
+  --kt-line-soft: #2C3138;
+  --kt-control-border: #4A515A;
+  --kt-unknown-border: #6B727C;
+  --kt-primary: #9DB8FF;
+  --kt-on-primary: #0A1638;
+  --kt-gut: #5CC488;
+  --kt-on-gut: #08210F;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --kt-ground: #111417;
+    --kt-surface: #1B1F24;
+    --kt-surface-muted: #23272E;
+    --kt-ink: #F2F0EA;
+    --kt-ink-2: #B8BDC5;
+    --kt-line: #343A42;
+    --kt-line-soft: #2C3138;
+    --kt-control-border: #4A515A;
+    --kt-unknown-border: #6B727C;
+    --kt-primary: #9DB8FF;
+    --kt-on-primary: #0A1638;
+    --kt-gut: #5CC488;
+    --kt-on-gut: #08210F;
+  }
+}

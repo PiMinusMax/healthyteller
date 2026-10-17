@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=390">
+<title>Alle Schätzungen</title>
+<link rel="stylesheet" href="../assets/fonts.css">
+<style>
+body{margin:0}
+a{color:#1D3B8F}a:hover{color:#132A66}
+:focus-visible{outline:3px solid #1D3B8F;outline-offset:2px}
+</style>
+</head>
+<body>
+<main style="width: 390px; height: 1120px; box-sizing: border-box; background: #F5F3ED; color: #15181C; font-family: 'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', system-ui, sans-serif; font-size: 18px; line-height: 1.45; display: flex; flex-direction: column; overflow: hidden">
+  <header style="display: flex; align-items: center; gap: 12px; padding: 12px 16px">
+    <a href="10-naehrwertliste.html" aria-label="Zurück zur Nährwertliste" style="flex: none; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 24px; background: #FFFFFF; border: 1px solid #D8D4CA; color: #15181C">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg>
+    </a>
+    <p style="flex: 1; margin: 0; font-size: 17px; font-weight: 700; color: #474C54">Nährwerte</p>
+  </header>
+
+  <div style="flex: 1; display: flex; flex-direction: column; gap: 18px; padding: 4px 20px 24px 20px">
+    <h1 style="margin: 0; font-size: 30px; font-weight: 800; line-height: 1.15">Alle Schätzungen</h1>
+
+    <aside aria-label="Hinweis zu Schätzungen" style="padding: 14px 16px; border-radius: 14px; background: #FCEFC7; border: 1px solid #B57A00">
+      <p style="margin: 0; font-size: 16px; line-height: 1.5"><strong>Schätzungen.</strong> Werte mit dem Zeichen ≈ sind geschätzt. Bei jedem dieser Werte steht, worauf die Schätzung beruht, zum Beispiel auf einem vergleichbaren Lebensmittel aus dem Bundeslebensmittelschlüssel oder auf der Zutatenliste. Schätzungen sind ungenauer als gemessene Werte.</p>
+    </aside>
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <label for="filter" style="font-size: 17px; font-weight: 700">Filter</label>
+      <select id="filter" style="height: 52px; padding: 0 14px; border: 2px solid #474C54; border-radius: 12px; background: #FFFFFF; color: #15181C; font: inherit; font-size: 18px">
+        <option selected="selected">Alle Grundlagen</option>
+        <option>Vergleichbares Lebensmittel im BLS</option>
+        <option>Zutatenliste</option>
+        <option>Nur Meine Lebensmittel</option>
+      </select>
+    </div>
+
+    <ul style="list-style: none; margin: 0; padding: 0; background: #FFFFFF; border: 1px solid #D8D4CA; border-radius: 18px; overflow: hidden; display: flex; flex-direction: column">
+      <li style="display: flex; flex-direction: column; gap: 4px; padding: 14px 16px">
+        <span style="display: flex; justify-content: space-between; gap: 12px"><strong>Gouda, mittelalt</strong><span style="font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace; font-weight: 600">≈ 75 µg</span></span>
+        <span style="font-size: 16px">Vitamin A</span>
+        <span style="font-size: 15px; color: #474C54">Geschätzt anhand des BLS-Eintrags Gouda, 45 % Fett i. Tr.</span>
+      </li>
+      <li style="display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border-top: 1px solid #E6E2D8">
+        <span style="display: flex; justify-content: space-between; gap: 12px"><strong>Gouda, mittelalt</strong><span style="font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace; font-weight: 600">≈ 6 µg</span></span>
+        <span style="font-size: 16px">Jod</span>
+        <span style="font-size: 15px; color: #474C54">Geschätzt anhand des BLS-Eintrags Gouda, 45 % Fett i. Tr.</span>
+      </li>
+      <li style="display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border-top: 1px solid #E6E2D8">
+        <span style="display: flex; justify-content: space-between; gap: 12px"><strong>Hähnchen-Nuggets, paniert</strong><span style="font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace; font-weight: 600">≈ 80 mg</span></span>
+        <span style="font-size: 16px">Purin als Harnsäure</span>
+        <span style="font-size: 15px; color: #474C54">Geschätzt anhand der Zutatenliste, 60 % Hähnchenfleisch.</span>
+      </li>
+      <li style="display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border-top: 1px solid #E6E2D8">
+        <span style="display: flex; justify-content: space-between; gap: 12px"><strong>Vollkornbrot, Bäckerei</strong><span style="font-family: 'Atkinson Hyperlegible Mono', ui-monospace, monospace; font-weight: 600">≈ 3 g</span></span>
+        <span style="font-size: 16px">Ballaststoffe</span>
+        <span style="font-size: 15px; color: #474C54">Geschätzt anhand des BLS-Eintrags Roggenvollkornbrot.</span>
+      </li>
+    </ul>
+
+    <button type="button" style="display: flex; align-items: center; justify-content: center; gap: 10px; height: 56px; border-radius: 16px; background: #FFFFFF; border: 2px solid #1D3B8F; color: #1D3B8F; font: inherit; font-size: 18px; font-weight: 700; cursor: pointer">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5"></path><path d="M5 20h14"></path></svg>
+      <span>Als CSV exportieren</span>
+    </button>
+  </div>
+</main>
+</body>
+</html>

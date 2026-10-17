@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Profil anlegen, Schritt 2</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;600;700;800&amp;family=Atkinson+Hyperlegible+Mono:wght@400;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1D3B8F}a:hover{color:#132A66}
+:focus-visible{outline:3px solid #1D3B8F;outline-offset:2px}
+</style>
+</helmet>
+<main style="width: 390px; height: 1460px; box-sizing: border-box; background: #F5F3ED; color: #15181C; font-family: 'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible', system-ui, sans-serif; font-size: 18px; line-height: 1.45; display: flex; flex-direction: column; overflow: hidden">
+  <header style="display: flex; align-items: center; gap: 12px; padding: 12px 16px">
+    <a href="Main.dc.html" aria-label="Profil-Assistent schließen" style="flex: none; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 24px; background: #FFFFFF; border: 1px solid #D8D4CA; color: #15181C">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+    </a>
+    <p style="flex: 1; margin: 0; font-size: 17px; font-weight: 700; color: #474C54">Profil für Erika Mustermann</p>
+  </header>
+
+  <div style="flex: 1; display: flex; flex-direction: column; gap: 20px; padding: 4px 20px 24px 20px">
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <div role="img" aria-label="Schritt 2 von 4" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px">
+        <span style="height: 8px; border-radius: 4px; background: #1D3B8F"></span>
+        <span style="height: 8px; border-radius: 4px; background: #1D3B8F"></span>
+        <span style="height: 8px; border-radius: 4px; background: #D8D4CA"></span>
+        <span style="height: 8px; border-radius: 4px; background: #D8D4CA"></span>
+      </div>
+      <p style="margin: 0; font-size: 15px; color: #474C54">Schritt 2 von 4 · Erkrankungen und Allergien</p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <h1 style="margin: 0; font-size: 28px; font-weight: 800; line-height: 1.15">Was soll die App berücksichtigen?</h1>
+      <p style="margin: 0; font-size: 17px; line-height: 1.45; color: #474C54">Wählen Sie, was eine Ärztin oder ein Arzt festgestellt hat. Sie können das jederzeit ändern.</p>
+    </div>
+
+    <fieldset style="margin: 0; padding: 6px 12px 6px 18px; border: 1px solid #D8D4CA; border-radius: 18px; background: #FFFFFF; display: flex; flex-direction: column">
+      <legend style="padding: 0 6px; font-size: 18px; font-weight: 800">Erkrankungen</legend>
+      <div style="display: flex; align-items: center; gap: 8px">
+        <label style="flex: 1; display: flex; align-items: center; gap: 14px; min-height: 60px; cursor: pointer"><input type="checkbox" checked="checked" style="flex: none; width: 26px; height: 26px; margin: 0; accent-color: #1D3B8F"><span>Diabetes oder Prädiabetes</span></label>
+        <button type="button" aria-label="Diabetes erklären" style="flex: none; width: 44px; height: 44px; border: 1px solid #B9B4A8; border-radius: 22px; background: #FFFFFF; color: #1D3B8F; font: inherit; font-size: 18px; font-weight: 800; cursor: pointer">?</button>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; border-top: 1px solid #E6E2D8">
+        <label style="flex: 1; display: flex; align-items: center; gap: 14px; min-height: 60px; cursor: pointer"><input type="checkbox" checked="checked" style="flex: none; width: 26px; height: 26px; margin: 0; accent-color: #1D3B8F"><span>Gicht oder erhöhte Harnsäure</span></label>
+        <button type="button" aria-label="Gicht erklären" style="flex: none; width: 44px; height: 44px; border: 1px solid #B9B4A8; border-radius: 22px; background: #FFFFFF; color: #1D3B8F; font: inherit; font-size: 18px; font-weight: 800; cursor: pointer">?</button>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; border-top: 1px solid #E6E2D8">
+        <label style="flex: 1; display: flex; align-items: center; gap: 14px; min-height: 60px; cursor: pointer"><input type="checkbox" checked="checked" style="flex: none; width: 26px; height: 26px; margin: 0; accent-color: #1D3B8F"><span>Bluthochdruck</span></label>
+        <button type="button" aria-label="Bluthochdruck erklären" style="flex: none; width: 44px; height: 44px; border: 1px solid #B9B4A8; border-radius: 22px; background: #FFFFFF; color: #1D3B8F; font: inherit; font-size: 18px; font-weight: 800; cursor: pointer">?</button>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; border-top: 1px solid #E6E2D8">
+        <label style="flex: 1; display: flex; align-items: center; gap: 14px; min-height: 60px; cursor: pointer"><input type="checkbox" checked="checked" style="flex: none; width: 26px; height: 26px; margin: 0; accent-color: #1D3B8F"><span>Erhöhte Leberwerte</span></label>
+        <button type="button" aria-label="Leberwerte erklären" style="flex: none; width: 44px; height: 44px; border: 1px solid #B9B4A8; border-radius: 22px; background: #FFFFFF; color: #1D3B8F; font: inherit; font-size: 18px; font-weight: 800; cursor: pointer">?</button>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; border-top: 1px solid #E6E2D8">
+        <label style="flex: 1; display: flex; align-items: center; gap: 14px; min-height: 60px; cursor: pointer"><input type="checkbox" style="flex: none; width: 26px; height: 26px; margin: 0; accent-color: #1D3B8F"><span>Niereninsuffizienz</span></label>
+        <button type="button" aria-label="Niereninsuffizienz erklären" style="flex: none; width: 44px; height: 44px; border: 1px solid #B9B4A8; border-radius: 22px; background: #FFFFFF; color: #1D3B8F; font: inherit; font-size: 18px; font-weight: 800; cursor: pointer">?</button>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; border-top: 1px solid #E6E2D8">
+        <label style="flex: 1; display: flex; align-items: center; gap: 14px; min-height: 60px; cursor: pointer"><input type="checkbox" style="flex: none; width: 26px; height: 26px; margin: 0; accent-color: #1D3B8F"><span>Nierensteine aus Kalziumoxalat</span></label>
+        <button type="button" aria-label="Nierensteine erklären" style="flex: none; width: 44px; height: 44px; border: 1px solid #B9B4A8; border-radius: 22px; background: #FFFFFF; color: #1D3B8F; font: inherit; font-size: 18px; font-weight: 800; cursor: pointer">?</button>
+      </div>
+    </fieldset>
+
+    <fieldset style="margin: 0; padding: 6px 12px 10px 18px; border: 1px solid #D8D4CA; border-radius: 18px; background: #FFFFFF; display: flex; flex-direction: column">
+      <legend style="padding: 0 6px; font-size: 18px; font-weight: 800">Allergien und Unverträglichkeiten</legend>
+      <div style="display: flex; align-items: center; gap: 8px">
+        <label style="flex: 1; display: flex; align-items: center; gap: 14px; min-height: 60px; cursor: pointer"><input type="checkbox" checked="checked" style="flex: none; width: 26px; height: 26px; margin: 0; accent-color: #1D3B8F"><span>Ei</span></label>
+        <button type="button" aria-label="Ei-Allergie erklären" style="flex: none; width: 44px; height: 44px; border: 1px solid #B9B4A8; border-radius: 22px; background: #FFFFFF; color: #1D3B8F; font: inherit; font-size: 18px; font-weight: 800; cursor: pointer">?</button>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; border-top: 1px solid #E6E2D8">
+        <label style="flex: 1; display: flex; align-items: center; gap: 14px; min-height: 60px; cursor: pointer"><input type="checkbox" style="flex: none; width: 26px; height: 26px; margin: 0; accent-color: #1D3B8F"><span>Milch</span></label>
+        <button type="button" aria-label="Milchallergie erklären" style="flex: none; width: 44px; height: 44px; border: 1px solid #B9B4A8; border-radius: 22px; background: #FFFFFF; color: #1D3B8F; font: inherit; font-size: 18px; font-weight: 800; cursor: pointer">?</button>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; border-top: 1px solid #E6E2D8">
+        <label style="flex: 1; display: flex; align-items: center; gap: 14px; min-height: 60px; cursor: pointer"><input type="checkbox" style="flex: none; width: 26px; height: 26px; margin: 0; accent-color: #1D3B8F"><span>Erdnüsse</span></label>
+        <button type="button" aria-label="Erdnussallergie erklären" style="flex: none; width: 44px; height: 44px; border: 1px solid #B9B4A8; border-radius: 22px; background: #FFFFFF; color: #1D3B8F; font: inherit; font-size: 18px; font-weight: 800; cursor: pointer">?</button>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; border-top: 1px solid #E6E2D8">
+        <label style="flex: 1; display: flex; align-items: center; gap: 14px; min-height: 60px; cursor: pointer"><input type="checkbox" style="flex: none; width: 26px; height: 26px; margin: 0; accent-color: #1D3B8F"><span>Histaminintoleranz</span></label>
+        <button type="button" aria-label="Histaminintoleranz erklären" style="flex: none; width: 44px; height: 44px; border: 1px solid #B9B4A8; border-radius: 22px; background: #FFFFFF; color: #1D3B8F; font: inherit; font-size: 18px; font-weight: 800; cursor: pointer">?</button>
+      </div>
+      <button type="button" style="align-self: flex-start; min-height: 44px; padding: 0; border: 0; background: none; color: #1D3B8F; font: inherit; font-size: 17px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; cursor: pointer">Alle 14 Hauptallergene zeigen</button>
+    </fieldset>
+
+    <fieldset style="margin: 0; padding: 6px 18px 18px 18px; border: 1px solid #D8D4CA; border-radius: 18px; background: #FFFFFF; display: flex; flex-direction: column; gap: 10px">
+      <legend style="padding: 0 6px; font-size: 18px; font-weight: 800">Fokus auf dem Teller</legend>
+      <p style="margin: 0; font-size: 16px; line-height: 1.45; color: #474C54">Weil eine Erkrankung gewählt ist, zeigt der Teller zuerst die Werte Ihrer Erkrankungen. Sie können jederzeit umschalten.</p>
+      <label style="display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 14px; box-sizing: border-box; border: 2px solid #1D3B8F; border-radius: 14px; background: #E3E9F7; cursor: pointer"><input type="radio" name="fokus" checked="checked" style="flex: none; width: 22px; height: 22px; margin: 0; accent-color: #1D3B8F"><span style="display: flex; flex-direction: column"><span style="font-weight: 800">Erkrankungen</span><span style="font-size: 15px; color: #474C54">Purin, Zucker, Salz, Kalium zuerst</span></span></label>
+      <label style="display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 0 14px; box-sizing: border-box; border: 1px solid #B9B4A8; border-radius: 14px; cursor: pointer"><input type="radio" name="fokus" style="flex: none; width: 22px; height: 22px; margin: 0; accent-color: #1D3B8F"><span style="display: flex; flex-direction: column"><span style="font-weight: 700">Nährstoffe</span><span style="font-size: 15px; color: #474C54">Vitamine, Mineralstoffe und Lücken zuerst</span></span></label>
+    </fieldset>
+
+    <div style="margin-top: auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+      <a href="ProfilPerson.dc.html" style="display: flex; align-items: center; justify-content: center; height: 60px; border-radius: 16px; background: #FFFFFF; border: 2px solid #1D3B8F; color: #1D3B8F; font-size: 18px; font-weight: 700; text-decoration: none">Zurück</a>
+      <a href="Grenzwerte.dc.html" style="display: flex; align-items: center; justify-content: center; height: 60px; border-radius: 16px; background: #1D3B8F; color: #FFFFFF; font-size: 19px; font-weight: 800; text-decoration: none">Weiter</a>
+    </div>
+  </div>
+</main>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1460}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>
