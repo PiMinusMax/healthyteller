@@ -4,7 +4,7 @@ Healthy Teller bewertet jedes Lebensmittel gleichzeitig gegen alle Erkrankungen,
 
 Die App stellt keine Diagnose und ersetzt keine ärztliche Beratung oder Ernährungstherapie.
 
-**Stand:** Grundgerüst (Meilenstein 1). Die App startet, hat aber noch keine Funktionen.
+**Stand:** erste nutzbare Version. Profil anlegen, Produkte per Barcode-Nummer aus Open Food Facts laden, Allergene und eigene Arztvorgaben bewerten, Teller und Druckliste. Fachlich geprüfte Regeln und Referenzwerte fehlen noch, deshalb zeigt die App für Erkrankungen meist „unbekannt“. Details: [docs/adr/0002-app-aufbau.md](docs/adr/0002-app-aufbau.md).
 
 ## Dokumente
 
@@ -24,8 +24,9 @@ Am einfachsten im Dev Container (`.devcontainer/`), der alle Werkzeuge mitbringt
 
 ```sh
 # App starten (im Ordner crates/app)
-dx serve --platform web
+dx serve --platform web        # öffnet http://127.0.0.1:8080
 dx serve --platform desktop
+dx serve --platform android    # braucht Android SDK und NDK, Emulator oder Gerät per USB
 
 # Prüfungen wie in der CI
 cargo fmt --all --check
@@ -40,6 +41,10 @@ scripts/repo-guard.sh
 (cd e2e && npm ci && npx playwright install --with-deps && npx playwright test)
 ```
 
+Die Ende-zu-Ende-Tests liegen in `e2e/tests/`. `helpers.ts` enthält die Bausteine (Grundhinweis bestätigen, Testprofil anlegen, Fixture-Produkt laden). Anfragen an Open Food Facts werden dort mit den Fixtures beantwortet, die Tests laufen also ohne Netz.
+
+Zum Ausprobieren ohne Netz: Barcode `4000000000017` liefert in den Tests das erfundene Produkt „Testjoghurt natur“. In der echten App fragt die Nummer Open Food Facts ab, dort gibt es sie nicht.
+
 | Ordner | Inhalt |
 | --- | --- |
 | `crates/core` | Datenmodell, Regel-Engine, Bewertung; ohne Abhängigkeiten |
@@ -52,6 +57,7 @@ scripts/repo-guard.sh
 | `fixtures/` | Testdateien mit erfundenen Werten |
 | `e2e/` | Playwright- und axe-Tests |
 | `docs/adr/` | Architekturentscheidungen |
+| `docs/mockups/` | Oberflächen-Mockups, Design-Tokens und Schrift |
 
 ## Lizenz
 
