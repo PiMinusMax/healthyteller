@@ -462,3 +462,26 @@ card-nova = Group { $group } of 4
 card-additives = Additives
 card-ingredients = Ingredients
 card-more-note = This information comes unchanged from the source. The app does not evaluate it yet.
+
+## Moving to another device
+
+transfer-title = Moving to another device
+transfer-lead = Profiles, my foods, saved plates and settings can be moved as an encrypted file. Without the password nobody can read the file, not even the project.
+transfer-export = Export
+transfer-pass = Password
+transfer-pass-repeat = Repeat password
+transfer-pass-hint = At least { $min } characters. Without this password the file cannot be opened.
+transfer-export-action = Create encrypted file
+transfer-save-file = Save file
+transfer-saved = Saved to { $path }
+transfer-no-folder = There is no downloads folder on this device.
+transfer-import = Import
+transfer-file = Export file (.htx)
+transfer-import-warning = Importing replaces profiles, my foods, saved plates and settings on this device.
+transfer-import-action = Import
+transfer-imported = Import complete.
+transfer-pass-short = The password is too short.
+transfer-pass-mismatch = The two passwords do not match.
+transfer-not-export = This is not an export file from Healthy Teller.
+transfer-wrong-pass = The password is wrong or the file is damaged.
+transfer-crypto-error = Encryption failed.

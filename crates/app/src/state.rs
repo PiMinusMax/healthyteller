@@ -88,6 +88,19 @@ pub struct AppState {
     pub rule_errors: Vec<String>,
 }
 
+/// Content of the encrypted export file for moving to another device.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+pub struct ExportData {
+    pub version: u32,
+    pub settings: Settings,
+    pub profiles: Vec<Profile>,
+    pub active_profile: Option<String>,
+    pub my_foods: Vec<MyFood>,
+    pub plates: Vec<SavedPlate>,
+    /// Source data of the foods above, so they work on the new device without a network.
+    pub foods: BTreeMap<String, CachedFood>,
+}
+
 thread_local! {
     static STORE: RefCell<Option<Store>> = const { RefCell::new(None) };
 }
@@ -259,6 +272,43 @@ impl AppState {
         Options {
             include_drafts: self.settings.include_draft_rules,
         }
+    }
+
+    pub fn export_data(&self) -> ExportData {
+        let used: Vec<&str> = self
+            .my_foods
+            .iter()
+            .map(|m| m.food_id.0.as_str())
+            .chain(
+                self.plates
+                    .iter()
+                    .flat_map(|p| p.items.iter().map(|i| i.food_id.0.as_str())),
+            )
+            .collect();
+        ExportData {
+            version: 1,
+            settings: self.settings.clone(),
+            profiles: self.profiles.clone(),
+            active_profile: self.active_profile.clone(),
+            my_foods: self.my_foods.clone(),
+            plates: self.plates.clone(),
+            foods: self
+                .foods
+                .iter()
+                .filter(|(k, _)| used.contains(&k.as_str()))
+                .map(|(k, v)| (k.clone(), v.clone()))
+                .collect(),
+        }
+    }
+
+    /// Replaces profiles, own foods, plates and settings with the imported ones.
+    pub fn import_data(&mut self, data: ExportData) {
+        self.settings = data.settings;
+        self.profiles = data.profiles;
+        self.active_profile = data.active_profile;
+        self.my_foods = data.my_foods;
+        self.plates = data.plates;
+        self.foods.extend(data.foods);
     }
 
     pub fn new_profile_id(&self) -> String {

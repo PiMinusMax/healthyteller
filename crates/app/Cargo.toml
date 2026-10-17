@@ -19,6 +19,7 @@ serde_json = { workspace = true }
 unic-langid = { version = "0.9.6", features = ["macros"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
+base64 = "0.22.1"
 js-sys = "0.3.106"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]

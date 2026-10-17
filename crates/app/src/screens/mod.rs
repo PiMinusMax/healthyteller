@@ -14,6 +14,7 @@ mod profile;
 mod search;
 mod settings;
 mod term;
+mod transfer;
 mod welcome;
 
 pub use about::About;

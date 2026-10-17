@@ -121,6 +121,8 @@ pub fn Settings() -> Element {
                 }
             }
 
+            super::transfer::Transfer {}
+
             Card { title: tr("settings-device"), id: "settings-device",
                 div { class: "card-body",
                     p { class: "small", {tr("settings-device-lead")} }

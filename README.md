@@ -35,6 +35,7 @@ Erste nutzbare Version:
 - Profil mit Erkrankungen, Allergien und Arztvorgaben
 - Produkte per Barcode-Nummer oder Name aus [Open Food Facts](https://world.openfoodfacts.org)
 - Bewertung von Allergenen und eigenen Arztvorgaben, Teller mit Tagessummen, Meine Lebensmittel, Druckliste
+- Gerätewechsel über eine verschlüsselte Exportdatei
 - Web, Desktop (Linux, Windows, macOS) und Android aus einer Codebasis
 
 Fachlich geprüfte Regeln und Referenzwerte fehlen noch. Für Erkrankungen zeigt die App deshalb meist „unbekannt“. Jede Grenze braucht eine zitierte Quelle und eine fachliche Freigabe. Hier hilft das Projekt am meisten Unterstützung, siehe [Mitmachen](#mitmachen).
