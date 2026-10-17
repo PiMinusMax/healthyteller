@@ -1,4 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
+import * as path from "path";
 
 // Output of `dx build --platform web --release` in crates/app.
 const webRoot = "../target/dx/healthyteller-app/release/web/public";
@@ -21,8 +22,24 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
   },
   projects: [
-    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
-    { name: "firefox", use: { ...devices["Desktop Firefox"] } },
-    { name: "webkit", use: { ...devices["Desktop Safari"] } },
+    { name: "chromium", use: { ...devices["Desktop Chrome"] }, testIgnore: /scan\.spec\.ts/ },
+    { name: "firefox", use: { ...devices["Desktop Firefox"] }, testIgnore: /scan\.spec\.ts/ },
+    { name: "webkit", use: { ...devices["Desktop Safari"] }, testIgnore: /scan\.spec\.ts/ },
+    {
+      // Only Chromium can play a video file as camera picture.
+      name: "chromium-camera",
+      testMatch: /scan\.spec\.ts/,
+      use: {
+        ...devices["Desktop Chrome"],
+        permissions: ["camera"],
+        launchOptions: {
+          args: [
+            "--use-fake-ui-for-media-stream",
+            "--use-fake-device-for-media-stream",
+            `--use-file-for-fake-video-capture=${path.join(__dirname, "fixtures/barcode-4000000000013.y4m")}`,
+          ],
+        },
+      },
+    },
   ],
 });

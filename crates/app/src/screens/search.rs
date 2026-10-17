@@ -34,6 +34,7 @@ pub fn Search() -> Element {
     let mut last_added = use_signal(|| None::<(String, usize)>);
     let mut online = use_signal(|| Online::Idle);
     let mut import_error = use_signal(|| None::<String>);
+    let scanning = use_signal(|| false);
 
     let s = state.read();
     let q = query().trim().to_lowercase();
@@ -137,8 +138,7 @@ pub fn Search() -> Element {
         }
     };
 
-    let check_barcode = move |_| {
-        let code = barcode();
+    let mut check_code = move |code: String| {
         lookup.set(Lookup::Loading);
         spawn(async move {
             match fetch::product_by_barcode(&code).await {
@@ -152,6 +152,7 @@ pub fn Search() -> Element {
             }
         });
     };
+    let check_barcode = move |_| check_code(barcode());
 
     rsx! {
         main { class: "screen",
@@ -257,8 +258,8 @@ pub fn Search() -> Element {
                     if let Lookup::Failed(msg) = lookup() {
                         p { class: "error", role: "alert", "{msg}" }
                     }
+                    {camera_section(scanning, barcode, check_code)}
                     p { class: "small muted", {tr("barcode-privacy")} }
-                    p { class: "small muted", {tr("barcode-camera-later")} }
                     div { class: "field",
                         label { r#for: "import-file", {tr("import-label")} }
                         input {
@@ -354,5 +355,44 @@ pub fn Search() -> Element {
                 }
             }
         }
+    }
+}
+
+/// Camera scan where the platform offers it (web app); elsewhere only number entry.
+#[cfg(target_arch = "wasm32")]
+fn camera_section(
+    mut scanning: Signal<bool>,
+    mut barcode: Signal<String>,
+    mut check_code: impl FnMut(String) + Copy + 'static,
+) -> Element {
+    rsx! {
+        if scanning() {
+            crate::scanner::CameraScanner {
+                on_code: move |code: String| {
+                    scanning.set(false);
+                    barcode.set(code.clone());
+                    check_code(code);
+                },
+                on_close: move |_| scanning.set(false),
+            }
+        } else {
+            button {
+                class: "btn btn-primary btn-large",
+                onclick: move |_| scanning.set(true),
+                Icon { name: IconName::Barcode }
+                {tr("scan-start")}
+            }
+        }
+    }
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+fn camera_section(
+    _scanning: Signal<bool>,
+    _barcode: Signal<String>,
+    _check_code: impl FnMut(String) + Copy + 'static,
+) -> Element {
+    rsx! {
+        p { class: "small muted", {tr("barcode-camera-later")} }
     }
 }

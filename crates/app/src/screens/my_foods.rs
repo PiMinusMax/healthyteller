@@ -192,14 +192,18 @@ fn AddMyFood() -> Element {
         last.set(Some(name));
     };
 
-    // Search hits carry only name and brand; the full product is loaded by barcode.
-    let mut add_hit = move |id: String| {
-        let code = id.trim_start_matches("off:").to_owned();
+    // Search hits may carry only name and brand; foods already on the device are complete.
+    let mut add_complete = move |food: Food| {
+        if !food.nutrients.is_empty() || state.read().food(&food.id.0).is_some() {
+            add(food);
+            return;
+        }
+        let code = food.id.0.trim_start_matches("off:").to_owned();
         lookup.set(Lookup::Loading);
         spawn(async move {
             match fetch::product_by_barcode(&code).await {
-                Ok(food) => {
-                    add(food);
+                Ok(full) => {
+                    add(full);
                     lookup.set(Lookup::Idle);
                 }
                 Err(e) => lookup.set(Lookup::Failed(tr(e.message_key()))),
@@ -316,7 +320,7 @@ fn AddMyFood() -> Element {
             }
             if !shown.is_empty() {
                 ul { class: "list",
-                    for (food, mine, online) in shown {
+                    for (food, mine, _online) in shown {
                         li { key: "{food.id.0}", class: "food-row",
                             span { class: "grow food-name", {labels::food_title(&food)} }
                             if !online { QualityMark { id: food.id.0.clone(), compact: true } }
@@ -328,7 +332,7 @@ fn AddMyFood() -> Element {
                                     "aria-label": tr_args("my-foods-add-named", &[("name", food.name.clone())]),
                                     onclick: {
                                         let food = food.clone();
-                                        move |_| if online { add_hit(food.id.0.clone()) } else { add(food.clone()) }
+                                        move |_| add_complete(food.clone())
                                     },
                                     Icon { name: IconName::Plus, size: 20 }
                                     {tr("action-add")}

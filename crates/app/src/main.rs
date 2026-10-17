@@ -6,6 +6,8 @@ mod fetch;
 mod format;
 mod i18n;
 mod labels;
+#[cfg(target_arch = "wasm32")]
+mod scanner;
 mod screens;
 mod state;
 
@@ -53,6 +55,12 @@ pub enum Route {
         PrintList {},
         #[route("/schaetzungen")]
         Estimates {},
+        #[route("/vergleich/:id/:grams")]
+        CompareStart { id: String, grams: u32 },
+        #[route("/vergleich/:id/:other/:grams")]
+        Compare { id: String, other: String, grams: u32 },
+        #[route("/arztfragen")]
+        DoctorQuestions {},
         #[route("/:..segments")]
         NotFound { segments: Vec<String> },
 }
@@ -122,10 +130,19 @@ fn App() -> Element {
 fn Shell() -> Element {
     let state = use_app_state();
     let route = use_route::<Route>();
-    let (accepted, theme) = {
+    let (accepted, theme, language) = {
         let s = state.read();
-        (s.settings.accepted_notice, s.settings.theme)
+        (
+            s.settings.accepted_notice,
+            s.settings.theme,
+            s.settings.language,
+        )
     };
+    i18n::set_language(language);
+    let lang = language.code();
+    use_effect(use_reactive!(|lang| {
+        document::eval(&format!("document.documentElement.lang = '{lang}';"));
+    }));
     let theme = match theme {
         Theme::System => "system",
         Theme::Light => "light",
@@ -133,7 +150,8 @@ fn Shell() -> Element {
     };
     let show_welcome = !accepted && !matches!(route, Route::About {});
     rsx! {
-        div { class: "app", "data-theme": "{theme}",
+        // Keyed by language, so every screen renders again with the new texts.
+        div { key: "{lang}", class: "app", "data-theme": "{theme}", lang: "{lang}",
             if show_welcome {
                 Welcome {}
             } else {
