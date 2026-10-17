@@ -15,7 +15,7 @@ Die App bewertet Erkrankungen erst, wenn es dafür eine fachlich geprüfte Regel
 So läuft es ab:
 
 1. Vorschlag als Issue mit der Vorlage „Fachliche Angabe“: Erkrankung, Kennzahl, Grenzwert und die Quelle mit Ausgabe und Seite.
-2. Daraus entsteht eine Regel mit `status: draft` und Referenzfällen innerhalb und außerhalb der Schwelle.
+2. Daraus entsteht eine Regel mit `status: draft` und Referenzfällen innerhalb und außerhalb der Schwelle. Die Quelle kommt als eigene Datei nach `rules/citations/`, die erfundenen Testlebensmittel der Referenzfälle nach `fixtures/rules/`. `cargo test` bewertet jeden Referenzfall mit der Regel und prüft, dass jede genannte Quelle erfasst ist.
 3. Eine Fachkraft prüft die Regel. Erst dann wird sie auf `status: reviewed` gesetzt und ausgeliefert.
 
 Zahlen ohne Quelle nehmen wir nicht an, auch keine „allgemein bekannten“.
