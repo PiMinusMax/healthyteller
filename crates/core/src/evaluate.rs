@@ -53,6 +53,8 @@ pub struct Budget {
     /// Amount compared with the limit: this portion, plus the day so far for day limits.
     pub used: Quantity,
     pub origin: LimitOrigin,
+    /// Share of a day limit per meal: the limit divided by the person's meals a day.
+    pub per_meal: Option<Quantity>,
 }
 
 impl Budget {
@@ -70,6 +72,10 @@ pub enum Reason {
     WithinLimit,
     NearLimit,
     OverLimit,
+    /// The day total stays below the limit, but this portion alone takes more than one meal's share.
+    LargePortionShare,
+    /// The day total stays below the limit; without meals a day there is no measure for one portion.
+    NoPortionMeasure,
     ValueUnknown,
     NoReviewedRule,
 }
@@ -84,6 +90,8 @@ impl Reason {
             Reason::WithinLimit => "within-limit",
             Reason::NearLimit => "near-limit",
             Reason::OverLimit => "over-limit",
+            Reason::LargePortionShare => "large-portion-share",
+            Reason::NoPortionMeasure => "no-portion-measure",
             Reason::ValueUnknown => "value-unknown",
             Reason::NoReviewedRule => "no-reviewed-rule",
         }
@@ -218,7 +226,13 @@ pub fn evaluate(
             if rule.user_overridable && covered_by_doctor.contains(&(rule.nutrient, rule.basis)) {
                 continue;
             }
-            results.push(evaluate_rule(food, portion, rule, day));
+            results.push(evaluate_rule(
+                food,
+                portion,
+                rule,
+                day,
+                profile.meals_per_day,
+            ));
         }
         let has_doctor_limit = results
             .iter()
@@ -330,12 +344,51 @@ fn level_for(
     }
 }
 
-fn evaluate_rule(food: &Food, portion: &Portion, rule: &Rule, day: &DayTotals) -> DimensionResult {
+/// A day limit alone says nothing about one portion: a pizza can fit into the day and still
+/// take most of it. With the person's meals a day, one meal's share is the day limit divided
+/// by that number; the app adds no threshold of its own (AGENTS.md rule 2, ADR 0005).
+fn judge_portion(
+    (level, reason): (Level, Reason),
+    basis: RuleBasis,
+    per_portion: Quantity,
+    day_limit: Quantity,
+    meals: Option<u8>,
+) -> ((Level, Reason), Option<Quantity>) {
+    if basis != RuleBasis::Day {
+        return ((level, reason), None);
+    }
+    let per_meal = meals
+        .filter(|&n| n > 0)
+        .map(|n| day_limit.scale(1.0 / f64::from(n)));
+    if level != Level::Ok {
+        return ((level, reason), per_meal);
+    }
+    let judged = match per_meal {
+        Some(share) if per_portion.ratio(share).is_some_and(|r| r > 1.0) => {
+            (Level::Caution, Reason::LargePortionShare)
+        }
+        Some(_) => (level, reason),
+        None => (Level::Unknown, Reason::NoPortionMeasure),
+    };
+    (judged, per_meal)
+}
+
+fn evaluate_rule(
+    food: &Food,
+    portion: &Portion,
+    rule: &Rule,
+    day: &DayTotals,
+    meals: Option<u8>,
+) -> DimensionResult {
     let mut r = match compared_amount(food, portion, rule.nutrient, rule.basis, day) {
         None => DimensionResult::new(rule.dimension, Level::Unknown, Reason::ValueUnknown),
         Some((per_portion, used)) => {
-            let (level, reason) = level_for(used, rule.caution(), rule.avoid());
-            let mut r = DimensionResult::new(rule.dimension, level, reason);
+            let mut judged = level_for(used, rule.caution(), rule.avoid());
+            let mut per_meal = None;
+            if let Some(limit) = rule.avoid() {
+                (judged, per_meal) = judge_portion(judged, rule.basis, per_portion, limit, meals);
+            }
+            let mut r = DimensionResult::new(rule.dimension, judged.0, judged.1);
             r.value_per_portion = Some(per_portion);
             if let Some(limit) = rule.avoid() {
                 r.budget = Some(Budget {
@@ -345,6 +398,7 @@ fn evaluate_rule(food: &Food, portion: &Portion, rule: &Rule, day: &DayTotals) -
                     origin: LimitOrigin::Rule {
                         id: rule.id.clone(),
                     },
+                    per_meal,
                 });
             }
             r
@@ -372,8 +426,14 @@ fn evaluate_doctor_limit(
     let mut r = match compared_amount(food, portion, limit.nutrient, limit.basis, day) {
         None => DimensionResult::new(dimension, Level::Unknown, Reason::ValueUnknown),
         Some((per_portion, used)) => {
-            // The app only adopts the doctor's maximum; it never derives a caution level from it.
-            let (level, reason) = level_for(used, None, Some(max));
+            // The app adopts the doctor's maximum and splits it only by the person's own meals.
+            let ((level, reason), per_meal) = judge_portion(
+                level_for(used, None, Some(max)),
+                limit.basis,
+                per_portion,
+                max,
+                profile.meals_per_day,
+            );
             let mut r = DimensionResult::new(dimension, level, reason);
             r.value_per_portion = Some(per_portion);
             r.budget = Some(Budget {
@@ -381,6 +441,7 @@ fn evaluate_doctor_limit(
                 basis: limit.basis,
                 used,
                 origin: LimitOrigin::Doctor,
+                per_meal,
             });
             r
         }
@@ -494,6 +555,49 @@ mod tests {
         assert_eq!(level(250.0), Level::Avoid);
     }
 
+    /// One portion that fits into the day but takes most of it is not "ok".
+    #[test]
+    fn large_portion_within_the_day_limit_is_judged_by_meal_share() {
+        let mut p = Profile::new("p", "Test");
+        p.doctor_limits.push(DoctorLimit {
+            nutrient: Nutrient::Salt,
+            max: Some(Quantity::new(6.0, Unit::Gram)),
+            min: None,
+            basis: RuleBasis::Day,
+            note: None,
+        });
+        let pizza = fixture_food(&[(Nutrient::Salt, 1.2, Unit::Gram)]);
+        let judge = |p: &Profile, grams: f64| {
+            let e = evaluate(
+                &pizza,
+                &portion(grams),
+                p,
+                &[],
+                &DayTotals::new(),
+                Options::default(),
+            );
+            (
+                e.results[0].level,
+                e.results[0].reason.clone(),
+                e.results[0].budget.clone(),
+            )
+        };
+        // 400 g = 4.8 g salt: below the day limit, but no measure for one portion yet.
+        assert_eq!(judge(&p, 400.0).0, Level::Unknown);
+        assert_eq!(judge(&p, 400.0).1, Reason::NoPortionMeasure);
+        p.meals_per_day = Some(3);
+        let (level, reason, budget) = judge(&p, 400.0);
+        assert_eq!((level, reason), (Level::Caution, Reason::LargePortionShare));
+        assert_eq!(
+            budget.unwrap().per_meal,
+            Some(Quantity::new(2.0, Unit::Gram))
+        );
+        // 100 g = 1.2 g salt stays within one meal's share of 2 g.
+        assert_eq!(judge(&p, 100.0).0, Level::Ok);
+        // Over the day limit stays avoid.
+        assert_eq!(judge(&p, 600.0).0, Level::Avoid);
+    }
+
     #[test]
     fn day_rule_adds_what_was_eaten_before() {
         let r = rule(
@@ -503,7 +607,8 @@ mod tests {
             100.0,
             200.0,
         );
-        let p = profile_with(Condition::Gout);
+        let mut p = profile_with(Condition::Gout);
+        p.meals_per_day = Some(2);
         let food = fixture_food(&[(Nutrient::Purine, 100.0, Unit::Milligram)]);
         let mut day = DayTotals::new();
         let fresh = evaluate(

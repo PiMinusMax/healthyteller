@@ -55,7 +55,7 @@ export async function acceptNotice(page: Page) {
 /** Invented test profile (AGENTS.md rule 18). */
 export async function createProfile(
   page: Page,
-  options: { conditions?: string[]; allergies?: string[]; medications?: string[]; saltLimit?: string } = {},
+  options: { conditions?: string[]; allergies?: string[]; medications?: string[]; saltLimit?: string; meals?: string } = {},
 ) {
   await page.getByRole("link", { name: "Profil anlegen" }).click();
   await page.getByLabel("Name", { exact: true }).fill("Test Person");
@@ -73,6 +73,10 @@ export async function createProfile(
   if (options.saltLimit) {
     await page.getByLabel("Salz").fill(options.saltLimit);
     await page.getByLabel("Salz").blur();
+  }
+  if (options.meals) {
+    await page.getByLabel("Wie viele Mahlzeiten essen Sie meist am Tag?").fill(options.meals);
+    await page.getByLabel("Wie viele Mahlzeiten essen Sie meist am Tag?").blur();
   }
   await page.getByRole("button", { name: "Speichern" }).click();
   await expect(page.getByText("Test Person")).toBeVisible();

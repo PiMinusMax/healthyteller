@@ -15,6 +15,9 @@ pub struct RuleTest {
     pub fixture_food: String,
     pub portion_g: f64,
     pub expect: String,
+    /// Meals a day of the test person; day rules judge one portion by this share.
+    #[serde(default)]
+    pub meals_per_day: Option<u8>,
 }
 
 #[derive(Clone, Debug, PartialEq, Deserialize)]
@@ -174,11 +177,12 @@ pub fn check_reference_cases(file: &RuleFile, foods: &[FixtureFood]) -> Vec<Rule
         rule_id: rule.id.clone(),
         message,
     };
-    let mut profile = Profile::new("fixture", "Fixture");
-    profile.conditions.insert(rule.condition);
     let rules = [rule.clone()];
     let mut errors = Vec::new();
     for case in &file.tests {
+        let mut profile = Profile::new("fixture", "Fixture");
+        profile.conditions.insert(rule.condition);
+        profile.meals_per_day = case.meals_per_day;
         let Some(food) = foods.iter().find(|f| f.id == case.fixture_food) else {
             errors.push(fail(format!("unknown fixture food {}", case.fixture_food)));
             continue;
@@ -243,6 +247,7 @@ tests:
     expect: avoid
   - fixture_food: fixture-b
     portion_g: 100
+    meals_per_day: 1
     expect: ok
 "#;
 

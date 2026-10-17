@@ -128,6 +128,10 @@ pub struct Profile {
     pub allergies: BTreeSet<Allergen>,
     #[serde(default)]
     pub medications: BTreeSet<MedicationGroup>,
+    /// Meals a day, set by the person. Splits a day limit into a share per meal,
+    /// so a single portion can be judged, not only the day total.
+    #[serde(default)]
+    pub meals_per_day: Option<u8>,
     /// Set by the person; otherwise derived from the conditions.
     pub focus_override: Option<Focus>,
     pub doctor_limits: Vec<DoctorLimit>,
@@ -143,6 +147,7 @@ impl Profile {
             conditions: BTreeSet::new(),
             allergies: BTreeSet::new(),
             medications: BTreeSet::new(),
+            meals_per_day: None,
             focus_override: None,
             doctor_limits: Vec::new(),
         }

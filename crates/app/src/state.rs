@@ -5,7 +5,7 @@ use std::collections::BTreeMap;
 
 use dioxus::prelude::*;
 use healthyteller_core::{
-    DayTotals, Food, FoodId, Options, PlateItem, Portion, Preparation, Profile, Rule,
+    DayTotals, Food, FoodId, Level, Options, PlateItem, Portion, Preparation, Profile, Rule,
 };
 use healthyteller_storage::Store;
 use serde::{Deserialize, Serialize};
@@ -267,6 +267,40 @@ impl AppState {
             item: PlateItem { food_id, portion },
             saved: false,
         });
+    }
+
+    /// Results needing attention for a food in its usual portion, one per dimension, for lists:
+    /// caution, avoid and values the source lacks. Never an overall score (AGENTS.md rule 7).
+    pub fn attention(&self, food_id: &str) -> Vec<(String, Level)> {
+        self.food(food_id)
+            .map(|f| self.attention_for(f))
+            .unwrap_or_default()
+    }
+
+    /// Like [`Self::attention`], for a food that is loaded but not stored, e.g. a search hit.
+    pub fn attention_for(&self, food: &Food) -> Vec<(String, Level)> {
+        let Some(profile) = self.active_profile() else {
+            return Vec::new();
+        };
+        let portion = self
+            .my_food(&food.id.0)
+            .map_or_else(default_portion, |m| m.portion);
+        let e = healthyteller_core::evaluate(
+            food,
+            &portion,
+            profile,
+            &self.rules,
+            &self.day_totals(false),
+            self.eval_options(),
+        );
+        e.results
+            .iter()
+            .filter(|r| {
+                matches!(r.level, Level::Avoid | Level::Caution)
+                    || r.reason == healthyteller_core::Reason::ValueUnknown
+            })
+            .map(|r| (crate::labels::result_title(r), r.level))
+            .collect()
     }
 
     pub fn eval_options(&self) -> Options {

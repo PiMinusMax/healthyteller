@@ -354,3 +354,7 @@ table.compare thead th { border-bottom: 2px solid var(--kt-ink); }
 details.card > summary span:first-child { font-weight: 800; font-size: 19px; }
 details.card[open] > summary svg { transform: rotate(180deg); }
 table.nutrients tbody th { padding-top: 16px; font-weight: 800; color: var(--kt-ink); }
+
+/* Verdicts in list rows: badge plus dimension */
+.verdicts { display: flex; flex-wrap: wrap; gap: 6px 12px; }
+.verdict { display: inline-flex; align-items: center; gap: 6px; }
