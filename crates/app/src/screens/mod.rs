@@ -2,6 +2,7 @@
 
 mod about;
 mod card;
+mod compare;
 mod estimates;
 mod home;
 mod my_foods;
@@ -11,6 +12,7 @@ mod plate;
 mod portion;
 mod print;
 mod profile;
+mod questions;
 mod search;
 mod settings;
 mod term;
@@ -19,6 +21,7 @@ mod welcome;
 
 pub use about::About;
 pub use card::FoodCard;
+pub use compare::{Compare, CompareStart};
 pub use estimates::Estimates;
 pub use home::Home;
 pub use my_foods::MyFoods;
@@ -28,6 +31,7 @@ pub use plate::Plate;
 pub use portion::PortionScreen;
 pub use print::PrintList;
 pub use profile::{ProfileDraft, ProfileEdit, Profiles};
+pub use questions::DoctorQuestions;
 pub use search::Search;
 pub use settings::Settings;
 #[cfg(test)]

@@ -21,10 +21,13 @@ Mit den Mockups in `docs/mockups/` steht das Ziel der Oberfläche fest. Die App 
 - **Tests ohne Netz.** Die Ende-zu-Ende-Tests beantworten Anfragen an Open Food Facts mit den Fixtures aus `fixtures/open-food-facts/`.
 - **Farben im Dunkelmodus.** Die Mockup-Tokens definieren für Dunkel keine hellen Hintergrundflächen (soft). Diese Werte sind ergänzt und in `crates/app/assets/main.css` als „added“ markiert; axe prüft den Kontrast in Hell und Dunkel.
 
+- **Vergleich und Arztfragen ohne Urteil.** Der Vergleich zweier Lebensmittel zeigt Werte der Quelle und die Ampeln je Dimension nebeneinander, wählt aber nicht aus. Die Fragen an den Arzt entstehen aus dem Profil (Widersprüche zwischen Regeln, fehlende Vorgaben, Spurenhinweise); die App beantwortet sie nicht.
+- **Quellen-Check.** Ein wöchentlicher Workflow lädt ein Produkt live von Open Food Facts, prüft es mit dem Adapter und fragt die Suchdienste ab. Bei einem Fehler legt er ein Issue an. Die geladenen Daten bleiben im Lauf.
+
 ## Noch nicht umgesetzt
 
 - Kamera-Scan (Crate `barcode`)
 - Referenzwerte (Soll) und damit Lücken und Vorschläge
-- Konfliktbericht als PDF, Alternativen, Schätzmethoden
+- automatische Vorschläge für Alternativen (brauchen geprüfte Regeln), Schätzmethoden
 - Verschlüsselung des lokalen Speichers selbst; bisher ist nur die Exportdatei verschlüsselt
 - Export auf Android (dort fehlt noch ein Ordner, auf den die Person zugreifen kann)

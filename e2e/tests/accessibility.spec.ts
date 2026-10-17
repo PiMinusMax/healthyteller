@@ -26,7 +26,7 @@ for (const scheme of ["light", "dark"] as const) {
     await page.getByRole("button", { name: "Zu Meine Lebensmittel hinzufügen" }).click();
     await page.getByRole("link", { name: "Alle Nährwerte" }).click();
     await expectNoViolations(page, "nutrient list");
-    for (const route of ["/", "/pruefen", "/teller", "/meine-lebensmittel", "/profil/neu/1", "/profile", "/profil/neu/2", "/einstellungen", "/ueber", "/druckliste", "/schaetzungen", "/begriff/purine"]) {
+    for (const route of ["/", "/pruefen", "/teller", "/meine-lebensmittel", "/profil/neu/1", "/profile", "/profil/neu/2", "/einstellungen", "/ueber", "/druckliste", "/schaetzungen", "/begriff/purine", "/arztfragen"]) {
       await page.goto(route);
       await expect(page.locator("main")).toBeVisible();
       await expectNoViolations(page, route);

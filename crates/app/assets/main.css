@@ -321,3 +321,10 @@ details.group > summary::-webkit-details-marker { display: none; }
   .app { background: #FFFFFF; color: #000000; }
   .card { break-inside: avoid; }
 }
+
+/* Comparison table */
+table.compare th, table.compare td { padding: 12px 10px; }
+table.compare thead th { border-bottom: 2px solid var(--kt-ink); }
+
+.print-only { display: none; }
+@media print { .print-only { display: block; } }
