@@ -418,6 +418,7 @@ Diese Regeln stehen wörtlich in der AGENTS.md und gelten für Menschen wie für
 17. Kleine Pull Requests mit Conventional Commits; Architekturentscheidungen als ADR in docs/adr/.
 18. Testprofile sind erfunden. Echte Personen- oder Gesundheitsdaten erscheinen nie in Code, Tests, Issues oder Logs.
 19. Die Pflichthinweise (Grundhinweis, Absprache mit dem Arzt, schwankende Zusammensetzung, Schätzungen, Allergene, Datenstand) sind Teil der Oberfläche, lassen sich nicht abschalten und werden in den Ende-zu-Ende-Tests geprüft.
+20. Fehler einer Quelle werden beim Original behoben. Ein Fork, etwa von Software von Open Food Facts, ist ein eigenes Repo außerhalb dieses Projekts: Er enthält nur Korrekturen, die als Pull Request ans Original gehen, und betreibt keinen eigenen Dienst. Die App nutzt nur Dienste der Originalquelle; ein Ausweichweg wie ein Testsystem der Quelle steht mit Grund und Endbedingung im Steckbrief und in einer ADR.
 
 ## Offene Entscheidungen
 

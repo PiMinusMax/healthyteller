@@ -11,6 +11,8 @@ pub enum FetchError {
     InvalidCode,
     NotFound,
     Network(String),
+    /// The source answered with an error status, for example 503 when it is overloaded.
+    Unavailable(u16),
     Format(String),
 }
 
@@ -20,6 +22,7 @@ impl FetchError {
             FetchError::InvalidCode => "fetch-invalid-code",
             FetchError::NotFound => "fetch-not-found",
             FetchError::Network(_) => "fetch-network",
+            FetchError::Unavailable(_) => "fetch-unavailable",
             FetchError::Format(_) => "fetch-format",
         }
     }
@@ -50,6 +53,9 @@ async fn get(request: healthyteller_ingest::FetchRequest) -> Result<Vec<u8>, Fet
     if response.status() == reqwest::StatusCode::NOT_FOUND {
         return Err(FetchError::NotFound);
     }
+    if !response.status().is_success() {
+        return Err(FetchError::Unavailable(response.status().as_u16()));
+    }
     response
         .bytes()
         .await
@@ -63,10 +69,25 @@ pub async fn product_by_barcode(code: &str) -> Result<Food, FetchError> {
 }
 
 /// Searches Open Food Facts by name or brand. Only the search terms leave the device.
+/// Tries the search services in the order the adapter gives and keeps the first
+/// error if all fail. Hits carry no nutrients; load the picked product with
+/// [`product_by_barcode`].
 pub async fn search_products(terms: &str) -> Result<Vec<Food>, FetchError> {
-    let bytes = get(OpenFoodFacts.search_request(terms)?).await?;
+    let mut first_error = None;
+    for request in OpenFoodFacts.search_requests(terms)? {
+        match search_with(request).await {
+            Ok(foods) => return Ok(foods),
+            Err(e) => {
+                first_error.get_or_insert(e);
+            }
+        }
+    }
+    Err(first_error.unwrap_or(FetchError::NotFound))
+}
+
+async fn search_with(request: healthyteller_ingest::FetchRequest) -> Result<Vec<Food>, FetchError> {
     let raw = RawArtifact {
-        bytes,
+        bytes: get(request).await?,
         retrieved_at: date::today(),
     };
     Ok(OpenFoodFacts.parse_search(&raw)?)
