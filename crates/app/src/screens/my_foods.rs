@@ -320,7 +320,7 @@ fn AddMyFood() -> Element {
             }
             if !shown.is_empty() {
                 ul { class: "list",
-                    for (food, mine, _online) in shown {
+                    for (food, mine, online) in shown {
                         li { key: "{food.id.0}", class: "food-row",
                             span { class: "grow food-name", {labels::food_title(&food)} }
                             if !online { QualityMark { id: food.id.0.clone(), compact: true } }
