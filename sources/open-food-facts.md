@@ -17,6 +17,7 @@ Hinweise:
 
 - Die App fragt nur den Barcode oder den Suchbegriff ab und speichert die Antwort im lokalen Cache. Der Gesamtexport wird nicht genutzt.
 - Die App sortiert die Treffer selbst: exakter Name vor Namensanfang vor enthaltenem Wort, Treffer nur über Kategorie zuletzt; Umlaute zählen gleich. Einträge mit gleichem Namen und gleicher Marke werden zu dem vollständigsten, bei Gleichstand neuesten zusammengefasst (`crates/ingest/src/search.rs`).
+- Damit die Trefferliste die Datenlage zeigen kann, lädt die App die ersten 20 Treffer im Hintergrund per Barcode nach, höchstens 4 Anfragen gleichzeitig. Die Daten bleiben nur im Arbeitsspeicher, bis man einen Treffer wählt.
 - Die Namenssuche liefert nur Barcode, Name und Marke. Wählt man einen Treffer, lädt die App das Produkt vollständig per Barcode, weil der Suchindex älter sein kann als die Produktdaten.
 - Open Food Facts garantiert weder Richtigkeit noch Vollständigkeit. Die App zeigt deshalb Vollständigkeit und Herkunft der Werte an.
 - Nährwerte sind Herstellerangaben und tragen in der App das Kennzeichen ∑. Fehlende Werte füllt die App aus `nutriments_estimated` (von Open Food Facts aus Zutaten berechnet, Kennzeichen ◐), siehe [ADR 0004](../docs/adr/0004-datenlage-und-schaetzung.md).

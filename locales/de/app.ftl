@@ -211,6 +211,7 @@ quality-source = Quellwerte
 quality-interpolated = hochgerechnet
 quality-estimated = geschätzt
 quality-incomplete = unvollständig
+quality-loading = Datenlage wird geladen
 quality-source-hint = Alle wichtigen Werte stammen von der Quelle, meist vom Etikett.
 quality-interpolated-hint = Einige wichtige Werte sind aus den Zutaten berechnet und ungenauer als Etikettwerte.
 quality-estimated-hint = Einige wichtige Werte sind von einem vergleichbaren Grundnahrungsmittel übernommen.

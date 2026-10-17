@@ -211,6 +211,7 @@ quality-source = source values
 quality-interpolated = calculated
 quality-estimated = estimated
 quality-incomplete = incomplete
+quality-loading = Loading data quality
 quality-source-hint = All important values come from the source, mostly from the label.
 quality-interpolated-hint = Some important values are calculated from the ingredients and less exact than label values.
 quality-estimated-hint = Some important values are taken from a comparable basic food.
