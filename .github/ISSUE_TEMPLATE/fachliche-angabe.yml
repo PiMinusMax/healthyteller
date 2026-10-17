@@ -1,0 +1,44 @@
+name: Fachliche Angabe
+description: Grenzwert, Regel oder Referenzwert mit Quelle vorschlagen.
+labels: ["fachlich-offen"]
+body:
+  - type: markdown
+    attributes:
+      value: "Ohne Quelle kann eine Angabe nicht übernommen werden (AGENTS.md Regel 2)."
+  - type: input
+    id: condition
+    attributes:
+      label: Erkrankung oder Zielgruppe
+      placeholder: "z. B. Gicht"
+    validations:
+      required: true
+  - type: input
+    id: metric
+    attributes:
+      label: Kennzahl und Bezug
+      placeholder: "z. B. Purin als Harnsäure, pro Tag"
+    validations:
+      required: true
+  - type: textarea
+    id: value
+    attributes:
+      label: Wert oder Schwellen
+      description: "Grenze für „mit Maß“ und für „meiden“, mit Einheit."
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Quelle
+      description: "Titel, Ausgabe oder Jahr, Seite oder Tabelle, Link oder DOI."
+    validations:
+      required: true
+  - type: dropdown
+    id: role
+    attributes:
+      label: Ihre Rolle
+      options:
+        - Ernährungsfachkraft
+        - Ärztin oder Arzt
+        - andere Fachkraft
+        - keine Fachkraft

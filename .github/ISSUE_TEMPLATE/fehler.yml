@@ -1,0 +1,27 @@
+name: Fehler melden
+description: Etwas funktioniert nicht wie erwartet.
+labels: ["fehler"]
+body:
+  - type: markdown
+    attributes:
+      value: "Bitte tragen Sie keine echten Gesundheitsdaten ein. Ein erfundenes Profil reicht als Beispiel."
+  - type: textarea
+    id: what
+    attributes:
+      label: Was ist passiert?
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Was hätten Sie erwartet?
+  - type: textarea
+    id: steps
+    attributes:
+      label: Schritte zum Nachstellen
+      placeholder: "1. Lebensmittel prüfen öffnen\n2. Barcode ... eingeben\n3. ..."
+  - type: input
+    id: platform
+    attributes:
+      label: Gerät und Browser oder Plattform
+      placeholder: "z. B. iPhone, Safari / Android-App / Linux-Desktop"
