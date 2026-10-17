@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { acceptNotice, checkFixtureFood, createProfile, mockOpenFoodFacts } from "./helpers";
+import { acceptNotice, checkFixtureFood, createProfile, mockOpenFoodFacts, typeBarcode } from "./helpers";
 
 test.beforeEach(async ({ page }) => {
   await mockOpenFoodFacts(page);
@@ -44,15 +44,17 @@ test("nutrient list shows origin marks, unknown values and the notices", async (
   await expect(page.locator('[data-notice="variation"]')).toBeVisible();
   await expect(page.locator('[data-notice="data-status"]')).toContainText("Die Werte stammen von Open Food Facts");
   // Missing values are shown as unknown, never as zero.
-  await expect(page.getByRole("row", { name: /Ballaststoffe unbekannt/ })).toBeVisible();
+  await expect(page.getByRole("row", { name: /Eiweiß 6 g/ })).toBeVisible();
+  await page.getByText(/^Unbekannt \(\d+\)$/).click();
+  await expect(page.locator("#nutrients-unknown")).toContainText("Ballaststoffe");
+  await expect(page.getByRole("row", { name: /Ballaststoffe/ })).toHaveCount(0);
 });
 
 test("unknown barcode shows a message", async ({ page }) => {
   await page.unrouteAll();
   await mockOpenFoodFacts(page, "product-not-found.json");
   await page.getByRole("link", { name: /Lebensmittel prüfen/ }).click();
-  await page.getByLabel("Barcode-Nummer").fill("4000000000031");
-  await page.getByRole("button", { name: "Barcode prüfen" }).click();
+  await typeBarcode(page, "4000000000031");
   await expect(page.getByRole("alert")).toHaveText("Open Food Facts kennt dieses Produkt nicht.");
 });
 
@@ -62,8 +64,7 @@ test("invalid barcode is rejected without a request", async ({ page }) => {
     if (r.url().includes("openfoodfacts")) requests++;
   });
   await page.getByRole("link", { name: /Lebensmittel prüfen/ }).click();
-  await page.getByLabel("Barcode-Nummer").fill("123");
-  await page.getByRole("button", { name: "Barcode prüfen" }).click();
+  await typeBarcode(page, "123");
   await expect(page.getByRole("alert")).toContainText("kein gültiger Barcode");
   expect(requests).toBe(0);
 });
@@ -82,8 +83,7 @@ test("values calculated from ingredients are marked as such", async ({ page }) =
   await mockOpenFoodFacts(page, "product-estimated.json");
   await createProfile(page);
   await page.getByRole("link", { name: /Lebensmittel prüfen/ }).click();
-  await page.getByLabel("Barcode-Nummer").fill("4000000000062");
-  await page.getByRole("button", { name: "Barcode prüfen" }).click();
+  await typeBarcode(page, "4000000000062");
   await expect(page.getByRole("heading", { level: 1, name: "Testapfel" })).toBeVisible();
   await page.getByRole("button", { name: "150 g" }).click();
   await page.getByRole("link", { name: "Bewerten" }).click();

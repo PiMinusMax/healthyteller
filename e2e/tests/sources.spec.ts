@@ -17,7 +17,7 @@ test("search by name at Open Food Facts", async ({ page }) => {
     }
   });
   await page.getByLabel("Lebensmittel suchen").fill("Quark");
-  await page.getByRole("button", { name: "Online nach Name oder Marke suchen" }).click();
+  await page.getByRole("button", { name: "Suchen", exact: true }).click();
   await expect(page.getByRole("button", { name: /Testquark Vanille/ })).toBeVisible();
   expect(searched).toBe("Quark");
   await page.getByRole("button", { name: /Testquark Vanille/ }).click();
@@ -40,7 +40,7 @@ test("falls back to the older search when Search-a-licious is down", async ({ pa
   await page.unrouteAll();
   await mockOpenFoodFacts(page, "product-found.json", { searchDown: true });
   await page.getByLabel("Lebensmittel suchen").fill("Quark");
-  await page.getByRole("button", { name: "Online nach Name oder Marke suchen" }).click();
+  await page.getByRole("button", { name: "Suchen", exact: true }).click();
   await expect(page.getByRole("button", { name: /Testquark Vanille/ })).toBeVisible();
 });
 
@@ -50,19 +50,21 @@ test("an overloaded source shows a clear message", async ({ page }) => {
     route.fulfill({ status: 503, headers: { "access-control-allow-origin": "*" }, body: "<html></html>" }),
   );
   await page.getByLabel("Lebensmittel suchen").fill("Quark");
-  await page.getByRole("button", { name: "Online nach Name oder Marke suchen" }).click();
+  await page.getByRole("button", { name: "Suchen", exact: true }).click();
   await expect(page.getByRole("alert")).toHaveText(
     "Open Food Facts antwortet gerade nicht. Bitte versuchen Sie es später noch einmal.",
   );
 });
 
 test("import a product file as fallback", async ({ page }) => {
-  await page.getByLabel("Oder Produktdatei importieren").setInputFiles(path.join(FIXTURES, "product-found.json"));
+  await page.goto("/einstellungen/quellen");
+  await page.getByLabel("Produktdatei importieren").setInputFiles(path.join(FIXTURES, "product-found.json"));
   await expect(page.getByRole("heading", { level: 1, name: "Testjoghurt natur" })).toBeVisible();
 });
 
 test("an unreadable file shows a message", async ({ page }) => {
-  await page.getByLabel("Oder Produktdatei importieren").setInputFiles({
+  await page.goto("/einstellungen/quellen");
+  await page.getByLabel("Produktdatei importieren").setInputFiles({
     name: "broken.json",
     mimeType: "application/json",
     buffer: Buffer.from("{ not json"),

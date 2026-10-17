@@ -4,7 +4,7 @@ use dioxus::prelude::*;
 use healthyteller_core::{Derivation, Nutrient, NutrientGroup};
 
 use crate::Route;
-use crate::components::{Card, DataStatusNotice, Notice, NoticeKind, TopBar};
+use crate::components::{DataStatusNotice, Icon, IconName, Notice, NoticeKind, TopBar};
 use crate::date;
 use crate::format;
 use crate::i18n::{tr, tr_args};
@@ -15,7 +15,7 @@ use crate::state::use_app_state;
 #[derive(Clone, PartialEq)]
 struct Row {
     name: String,
-    value: Option<String>,
+    value: String,
     derivation: Option<Derivation>,
 }
 
@@ -40,25 +40,29 @@ pub fn NutrientList(id: String, grams: u32, prep: String) -> Element {
         .unwrap_or_default();
     drop(s);
 
+    // Known values in one table; unknown ones named in one line instead of rows of "unbekannt".
+    let mut unknown: Vec<String> = Vec::new();
     let groups: Vec<(NutrientGroup, Vec<Row>)> = NutrientGroup::ALL
         .into_iter()
         .map(|g| {
             let rows = Nutrient::ALL
                 .iter()
                 .filter(|n| n.group() == g)
-                .map(|&n| {
-                    let v = food.nutrients.get(&n);
-                    Row {
+                .filter_map(|&n| {
+                    let Some(value) = food.amount_in(n, &portion) else {
+                        unknown.push(labels::nutrient(n));
+                        return None;
+                    };
+                    Some(Row {
                         name: labels::nutrient(n),
-                        value: food
-                            .amount_in(n, &portion)
-                            .map(|q| format::quantity(q.to(n.unit()).unwrap_or(q))),
-                        derivation: v.map(|v| v.derivation.clone()),
-                    }
+                        value: format::quantity(value.to(n.unit()).unwrap_or(value)),
+                        derivation: food.nutrients.get(&n).map(|v| v.derivation.clone()),
+                    })
                 })
-                .collect();
+                .collect::<Vec<_>>();
             (g, rows)
         })
+        .filter(|(_, rows)| !rows.is_empty())
         .collect();
     let has_estimates = food.nutrients.values().any(|v| v.derivation.is_estimate());
     let source = labels::source_name(&food.source.id);
@@ -69,50 +73,30 @@ pub fn NutrientList(id: String, grams: u32, prep: String) -> Element {
                 back: Route::FoodCard { id: id.clone(), grams, prep: prep.clone() },
                 title: format!("{} · {}", food.name, labels::portion(&portion)),
             }
-            div {
-                h1 { class: "title", {tr("nutrients-title")} }
-                p { class: "lead", {tr("nutrients-lead")} }
+            h1 { class: "title", {tr("nutrients-title")} }
+            ul { class: "origin-legend compact", "aria-label": tr("nutrients-origin"),
+                li { Mark { derivation: Some(Derivation::Measured) } span { "aria-hidden": "true", {tr("origin-measured")} } }
+                li { Mark { derivation: Some(Derivation::Calculated) } span { "aria-hidden": "true", {tr("origin-calculated")} } }
+                li { Mark { derivation: Some(Derivation::Interpolated) } span { "aria-hidden": "true", {tr("origin-interpolated")} } }
+                li { Mark { derivation: Some(Derivation::Estimated { basis: String::new(), method: Default::default() }) } span { "aria-hidden": "true", {tr("origin-estimate")} } }
             }
-            Card { title: tr("nutrients-origin"),
-                ul { class: "card-body list", style: "display: grid; grid-template-columns: 1fr 1fr; gap: 10px;",
-                    li { style: "border: none;", Mark { derivation: Some(Derivation::Measured) } " " {tr("origin-measured")} }
-                    li { style: "border: none;", Mark { derivation: Some(Derivation::Calculated) } " " {tr("origin-calculated")} }
-                    li { style: "border: none;", Mark { derivation: Some(Derivation::Interpolated) } " " {tr("origin-interpolated")} }
-                    li { style: "border: none;", Mark { derivation: Some(Derivation::Estimated { basis: String::new(), method: Default::default() }) } " " {tr("origin-estimate")} }
-                    li { style: "border: none;", Mark { derivation: None } " " {tr("origin-unknown")} }
-                }
-            }
-            Notice { kind: NoticeKind::Variation }
-            if has_estimates {
-                Notice { kind: NoticeKind::Estimates, class: "notice-warn" }
-            }
-            for (group, rows) in groups {
-                Card { key: "{group.key()}", title: tr(&format!("group-{}", group.key())), id: format!("group-{}", group.key()),
-                    details { class: "group", open: matches!(group, NutrientGroup::Energy | NutrientGroup::Macronutrients),
-                        summary {
-                            span { class: "small muted",
-                                {tr_args("nutrients-group-summary", &[
-                                    ("count", rows.len().to_string()),
-                                    ("unknown", rows.iter().filter(|r| r.value.is_none()).count().to_string()),
-                                ])}
+            if !groups.is_empty() {
+                section { class: "card", "aria-label": tr("nutrients-title"),
+                    table { class: "nutrients",
+                        thead {
+                            tr {
+                                th { {tr("nutrients-col-name")} }
+                                th { class: "r", {tr("nutrients-col-portion")} }
+                                th { class: "r", {tr("nutrients-col-origin")} }
                             }
-                            crate::components::Icon { name: crate::components::IconName::ChevronDown, size: 20 }
                         }
-                        table { class: "nutrients",
-                            thead {
-                                tr {
-                                    th { {tr("nutrients-col-name")} }
-                                    th { class: "r", {tr("nutrients-col-portion")} }
-                                    th { class: "r", {tr("nutrients-col-origin")} }
-                                }
-                            }
-                            tbody {
+                        for (group, rows) in groups {
+                            tbody { key: "{group.key()}",
+                                tr { th { colspan: 3, scope: "colgroup", {tr(&format!("group-{}", group.key()))} } }
                                 for row in rows {
                                     tr { key: "{row.name}",
                                         td { "{row.name}" }
-                                        td { class: "r num",
-                                            if let Some(v) = &row.value { "{v}" } else { span { class: "muted", {tr("value-unknown")} } }
-                                        }
+                                        td { class: "r num", "{row.value}" }
                                         td { class: "r", Mark { derivation: row.derivation.clone() } }
                                     }
                                 }
@@ -121,8 +105,21 @@ pub fn NutrientList(id: String, grams: u32, prep: String) -> Element {
                     }
                 }
             }
+            if !unknown.is_empty() {
+                details { class: "card group", id: "nutrients-unknown",
+                    summary {
+                        span { {tr_args("nutrients-unknown", &[("count", unknown.len().to_string())])} }
+                        Icon { name: IconName::ChevronDown, size: 20 }
+                    }
+                    p { class: "card-body", {unknown.join(", ")} }
+                }
+            }
+            Notice { kind: NoticeKind::Variation }
+            if has_estimates {
+                Notice { kind: NoticeKind::Estimates, class: "notice-warn" }
+                Link { class: "btn btn-secondary btn-large", to: Route::Estimates {}, {tr("estimates-all")} }
+            }
             DataStatusNotice { source: source.clone(), date: date::display(&fetched) }
-            Link { class: "btn btn-secondary btn-large", to: Route::Estimates {}, {tr("estimates-all")} }
         }
     }
 }
