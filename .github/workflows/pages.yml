@@ -37,8 +37,7 @@ jobs:
           site=target/dx/healthyteller-app/release/web/public
           # GitHub Pages answers unknown paths with 404.html; the app routes them itself.
           cp "$site/index.html" "$site/404.html"
-          touch "$site/.nojekyll"
-      - uses: actions/upload-pages-artifact@v4
+      - uses: actions/upload-pages-artifact@v3
         with:
           path: target/dx/healthyteller-app/release/web/public
 
