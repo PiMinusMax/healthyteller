@@ -4,6 +4,7 @@ use healthyteller_core::{
     Allergen, Condition, Dimension, DimensionResult, Evidence, Food, Nutrient, Portion,
     Preparation, Profile, RuleBasis,
 };
+use healthyteller_ingest::rules::Citation;
 use healthyteller_ingest::sources;
 
 use crate::format;
@@ -69,8 +70,22 @@ pub fn profile_summary(p: &Profile) -> String {
     }
 }
 
+/// Name of a data source or, for rule sources, the cited work with its place.
 pub fn source_name(id: &str) -> String {
+    if let Some(c) = citations().iter().find(|c| c.id == id) {
+        return format!("{} ({}, {}), {}", c.title, c.publisher, c.year, c.locator);
+    }
     sources::by_id(id).map_or_else(|| id.to_owned(), |s| s.name.to_owned())
+}
+
+fn citations() -> &'static [Citation] {
+    static CITATIONS: std::sync::OnceLock<Vec<Citation>> = std::sync::OnceLock::new();
+    CITATIONS.get_or_init(|| {
+        crate::state::CITATION_FILES
+            .iter()
+            .filter_map(|t| healthyteller_ingest::rules::parse_citation(t).ok())
+            .collect()
+    })
 }
 
 /// Title of a result: the nutrient for rules and doctor's limits, otherwise the dimension.
