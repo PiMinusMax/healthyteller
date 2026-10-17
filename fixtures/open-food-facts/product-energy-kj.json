@@ -1,0 +1,9 @@
+{
+  "_comment": "Fixture with invented values: energy only in kJ, no allergen or ingredient data.",
+  "status": 1,
+  "product": {
+    "code": "4000000000024",
+    "product_name": "Fixture crackers",
+    "nutriments": { "energy_100g": 418.4 }
+  }
+}
