@@ -27,7 +27,7 @@ const COMMON_ALLERGENS: [Allergen; 4] = [
 ];
 
 /// Metrics a doctor's limit can be entered for, per condition.
-fn doctor_metrics(conditions: &std::collections::BTreeSet<Condition>) -> Vec<Nutrient> {
+pub(crate) fn doctor_metrics(conditions: &std::collections::BTreeSet<Condition>) -> Vec<Nutrient> {
     let mut list = Vec::new();
     for c in conditions {
         let add: &[Nutrient] = match c {
@@ -92,6 +92,9 @@ pub fn Profiles() -> Element {
                 }
             }
             Link { class: "btn btn-primary btn-large", to: Route::ProfileEdit { id: "neu".into(), step: 1 }, Icon { name: IconName::Plus } {tr("profiles-new")} }
+            if active.is_some() {
+                Link { class: "btn btn-secondary btn-large", to: Route::DoctorQuestions {}, {tr("questions-link")} }
+            }
             p { class: "status-line", Icon { name: IconName::Lock, size: 20 } {tr("profiles-local")} }
         }
     }

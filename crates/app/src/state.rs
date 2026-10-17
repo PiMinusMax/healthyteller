@@ -40,6 +40,7 @@ pub struct Settings {
     pub theme: Theme,
     /// Also show results of rules that are not reviewed yet, marked as drafts.
     pub include_draft_rules: bool,
+    pub language: crate::i18n::Language,
 }
 
 /// A typical food with its usual portion.

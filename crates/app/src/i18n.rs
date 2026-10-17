@@ -1,11 +1,31 @@
 //! UI texts come only from the Fluent files under `locales/` (AGENTS.md rule 16).
 
+use std::cell::Cell;
+
 use fluent_bundle::{FluentArgs, FluentBundle, FluentResource, FluentValue};
+use serde::{Deserialize, Serialize};
 use unic_langid::{LanguageIdentifier, langid};
 
 const DE: &str = include_str!("../../../locales/de/app.ftl");
-#[cfg(test)]
 const EN: &str = include_str!("../../../locales/en/app.ftl");
+
+/// UI language. German comes first (AGENTS.md rule 16).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Language {
+    #[default]
+    De,
+    En,
+}
+
+impl Language {
+    pub fn code(self) -> &'static str {
+        match self {
+            Language::De => "de",
+            Language::En => "en",
+        }
+    }
+}
 
 fn bundle(lang: LanguageIdentifier, source: &str) -> FluentBundle<FluentResource> {
     let resource = FluentResource::try_new(source.to_owned())
@@ -21,7 +41,23 @@ fn bundle(lang: LanguageIdentifier, source: &str) -> FluentBundle<FluentResource
 }
 
 thread_local! {
-    static BUNDLE: FluentBundle<FluentResource> = bundle(langid!("de"), DE);
+    static BUNDLE_DE: FluentBundle<FluentResource> = bundle(langid!("de"), DE);
+    static BUNDLE_EN: FluentBundle<FluentResource> = bundle(langid!("en"), EN);
+    static CURRENT: Cell<Language> = const { Cell::new(Language::De) };
+}
+
+pub fn set_language(language: Language) {
+    CURRENT.with(|c| c.set(language));
+}
+
+fn format(bundle: &FluentBundle<FluentResource>, id: &str, args: &FluentArgs) -> Option<String> {
+    let pattern = bundle.get_message(id)?.value()?;
+    let mut errors = Vec::new();
+    Some(
+        bundle
+            .format_pattern(pattern, Some(args), &mut errors)
+            .into_owned(),
+    )
 }
 
 /// Looks up a message by id. A missing id is a bug, so it shows up visibly as the id itself.
@@ -30,20 +66,20 @@ pub fn tr(id: &str) -> String {
 }
 
 /// Looks up a message and fills in its variables, e.g. `{ $name }`.
+/// Falls back to German when the current language lacks the id.
 pub fn tr_args(id: &str, args: &[(&str, String)]) -> String {
-    BUNDLE.with(|bundle| {
-        let Some(pattern) = bundle.get_message(id).and_then(|message| message.value()) else {
-            return id.to_owned();
-        };
-        let mut fluent_args = FluentArgs::new();
-        for (name, value) in args {
-            fluent_args.set(*name, FluentValue::from(value.clone()));
-        }
-        let mut errors = Vec::new();
-        bundle
-            .format_pattern(pattern, Some(&fluent_args), &mut errors)
-            .into_owned()
-    })
+    let mut fluent_args = FluentArgs::new();
+    for (name, value) in args {
+        fluent_args.set(*name, FluentValue::from(value.clone()));
+    }
+    let current = if CURRENT.with(Cell::get) == Language::En {
+        BUNDLE_EN.with(|b| format(b, id, &fluent_args))
+    } else {
+        None
+    };
+    current
+        .or_else(|| BUNDLE_DE.with(|b| format(b, id, &fluent_args)))
+        .unwrap_or_else(|| id.to_owned())
 }
 
 /// True if the German texts define this id.
@@ -52,7 +88,7 @@ pub fn has_message(id: &str) -> bool {
 }
 
 fn has(id: &str) -> bool {
-    BUNDLE.with(|bundle| bundle.has_message(id))
+    BUNDLE_DE.with(|bundle| bundle.has_message(id))
 }
 
 #[cfg(test)]
@@ -209,6 +245,7 @@ mod tests {
             ids.push(format!("term-{t}-text"));
         }
         ids.extend((1..=3).map(|s| format!("profile-step-{s}")));
+        ids.extend(["conflict", "missing", "traces"].map(|k| format!("questions-kind-{k}")));
         let missing: Vec<&String> = ids.iter().filter(|id| !has(id)).collect();
         assert!(
             missing.is_empty(),
@@ -236,6 +273,14 @@ mod tests {
             .next(),
             Some("Die Werte stammen von Open Food Facts, Stand 01.01.2026")
         );
+    }
+
+    #[test]
+    fn switches_language() {
+        set_language(Language::En);
+        assert_eq!(tr("settings-title"), "Settings");
+        set_language(Language::De);
+        assert_eq!(tr("settings-title"), "Einstellungen");
     }
 
     #[test]
