@@ -220,6 +220,7 @@ pub fn ProfileEdit(id: String, step: u8) -> Element {
 #[component]
 fn StepPerson(draft: Signal<Option<Profile>>) -> Element {
     let p = draft().unwrap_or_else(|| Profile::new("", ""));
+    let today = crate::date::today();
     let mut edit = move |f: Box<dyn FnOnce(&mut Profile)>| {
         if let Some(p) = draft.write().as_mut() {
             f(p);
@@ -244,14 +245,22 @@ fn StepPerson(draft: Signal<Option<Profile>>) -> Element {
                     p { class: "small muted", {tr("profile-name-hint")} }
                 }
                 div { class: "field",
-                    label { r#for: "profile-age", {tr("profile-age")} }
+                    label { r#for: "profile-birth-date", {tr("profile-birth-date")} }
                     input {
-                        id: "profile-age",
+                        id: "profile-birth-date",
                         class: "input num",
-                        inputmode: "numeric",
-                        style: "max-width: 160px;",
-                        value: p.age.map(|a| a.to_string()).unwrap_or_default(),
-                        oninput: move |e| { let v = e.value().trim().parse::<u8>().ok().filter(|a| *a > 0 && *a < 130); edit(Box::new(move |p| p.age = v)) },
+                        r#type: "date",
+                        style: "max-width: 240px;",
+                        max: "{today}",
+                        value: p.birth_date.clone().unwrap_or_default(),
+                        oninput: move |e| {
+                            let v = e.value();
+                            let v = (!v.trim().is_empty()).then_some(v);
+                            edit(Box::new(move |p| p.birth_date = v))
+                        },
+                    }
+                    if let Some(age) = p.age_on(&today) {
+                        p { class: "small muted", {tr_args("profile-age-today", &[("age", age.to_string())])} }
                     }
                 }
                 fieldset { class: "field", style: "border: none; padding: 0; margin: 0;",
