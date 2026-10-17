@@ -2,6 +2,7 @@
 
 use healthyteller_core::Food;
 use healthyteller_ingest::off::OpenFoodFacts;
+use healthyteller_ingest::search::{self, SearchHit};
 use healthyteller_ingest::{IngestError, RawArtifact, SourceAdapter};
 
 use crate::date;
@@ -72,11 +73,11 @@ pub async fn product_by_barcode(code: &str) -> Result<Food, FetchError> {
 /// Tries the search services in the order the adapter gives and keeps the first
 /// error if all fail. Hits carry no nutrients; load the picked product with
 /// [`product_by_barcode`].
-pub async fn search_products(terms: &str) -> Result<Vec<Food>, FetchError> {
+pub async fn search_products(terms: &str) -> Result<Vec<SearchHit>, FetchError> {
     let mut first_error = None;
     for request in OpenFoodFacts.search_requests(terms)? {
         match search_with(request).await {
-            Ok(foods) => return Ok(foods),
+            Ok(hits) => return Ok(search::rank_and_merge(terms, hits)),
             Err(e) => {
                 first_error.get_or_insert(e);
             }
@@ -85,7 +86,9 @@ pub async fn search_products(terms: &str) -> Result<Vec<Food>, FetchError> {
     Err(first_error.unwrap_or(FetchError::NotFound))
 }
 
-async fn search_with(request: healthyteller_ingest::FetchRequest) -> Result<Vec<Food>, FetchError> {
+async fn search_with(
+    request: healthyteller_ingest::FetchRequest,
+) -> Result<Vec<SearchHit>, FetchError> {
     let raw = RawArtifact {
         bytes: get(request).await?,
         retrieved_at: date::today(),

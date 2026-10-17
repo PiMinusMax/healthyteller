@@ -1,7 +1,7 @@
 //! 03/04 Suche: search field, barcode, saved plates and the person's own foods.
 
 use dioxus::prelude::*;
-use healthyteller_core::Food;
+use healthyteller_ingest::search::SearchHit;
 
 use crate::Route;
 use crate::components::{Card, Icon, IconName, TopBar};
@@ -14,7 +14,7 @@ use crate::state::{update, use_app_state};
 enum Online {
     Idle,
     Loading,
-    Results(Vec<Food>),
+    Results(Vec<SearchHit>),
     Failed(String),
 }
 
@@ -213,15 +213,18 @@ pub fn Search() -> Element {
                             p { class: "card-row muted", {tr("search-online-none")} }
                         }
                         ul { class: "list",
-                            for food in foods {
-                                li { key: "{food.id.0}",
+                            for hit in foods {
+                                li { key: "{hit.food.id.0}",
                                     button {
                                         class: "row-btn food-row",
                                         onclick: {
-                                            let id = food.id.0.clone();
+                                            let id = hit.food.id.0.clone();
                                             move |_| pick_result(id.clone())
                                         },
-                                        span { class: "grow food-name", {labels::food_title(&food)} }
+                                        span { class: "grow food-name", {labels::food_title(&hit.food)} }
+                                        if hit.merged > 1 {
+                                            span { class: "small muted", {tr_args("search-merged", &[("count", hit.merged.to_string())])} }
+                                        }
                                         Icon { name: IconName::ChevronRight }
                                     }
                                 }
