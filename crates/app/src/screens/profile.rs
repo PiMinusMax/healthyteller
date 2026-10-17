@@ -2,7 +2,8 @@
 
 use dioxus::prelude::*;
 use healthyteller_core::{
-    Allergen, Condition, DoctorLimit, Focus, Nutrient, Profile, Quantity, RuleBasis, Sex,
+    Allergen, Condition, DoctorLimit, Focus, MedicationGroup, Nutrient, Profile, Quantity,
+    RuleBasis, Sex,
 };
 
 use crate::Route;
@@ -333,6 +334,23 @@ fn StepConditions(draft: Signal<Option<Profile>>, show_all: Signal<bool>) -> Ele
             if !show_all() {
                 div { class: "card-row",
                     button { class: "link-btn", onclick: move |_| show_all.set(true), {tr("profile-allergies-all")} }
+                }
+            }
+        }
+        Card { title: tr("profile-medications"), id: "profile-medications",
+            p { class: "card-body small muted", {tr("profile-medications-hint")} }
+            for m in MedicationGroup::ALL {
+                label { key: "{m.key()}", class: "check-row",
+                    input {
+                        r#type: "checkbox",
+                        checked: p.medications.contains(&m),
+                        onchange: move |e| {
+                            if let Some(p) = draft.write().as_mut() {
+                                if e.checked() { p.medications.insert(m); } else { p.medications.remove(&m); }
+                            }
+                        },
+                    }
+                    span { class: "grow", {labels::medication(m)} }
                 }
             }
         }

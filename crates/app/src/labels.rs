@@ -1,8 +1,8 @@
 //! Translated names for the core types.
 
 use healthyteller_core::{
-    Allergen, Condition, Dimension, DimensionResult, Evidence, Food, Nutrient, Portion,
-    Preparation, Profile, RuleBasis,
+    Allergen, Condition, Dimension, DimensionResult, Evidence, Food, MedicationGroup, Nutrient,
+    Portion, Preparation, Profile, RuleBasis,
 };
 use healthyteller_ingest::sources;
 
@@ -15,6 +15,10 @@ pub fn nutrient(n: Nutrient) -> String {
 
 pub fn condition(c: Condition) -> String {
     tr(&format!("condition-{}", c.key()))
+}
+
+pub fn medication(m: MedicationGroup) -> String {
+    tr(&format!("medication-{}", m.key()))
 }
 
 pub fn allergen(a: Allergen) -> String {
@@ -62,6 +66,7 @@ pub fn portion(p: &Portion) -> String {
 pub fn profile_summary(p: &Profile) -> String {
     let mut parts: Vec<String> = p.conditions.iter().map(|&c| condition(c)).collect();
     parts.extend(p.allergies.iter().map(|&a| allergy(a)));
+    parts.extend(p.medications.iter().map(|&m| medication(m)));
     if parts.is_empty() {
         tr("profile-no-conditions")
     } else {
@@ -85,6 +90,9 @@ pub fn result_title(r: &DimensionResult) -> String {
 pub fn result_why(r: &DimensionResult) -> String {
     if r.dimension == Dimension::Allergens {
         tr("why-allergy")
+    } else if !r.medications.is_empty() {
+        let names: Vec<String> = r.medications.iter().map(|&m| medication(m)).collect();
+        tr_args("why-medications", &[("medications", names.join(", "))])
     } else if r.conditions.is_empty() {
         tr("why-doctor")
     } else {

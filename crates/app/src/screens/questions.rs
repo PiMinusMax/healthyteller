@@ -93,6 +93,18 @@ pub fn DoctorQuestions() -> Element {
         }
     }
 
+    // Drug groups: no food-drug rule is reviewed yet, so the doctor is the one to ask.
+    for &m in &profile.medications {
+        let name = labels::medication(m);
+        questions.push(Question {
+            key: format!("medication-{}", m.key()),
+            topic: name.clone(),
+            kind: "medication",
+            context: tr("questions-medication-context"),
+            question: tr_args("questions-medication", &[("medication", name)]),
+        });
+    }
+
     // Own foods with trace warnings for an allergen of the profile.
     for m in &s.my_foods {
         let Some(food) = s.food(&m.food_id.0) else {

@@ -55,7 +55,7 @@ export async function acceptNotice(page: Page) {
 /** Invented test profile (AGENTS.md rule 18). */
 export async function createProfile(
   page: Page,
-  options: { conditions?: string[]; allergies?: string[]; saltLimit?: string } = {},
+  options: { conditions?: string[]; allergies?: string[]; medications?: string[]; saltLimit?: string } = {},
 ) {
   await page.getByRole("link", { name: "Profil anlegen" }).click();
   await page.getByLabel("Name", { exact: true }).fill("Test Person");
@@ -65,6 +65,9 @@ export async function createProfile(
   }
   for (const a of options.allergies ?? []) {
     await page.getByLabel(a, { exact: true }).check();
+  }
+  for (const m of options.medications ?? []) {
+    await page.getByLabel(m).check();
   }
   await page.getByRole("button", { name: "Weiter" }).click();
   if (options.saltLimit) {
