@@ -67,3 +67,25 @@ test("invalid barcode is rejected without a request", async ({ page }) => {
   await expect(page.getByRole("alert")).toContainText("kein gültiger Barcode");
   expect(requests).toBe(0);
 });
+
+test("the card shows the data quality and what is missing", async ({ page }) => {
+  await createProfile(page);
+  await checkFixtureFood(page);
+  // The fixture has no saturated fat, one of the seven label values.
+  const quality = page.locator(".quality-explanation");
+  await expect(quality.locator(".quality")).toContainText("unvollständig");
+  await expect(quality).toContainText("Es fehlen: Gesättigte Fettsäuren.");
+});
+
+test("values calculated from ingredients are marked as such", async ({ page }) => {
+  await page.unrouteAll();
+  await mockOpenFoodFacts(page, "product-estimated.json");
+  await createProfile(page);
+  await page.getByRole("link", { name: /Lebensmittel prüfen/ }).click();
+  await page.getByLabel("Barcode-Nummer").fill("4000000000062");
+  await page.getByRole("button", { name: "Barcode prüfen" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Testapfel" })).toBeVisible();
+  await page.getByRole("button", { name: "150 g" }).click();
+  await page.getByRole("link", { name: "Bewerten" }).click();
+  await expect(page.locator(".quality-explanation .quality")).toContainText("hochgerechnet");
+});

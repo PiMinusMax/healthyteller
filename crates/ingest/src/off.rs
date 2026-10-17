@@ -16,7 +16,7 @@ pub const SOURCE_ID: &str = "off";
 
 const FIELDS: &str = "code,product_name,product_name_de,generic_name_de,brands,nutriments,\
 allergens_tags,traces_tags,ingredients_text,ingredients_text_de,nova_group,additives_tags,\
-completeness,rev";
+completeness,rev,nutriments_estimated";
 
 /// Open Food Facts asks every app to identify itself.
 pub const USER_AGENT: &str = "HealthyTeller/0.1 (https://github.com/PiMinusMax/healthyteller)";
@@ -299,6 +299,26 @@ fn allergens(tags: &[String]) -> BTreeSet<Allergen> {
         .collect()
 }
 
+/// Values per 100 g of one nutriments object, in the unit of each nutrient.
+fn nutriments(n: &Value) -> Vec<(Nutrient, Quantity)> {
+    let per_100g = |key: &str| n.get(format!("{key}_100g")).and_then(number);
+    let mut out = Vec::new();
+    if let Some(kcal) = per_100g("energy-kcal") {
+        out.push((Nutrient::Energy, Quantity::new(kcal, Unit::Kilocalorie)));
+    } else if let Some(kcal) =
+        per_100g("energy").and_then(|kj| Quantity::new(kj, Unit::Kilojoule).to(Unit::Kilocalorie))
+    {
+        out.push((Nutrient::Energy, kcal));
+    }
+    for &(key, nutrient) in NUTRIMENTS {
+        if let Some(grams) = per_100g(key) {
+            let q = Quantity::new(grams, Unit::Gram);
+            out.push((nutrient, q.to(nutrient.unit()).unwrap_or(q)));
+        }
+    }
+    out
+}
+
 fn parse_product(product: &Value, retrieved_at: &str) -> Result<Food, IngestError> {
     let code = text(product, "code").ok_or_else(|| IngestError::Format("missing code".into()))?;
     let source = SourceRef {
@@ -309,36 +329,28 @@ fn parse_product(product: &Value, retrieved_at: &str) -> Result<Food, IngestErro
             .map_or_else(|| "api-v2".to_owned(), |rev| format!("api-v2, rev {rev}")),
         retrieved_at: retrieved_at.to_owned(),
     };
-    let value = |quantity: Quantity| SourcedValue {
+    let value = |quantity: Quantity, derivation: Derivation| SourcedValue {
         quantity,
         basis: ValueBasis::Per100gAsSold,
         source: source.clone(),
-        derivation: Derivation::Declared,
+        derivation,
         samples: None,
         min: None,
         max: None,
     };
 
+    // Label values first. Open Food Facts calculates further values from the
+    // ingredients (`nutriments_estimated`); they only fill gaps.
     let mut nutrients = BTreeMap::new();
-    if let Some(n) = product.get("nutriments") {
-        let per_100g = |key: &str| n.get(format!("{key}_100g")).and_then(number);
-        if let Some(kcal) = per_100g("energy-kcal") {
-            nutrients.insert(
-                Nutrient::Energy,
-                value(Quantity::new(kcal, Unit::Kilocalorie)),
-            );
-        } else if let Some(kj) = per_100g("energy") {
-            let kcal = Quantity::new(kj, Unit::Kilojoule).to(Unit::Kilocalorie);
-            if let Some(kcal) = kcal {
-                nutrients.insert(Nutrient::Energy, value(kcal));
-            }
-        }
-        for &(key, nutrient) in NUTRIMENTS {
-            if let Some(grams) = per_100g(key) {
-                let q = Quantity::new(grams, Unit::Gram);
-                let q = q.to(nutrient.unit()).unwrap_or(q);
-                nutrients.insert(nutrient, value(q));
-            }
+    for (key, derivation) in [
+        ("nutriments", Derivation::Declared),
+        ("nutriments_estimated", Derivation::Interpolated),
+    ] {
+        let Some(n) = product.get(key) else { continue };
+        for (nutrient, quantity) in nutriments(n) {
+            nutrients
+                .entry(nutrient)
+                .or_insert_with(|| value(quantity, derivation.clone()));
         }
     }
 
@@ -434,6 +446,31 @@ mod tests {
         let kcal = foods[0].nutrients[&Nutrient::Energy].quantity;
         assert!((kcal.amount - 100.0).abs() < 1e-9);
         assert!(!foods[0].allergens.known);
+    }
+
+    #[test]
+    fn estimated_values_fill_gaps_but_never_replace_the_label() {
+        let food = &OpenFoodFacts
+            .parse(&fixture("product-estimated.json"))
+            .unwrap()[0];
+        let energy = &food.nutrients[&Nutrient::Energy];
+        assert_eq!(energy.quantity, Quantity::new(50.0, Unit::Kilocalorie));
+        assert_eq!(energy.derivation, Derivation::Declared);
+        // A label zero stays a zero from the label.
+        assert_eq!(
+            food.nutrients[&Nutrient::Fat].derivation,
+            Derivation::Declared
+        );
+        let calcium = &food.nutrients[&Nutrient::Calcium];
+        assert_eq!(calcium.derivation, Derivation::Interpolated);
+        assert!((calcium.quantity.amount - 5.0).abs() < 1e-9);
+        assert_eq!(calcium.quantity.unit, Unit::Milligram);
+        assert_eq!(
+            food.nutrients[&Nutrient::Protein].derivation,
+            Derivation::Interpolated
+        );
+        // Neither source has a value: it stays missing.
+        assert!(!food.nutrients.contains_key(&Nutrient::Iron));
     }
 
     #[test]

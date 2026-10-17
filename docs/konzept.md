@@ -322,6 +322,7 @@ Die Liste zeigt jeden Nährstoff pro Portion und als Anteil am persönlichen Ref
 | --- | --- | --- |
 | gemessen | Laboranalyse aus der Quelle | BLS-Herkunft „Analyse“ |
 | von der Quelle berechnet | die Quelle hat den Wert selbst abgeleitet | BLS-Rezeptberechnung oder übernommener Wert |
+| ◐ von der Quelle aus Zutaten berechnet | die Quelle hat den Wert aus Zutaten und Anteilen hochgerechnet | `nutriments_estimated` von Open Food Facts |
 | ≈ Schätzung der App | von der App nach dokumentierter Methode geschätzt | Vitamine eines Markenprodukts vom BLS-Gegenstück übernommen |
 | unbekannt | kein Wert in irgendeiner Quelle | zählt nie als 0 |
 
@@ -330,6 +331,8 @@ Die App schätzt nur dort, wo keine Quelle einen Wert hat, und nur nach diesen M
 1. Übernahme vom zugeordneten generischen Lebensmittel. Ein Markenprodukt aus Open Food Facts nennt meist nur die Pflichtangaben; fehlende Vitamine und Mineralstoffe kommen vom passenden BLS-Eintrag, Etikettenwerte haben immer Vorrang.
 2. Berechnung aus Zutaten. Nennt das Produkt Zutaten mit Anteilen, rechnet die App wie der BLS bei Rezepten aus den Einzelzutaten hoch.
 3. Schätzrezepte des Projekts. Für Lebensmittel, die in keiner Quelle stehen, hinterlegt das Projekt geprüfte Schätzrezepte im Repo. Sie enthalten nur Anteile und Quell-IDs, keine Werte; gerechnet wird auf dem Gerät.
+
+Wie die Stufen zusammenspielen und wie die App die Datenlage je Lebensmittel zeigt, legt [ADR 0004](adr/0004-datenlage-und-schaetzung.md) fest.
 
 Jede Schätzung trägt das Zeichen ≈ und nennt ihre Grundlage, zum Beispiel „geschätzt anhand des BLS-Eintrags Gouda, 45 % Fett i. Tr.“. Alle geschätzten Werte stehen zusätzlich in einer eigenen Liste, die sich filtern und als CSV exportieren lässt. Liegt ein geschätzter Wert nahe an einer Schwelle, sagt die Ampel das ausdrücklich.
 

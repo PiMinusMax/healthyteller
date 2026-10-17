@@ -23,7 +23,7 @@ pub fn Estimates() -> Element {
                 .nutrients
                 .iter()
                 .filter_map(move |(n, v)| match &v.derivation {
-                    Derivation::Estimated { basis } => Some((
+                    Derivation::Estimated { basis, .. } => Some((
                         c.food.name.clone(),
                         labels::nutrient(*n),
                         format::quantity(v.quantity),

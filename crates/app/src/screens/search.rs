@@ -4,7 +4,7 @@ use dioxus::prelude::*;
 use healthyteller_ingest::search::SearchHit;
 
 use crate::Route;
-use crate::components::{Card, Icon, IconName, TopBar};
+use crate::components::{Card, Icon, IconName, QualityMark, TopBar};
 use crate::fetch;
 use crate::i18n::{tr, tr_args};
 use crate::labels;
@@ -187,6 +187,7 @@ pub fn Search() -> Element {
                                     Link { class: "food-row", to: Route::PortionScreen { id: id.clone() },
                                         span { class: "grow food-name", "{name}" }
                                         if mine { span { class: "small muted", {tr("search-mine")} } }
+                                        QualityMark { id: id.clone(), compact: true }
                                     }
                                 }
                             }
